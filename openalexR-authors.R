@@ -21,10 +21,16 @@ library(testthat)
 # For openAlex to get faster response
 options (openalexR.mailto="yhan@arizona.edu")
 
-### Testing data
-testing_data_author <- c("Yan Han", "Phillip Kuo", "Marek Rychlik", "Bekir Tanriover", "Alahm Saleh")
-testing_data_affiliation <- c("University of Arizona")
-testing_data_year <- c("2022", "2021", "2020", "2012")
+### Test data
+test_data_UAL_authors     <- c("Yan Han", "Ellen Dubinski", "Fernando Rios", "Ahlam Saleh")
+test_data_COM_authors     <- c("Phillip Kuo", "Bekir Tanriover", "Ahlam Saleh")
+test_data_science_authors <- c("Marek Rychlik", "Ali Bilgin", "Beichuan Zhang")
+test_data_ischool_authors <- c("Hong Cui")
+test_data_others          <- c("Leila Hudson", "Mona Hymel")
+
+
+test_data_affiliation <- c("University of Arizona")
+test_data_year <- c("2022", "2021", "2020", "2012")
 
 ################################ Author ##############################
 # Filter Doc: https://github.com/ropensci/openalexR/blob/main/vignettes/articles/Filters.Rmd
@@ -32,7 +38,7 @@ testing_data_year <- c("2022", "2021", "2020", "2012")
 #### 1. First do a fuzzy search on author's name ##########################
 ###  do NOT use display_name because it requires an exact match. Often there are multiple middle names for an author
 author_from_names <- oa_fetch(entity = "author",
-                               search = testing_data_author[4] ) ### "search" syntax allows fuzzy search for middle name
+                               search = test_data_author[5] ) ### "search" syntax allows fuzzy search for middle name
 
 # Filter out not "University of Arizona" authors using "affiliation_display_name" column. 
 # other filtering fields can be "affiliation_id", "affiliation_ror"
@@ -146,18 +152,30 @@ calculate_works_count <- function(author, affiliation, year) {
 
 ########################## TESTING PEOPLE I KNOW ####################
 ### Yan Han return 0 (no publishing data)
-author_stats <- calculate_works_count(testing_data_author[1], testing_data_affiliation[1], testing_data_year[2])
+author_stats <- calculate_works_count(test_data_UAL_authors[1], test_data_affiliation[1], test_data_year[1])
 rm(author_stats)
 
-#### Phillip Kuo no return df, because of error
-author_stats <- calculate_works_count(testing_data_author[2], testing_data_affiliation[1], testing_data_year[2])
+############# College of Medicine: Tucson
+#### Phillip Kuo no return df, because of error. shall have 26 IDs, 2022: 
+author_stats <- calculate_works_count(test_data_COM_authors[1], test_data_affiliation[1], test_data_year[2])
+### Benkir Tanriover returns 5 openAlex ID: 2022: works 11, cited 166; 2021: works 4 cited 167
+author_stats <- calculate_works_count(test_data_COM_authors[2], test_data_affiliation[1], test_data_year[1])
+author_stats <- calculate_works_count(test_data_COM_authors[2], test_data_affiliation[1], test_data_year[2])
+###  Ahlam Saleh returns 0, because of "One list does not contain a valid OpenAlex collection"
+author_stats <- calculate_works_count(test_data_COM_authors[3], test_data_affiliation[1], test_data_year[1])
 
-### 
-author_stats <- calculate_works_count(testing_data_author[3], testing_data_affiliation[1], testing_data_year[2])
+######## Science
+author_stats <- calculate_works_count(test_data_science_authors[1], test_data_affiliation[1], test_data_year[1])
+author_stats <- calculate_works_count(test_data_science_authors[2], test_data_affiliation[1], test_data_year[1])
 
-### Benkir Tanriover returns
-author_stats <- calculate_works_count(testing_data_author[4], testing_data_affiliation[1], testing_data_year[2])
 
+###
+author_stats <- calculate_works_count(test_data_ischool_authors[1], test_data_affiliation[1], test_data_year[1])
+
+###### Others
+author_stats <- calculate_works_count(test_data_others[1], test_data_affiliation[1], test_data_year[1])
+# Error in works_count[[i]] : subscript out of bounds
+author_stats <- calculate_works_count(test_data_others[2], test_data_affiliation[1], test_data_year[1])
 
 ###########################################
 
