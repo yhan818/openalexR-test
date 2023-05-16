@@ -38,7 +38,7 @@ test_data_year <- c("2022", "2021", "2020", "2012")
 #### 1. First do a fuzzy search on author's name ##########################
 ###  do NOT use display_name because it requires an exact match. Often there are multiple middle names for an author
 author_from_names <- oa_fetch(entity = "author",
-                               search = test_data_author[5] ) ### "search" syntax allows fuzzy search for middle name
+                               search = test_data_COM_authors[1] ) ### "search" syntax allows fuzzy search for middle name
 
 # Filter out not "University of Arizona" authors using "affiliation_display_name" column. 
 # other filtering fields can be "affiliation_id", "affiliation_ror"
@@ -62,18 +62,30 @@ total_works_sum_year <- 0
 cited_sum_year <- 0
 total_cited_sum_year <-0
 
+### Handle empty list
+df <-works_count[[20]]
+if (is.null(df)) { 
+  print("Emement is null")
+} else {
+    print("CONT")
+  }
+
+
+filtered_df_2022 <- df[df$year == 2022, ]
+
 # Loop through each data frame in the list 
+length(works_count)
 for (i in 1:length(works_count)) {
   # Access the data frame within the list
   df <- works_count[[i]]
   
+  
+  if (is.data.frame(df)) {
+    ##### Note: If you see error msg: Error: $ operator is invalid for atomic vectors
+    # That means certain works_count  is logical and has no data
   ########## Building block for count each year
   # Filter the data frame for the year 2022
   filtered_df_2022 <- df[df$year == 2022, ]
-  
-  ##### Note: If you see error msg: Error: $ operator is invalid for atomic vectors
-  # That means certain works_count  is logical and has no data
-
   # Calculate the sum of the filtered 'works_count' column
   works_sum_2022 <- sum(filtered_df_2022$works_count)
   total_works_sum_2022 <- total_works_sum_2022 + works_sum_2022
@@ -84,6 +96,10 @@ for (i in 1:length(works_count)) {
   # reset this number to 0 
   works_sum_2022 <- 0 
   cited_sum_2022 <- 0
+  } else {
+    print("This is NOT a dataframe. Data wrong")
+  }
+  
 }
 
 total_cited_sum_2022 <- 0
@@ -116,24 +132,30 @@ calculate_works_count <- function(author, affiliation, year) {
     # Access the data frame within the list
     df <- works_count[[i]]
 
-    # Filter the data frame by year
-    filtered_df_year <- df[df$year == year, ]
+    if (is.data.frame(df)) {
+      # Filter the data frame by year
+      filtered_df_year <- df[df$year == year, ]
+  
+      # Calculate the sum of the filtered 'works_count' column
+      works_sum_year <- sum(filtered_df_year$works_count)
+      total_works_sum_year <- total_works_sum_year + works_sum_year
+      # Calculate the sum of the filtered 'cited_by_count' column
+      cited_sum_year <- sum(filtered_df_year$cited_by_count)
+      total_cited_sum_year <- total_cited_sum_year + cited_sum_year
     
-    ##### Note: If you see error msg: Error: $ operator is invalid for atomic vectors
-    # That means certain works_count  is logical and has no data
-    
-    # Calculate the sum of the filtered 'works_count' column
-    works_sum_year <- sum(filtered_df_year$works_count)
-    total_works_sum_year <- total_works_sum_year + works_sum_year
-    # Calculate the sum of the filtered 'cited_by_count' column
-    cited_sum_year <- sum(filtered_df_year$cited_by_count)
-    total_cited_sum_year <- total_cited_sum_year + cited_sum_year
-    
-    # reset this number to 0 after each iteration
-    works_sum_year <- 0 
-    cited_sum_year <- 0
+      # reset this number to 0 after each iteration
+      works_sum_year <- 0 
+      cited_sum_year <- 0
+    } else {
+      ##### Note: If you see error msg: Error: $ operator is invalid for atomic vectors
+      # That means certain works_count  is logical and has no data
+      
+      print("This is NOT a dataframe. Data Wrong")
+      # set value as -1 for warning message
+      Total_sum_of_works = -1
+      Total_cited_sum_year = -1
+    }
   }
-
   # Build output dataframe author_stats
   author_stats <-data.frame (
     Name = author,
@@ -151,31 +173,38 @@ calculate_works_count <- function(author, affiliation, year) {
   }
 
 ########################## TESTING PEOPLE I KNOW ####################
-### Yan Han return 0 (no publishing data)
+### Format: Name: Year: Works/Cited
+### Yan Han: 2022: 0/0
 author_stats <- calculate_works_count(test_data_UAL_authors[1], test_data_affiliation[1], test_data_year[1])
 rm(author_stats)
 
-############# College of Medicine: Tucson
-#### Phillip Kuo no return df, because of error. shall have 26 IDs, 2022: 
+############# College of Medicine Tucson Test Date:  2023-05-14: If test in a different date, result may vary 
+#### Phillip Kuo: 2022: 30/133: 26 IDs
 author_stats <- calculate_works_count(test_data_COM_authors[1], test_data_affiliation[1], test_data_year[2])
 ### Benkir Tanriover returns 5 openAlex ID: 2022: works 11, cited 166; 2021: works 4 cited 167
 author_stats <- calculate_works_count(test_data_COM_authors[2], test_data_affiliation[1], test_data_year[1])
 author_stats <- calculate_works_count(test_data_COM_authors[2], test_data_affiliation[1], test_data_year[2])
-###  Ahlam Saleh returns 0, because of "One list does not contain a valid OpenAlex collection"
+###  Ahlam Saleh returns 0, because of "One list does not contain a valid OpenAlex collection" ????
 author_stats <- calculate_works_count(test_data_COM_authors[3], test_data_affiliation[1], test_data_year[1])
 
 ######## Science
+### Marek Rychlik returns : works 0, cited 11
 author_stats <- calculate_works_count(test_data_science_authors[1], test_data_affiliation[1], test_data_year[1])
+### Ali Bilgin: works 4, cited 187
 author_stats <- calculate_works_count(test_data_science_authors[2], test_data_affiliation[1], test_data_year[1])
 
-
-###
+### Hong Cui: Error in works_count[[i]], subscript out of bonds! need to test!!! 
 author_stats <- calculate_works_count(test_data_ischool_authors[1], test_data_affiliation[1], test_data_year[1])
 
 ###### Others
+### Leila Hudson: 2022: 0/2
 author_stats <- calculate_works_count(test_data_others[1], test_data_affiliation[1], test_data_year[1])
+
 # Error in works_count[[i]] : subscript out of bounds
+
 author_stats <- calculate_works_count(test_data_others[2], test_data_affiliation[1], test_data_year[1])
+
+
 
 ###########################################
 
