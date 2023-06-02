@@ -18,6 +18,19 @@ library(ggplot2)
 library(knitr)
 library(testthat)
 
+
+### LDAP search
+#LDAP query against ldap.arizona.edu (public, no account required), e.g.
+# Via linux terminal: ldapsearch -H ldap://ldap.arizona.edu -D "" -b "o=University of Arizona,c=US" -w -x 'departmentNumber=1705' givenName sn
+
+# To find Dept HR code: log into apps.iam.arizona.edu to search person >> OrgSearch (partent org, child orgs)
+# Example: https://apps.iam.arizona.edu/orgs/ua_orgs/view/1705
+
+# R does not have LDAP packages??
+
+# clean all objects from the environment to start
+rm(list = ls())
+
 # For openAlex to get faster response
 options (openalexR.mailto="yhan@arizona.edu")
 
@@ -209,11 +222,6 @@ author_stats <- calculate_works_count(test_data_COM_Tucson_authors[4], test_data
 author_stats <- calculate_works_count(test_data_COM_Tucson_authors[5], test_data_affiliation[1], test_data_year[1])
 
 
-
-
-
-
-
 ######## Science
 ### Marek Rychlik returns : works 0, cited 11
 author_stats <- calculate_works_count(test_data_science_authors[1], test_data_affiliation[1], test_data_year[1])
@@ -245,12 +253,26 @@ test_data_COM_Tucson_authors <- c("Che Liu", "Robert Aaronson", "Alexa Aaronson"
                                   "Richard Ablin", "Ahmed Aboul-Nasr", "Arin Aboulian", "Suzanne Abrahamson", "Amber Abrams", "Artyom Abramyan", "Edward Abril", "Anas Husni Mohamad Abu Assi", "Laila Zaid", "Joe Abuhakmeh",
                                   "Xiaohong Zhang", "Hui Zhang")
 
+
+data_COM_dept_0713_authors <- c("Andrea Morton", "Maryam Emami Neyestanak", "Zerema Nagoyev", "Haw-chih Tai", "Dianesh Bharti", "Darleen Redondo", "Rachael Bendall", "Karen Padilla", "James Liao",
+                                "Jazmine Aguilar", "Aleksandr Dekan", "Ivonne Bello", "Gary Langworthy", "Alyussa Campbell", "Yvette Marinez", "Hannah Cowling", "Hannah Gannon", "Tera Bolton",
+                                "Dorothy Campos", "Sharon Halvorsen", "Ian Boggs", "Beverly Gordon", "Palash Mallick", "Gabriela Montenegro Vargas", "Bekir Tanriover", "Meghan Gerhart",
+                                "Shasta McManus", "Katherine Mendoza", "Keyu Song", "Aline Kellerman", "Luz Badilla", "Sarah Yates", "Suzann Duan", "Edward Gelmann", "Nicole Marquez", "Courtney Smith",
+                                "Joel James", "Katherine Sepulveda", "Lin Ding", "Sulaiman Sheriff", "Neil MacDonald", "Sarah Munoz", "Juanita Merchang", "Nicole Sullivan", "Carolyn Bothwell",
+                                "Rachna Shroff", "Matthew Ollerton", "Karen Railey", "Luis Benitez", "Vivian Kominos", "Huashi Li", "Mathews Valuparampil Varghese", "Christeana Castro", "Fariba Donovan",
+                                "Xingnan Li", "Baltazar Campos", "Deborah Meyers", "Eugnene Bleecker", "Lizette Martinez"< "Sicily La Rue", "Paul Langlais", "Krystal Fimbres", "Wayne Willis", "Rocio Zapata Bustos"
+                                )
+
 unit_authors_list <- list(author_stats)
 #author_stats <-calculate_works_count(test_data_COM_Tucson_authors[1], "University of Arizona",2022)
 #unit_authors_list <- append(unit_authors_list, list(author_stats))
 #unit_authors_list
 
-for (author in test_data_COM_Tucson_authors) {
+###
+authors <- data_COM_dept_0731_authors
+
+#### Retrieving one author at a time.
+for (author in authors) {
   print(author)
   # Setting org_name can be critical for the # of results got.
   # If org_name = "", there will be many unrelated people.
