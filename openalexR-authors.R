@@ -3,7 +3,8 @@
 ######## Date: May 9, 2023
 ##### Search authors' publication using openAlex data ####
 # OpenAlex R Documentation: https://github.com/ropensci/openalexR
-# OpenAlex Beta exploer: https://explore.openalex.org/
+# OpenAlex Beta explorer: https://explore.openalex.org/ (the explorer seems not to display all the possible researchers. In ohter words, You shall use API
+# The explorer can be only used as a verification/testing purpose!!!
 
 install.packages("openalexR")
 install.packages("dplyr")
@@ -23,7 +24,7 @@ library(testthat)
 #LDAP query against ldap.arizona.edu (public, no account required), e.g.
 # Via linux terminal: ldapsearch -H ldap://ldap.arizona.edu -D "" -b "o=University of Arizona,c=US" -w -x 'departmentNumber=1705' givenName sn
 
-# To find Dept HR code: log into apps.iam.arizona.edu to search person >> OrgSearch (partent org, child orgs)
+# To find Dept HR code: log into apps.iam.arizona.edu to search person >> OrgSearch (partent org, child orgs) 
 # Example: https://apps.iam.arizona.edu/orgs/ua_orgs/view/1705
 
 # R does not have LDAP packages??
@@ -52,7 +53,7 @@ test_data_year <- c("2022", "2021", "2020", "2012")
 #### 1. First do a fuzzy search on author's name ##########################
 ###  do NOT use display_name because it requires an exact match. Often there are multiple middle names for an author
 author_from_names <- oa_fetch(entity = "author",
-                               search = test_data_COM_Tucson_authors[3] ) ### "search" syntax allows fuzzy search for middle name
+                               search = test_data_COM_authors[2] ) ### "search" syntax allows fuzzy search for middle name
 # first checking
 if (!is.null(author_from_names)) {
   print("author found")
@@ -254,13 +255,13 @@ test_data_COM_Tucson_authors <- c("Che Liu", "Robert Aaronson", "Alexa Aaronson"
                                   "Xiaohong Zhang", "Hui Zhang")
 
 
-data_COM_dept_0713_authors <- c("Andrea Morton", "Maryam Emami Neyestanak", "Zerema Nagoyev", "Haw-chih Tai", "Dianesh Bharti", "Darleen Redondo", "Rachael Bendall", "Karen Padilla", "James Liao",
+data_COM_dept_0713_staff <- c("Andrea Morton", "Maryam Emami Neyestanak", "Zerema Nagoyev", "Haw-chih Tai", "Dianesh Bharti", "Darleen Redondo", "Rachael Bendall", "Karen Padilla", "James Liao",
                                 "Jazmine Aguilar", "Aleksandr Dekan", "Ivonne Bello", "Gary Langworthy", "Alyussa Campbell", "Yvette Marinez", "Hannah Cowling", "Hannah Gannon", "Tera Bolton",
                                 "Dorothy Campos", "Sharon Halvorsen", "Ian Boggs", "Beverly Gordon", "Palash Mallick", "Gabriela Montenegro Vargas", "Bekir Tanriover", "Meghan Gerhart",
                                 "Shasta McManus", "Katherine Mendoza", "Keyu Song", "Aline Kellerman", "Luz Badilla", "Sarah Yates", "Suzann Duan", "Edward Gelmann", "Nicole Marquez", "Courtney Smith",
                                 "Joel James", "Katherine Sepulveda", "Lin Ding", "Sulaiman Sheriff", "Neil MacDonald", "Sarah Munoz", "Juanita Merchang", "Nicole Sullivan", "Carolyn Bothwell",
                                 "Rachna Shroff", "Matthew Ollerton", "Karen Railey", "Luis Benitez", "Vivian Kominos", "Huashi Li", "Mathews Valuparampil Varghese", "Christeana Castro", "Fariba Donovan",
-                                "Xingnan Li", "Baltazar Campos", "Deborah Meyers", "Eugnene Bleecker", "Lizette Martinez"< "Sicily La Rue", "Paul Langlais", "Krystal Fimbres", "Wayne Willis", "Rocio Zapata Bustos"
+                                "Xingnan Li", "Baltazar Campos", "Deborah Meyers", "Eugnene Bleecker", "Lizette Martinez", "Sicily La Rue", "Paul Langlais", "Krystal Fimbres", "Wayne Willis", "Rocio Zapata Bustos"
                                 )
 
 unit_authors_list <- list(author_stats)
@@ -269,7 +270,7 @@ unit_authors_list <- list(author_stats)
 #unit_authors_list
 
 ###
-authors <- data_COM_dept_0731_authors
+authors <- data_COM_dept_0713_staff
 
 #### Retrieving one author at a time.
 for (author in authors) {
@@ -277,7 +278,7 @@ for (author in authors) {
   # Setting org_name can be critical for the # of results got.
   # If org_name = "", there will be many unrelated people.
   # College of Medicine OpenAlex data some do not have affiliation with University of Arizona.
-  org_name = "University"
+  org_name = "Arizona"
   temp_author_status <- calculate_works_count(author, org_name, 2022)
   temp_author_status
   unit_authors_list <- append(unit_authors_list, list(temp_author_status))
@@ -294,35 +295,6 @@ filtered_author2 <- subset(author2_from_names, grepl("https://openalex.org/I1380
 author3_from_names <- oa_fetch(entity = "author", display_name = c("Bekir Tanriover", "Ahlam Saleh") ) ### "search" syntax allows fuzzy search for middle name
 filtered_author3 <- subset(author3_from_names, grepl("https://ror.org/03m2x1q45", affiliation_ror, ignore.case=TRUE))
 
-################################################################################################
-###################### 2. Using found openAlex IDs to get publications #####
-
-openalex_ids_author <-oa_fetch(entity = "author", openalex = "A4353996111" )
-openalex_id_author
-
-author_works <- oa_fetch ( entity = "works",
-                           author.id=("A4353996111"),
-                           verbose = TRUE )
-show_works(author_works)
-
-# Testing multiple authors
-openalex_ids_authors <- c("A4353685810", "A4354460443")
-
-# Create an empty list to store the downloaded data for each author
-authors_data <- list()
-
-# Iterate over the author IDs and download data for each
-for (id in openalex_ids_authors) {
-  authors_data[[id]] <- oa_fetch(entity = "author", openalex = id)
-}
-
-# 3. Now that we have data in list, iterate over the list elements
-for (author_data in authors_data) {
-  #print(author_data)
-  print(author_data$works_count)
-  print(author_data$counts_by_year)
-
-}
 
 
 ##### Testing with multiple authors
