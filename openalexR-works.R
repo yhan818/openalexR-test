@@ -7,6 +7,7 @@
 # The explorer can be only used as a verification/testing purpose!!!
 
 install.packages("openalexR")
+install.packages("readr")
 install.packages("dplyr")
 install.packages("ggplot2")
 install.packages("knitr")
@@ -18,6 +19,7 @@ library(dplyr)
 library(ggplot2)
 library(knitr)
 library(testthat)
+library(readr)
 
 options (openalexR.mailto="yhan@arizona.edu")
 
@@ -51,20 +53,51 @@ openalex_author_id <- filtered_authors$id[1]
 author_works <- oa_fetch ( entity = "works",
                            author.id=(openalex_author_id),
                            verbose = TRUE )
-show_works(author_works)
-print(author_works)
+object_type <- class(author_works)
+print(object_type)
 
 # Filter publications after year 2020
-filtered_works_after_year_2020 <- author_works %>%
+filtered_author_works <- author_works %>%
   filter(substr(publication_date, 1,4) >"2020")
 
 # Filter source of work
-so_values <- filtered_works_after_year_2020$so
+so_values <- filtered_author_works$so
+
+#convert author_works$author (list) to , separated by "," using sapply
+# List "author" contains all the authors info
+filtered_author_works$author <- sapply(filtered_author_works$author, paste, collapse = ",")
+# List "ids" contains openAlexId, doi, and pmid
+filtered_author_works$ids <- sapply(filtered_author_works$ids, paste, collapse = ",")
+# List "referenced_works" contains references
+filtered_author_works$referenced_works <- sapply(filtered_author_works$referenced_works, paste, collapse = ",")
+# List "related_works" contains related works
+filtered_author_works$related_works <- sapply(filtered_author_works$related_works, paste, collapse = ",")
+
+filtered_author_works$counts_by_year <- NULL
+filtered_author_works$concepts <- NULL
+
+field_names <-colnames(filtered_author_works)
+print(field_names)
+
+getwd()
+setwd("/home/yhan/Documents/openalexR-test")
+
+selected_columns <- filtered_author_works[c("id", "display_name", "author", "ab", "publication_date",  "relevance_score", "so", "so_id", "host_organization", "issn_l", "url"
+                                            , "pdf_url", "license", "version", "first_page", "last_page", "volume", "issue", "is_oa", "cited_by_count", "publication_year"
+                                            ,"cited_by_api_url", "ids", "doi", "type", "referenced_works", "related_works")]
+write.csv(selected_columns, file = "author_works.csv", row.names = TRUE)
+
+# get work
+works1 <- "W4213067910"
+test1 <- oa_fetch(
+  identifier = works1,
+  entity = "works"
+)
+print(works1)
 
 ## Questions for openAlex
-# https://openalex.org/P4310320990 (does not display anything )
-# https://openalex.org/S157664895 (does not display anything)
-
+# host_organization: https://openalex.org/P4310320990 (does not display anything ) (organization from https://openalex.org/W2167151078 << search from "Bekir Tanriover"
+# so_id: https://openalex.org/S157664895 (does not display anything)
 
 
 
