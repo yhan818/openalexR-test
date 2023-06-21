@@ -1,6 +1,7 @@
 ###################### 2. Using found openAlex IDs to get publications #####
 ######## Author: Yan Han
 ######## Date: June 5, 2023
+######## Updated: June 5, 2023
 ##### Search authors' publication using openAlex data ####
 # OpenAlex R Documentation: https://github.com/ropensci/openalexR
 # OpenAlex Beta explorer: https://explore.openalex.org/ (the explorer seems not to display all the possible researchers. In ohter words, You shall use API
@@ -22,6 +23,8 @@ library(testthat)
 library(readr)
 
 options (openalexR.mailto="yhan@arizona.edu")
+getwd()
+setwd("/home/yhan/Documents/openalexR-test")
 
 ### Test data
 test_data_COM_authors     <- c("Phillip Kuo", "Bekir Tanriover", "Ahlam Saleh")
@@ -79,8 +82,7 @@ filtered_author_works$concepts <- NULL
 field_names <-colnames(filtered_author_works)
 print(field_names)
 
-getwd()
-setwd("/home/yhan/Documents/openalexR-test")
+
 
 selected_columns <- filtered_author_works[c("id", "display_name", "author", "ab", "publication_date",  "relevance_score", "so", "so_id", "host_organization", "issn_l", "url"
                                             , "pdf_url", "license", "version", "first_page", "last_page", "volume", "issue", "is_oa", "cited_by_count", "publication_year"

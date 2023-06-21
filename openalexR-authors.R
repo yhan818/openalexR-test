@@ -1,6 +1,7 @@
 ############# Author's search ##########
 ######## Author: Yan Han
 ######## Date: May 9, 2023
+######## Updated: June 21, 2023
 ##### Search authors' publication using openAlex data ####
 # OpenAlex R Documentation: https://github.com/ropensci/openalexR
 # OpenAlex Beta explorer: https://explore.openalex.org/ (the explorer seems not to display all the possible researchers. In ohter words, You shall use API
@@ -19,6 +20,8 @@ library(ggplot2)
 library(knitr)
 library(testthat)
 
+getwd()
+setwd("/home/yhan/Documents/openalexR-test")
 
 ### LDAP search
 #LDAP query against ldap.arizona.edu (public, no account required), e.g.
@@ -27,8 +30,9 @@ library(testthat)
 # To find Dept HR code: log into apps.iam.arizona.edu to search person >> OrgSearch (partent org, child orgs) 
 # Example: https://apps.iam.arizona.edu/orgs/ua_orgs/view/1705
 
-# R does not have LDAP packages??
+# College of Medicine Department of: code : 0713
 
+# R does not have LDAP packages??
 # clean all objects from the environment to start
 rm(list = ls())
 
@@ -43,9 +47,25 @@ test_data_science_authors <- c("Marek Rychlik", "Ali Bilgin", "Beichuan Zhang")
 test_data_ischool_authors <- c("Hong Cui")
 test_data_others          <- c("Leila Hudson", "Mona Hymel")
 
-
 test_data_affiliation <- c("University of Arizona")
 test_data_year <- c("2022", "2021", "2020", "2012")
+
+# Read test data from CSV: column: LastName, FirstName
+file_path <- "test_authors_COM_0713.csv"    #"test_authors_1.csv"
+data <- read.csv(file_path) 
+
+# create an empty vector
+data_unit_staff <- list()
+# iterate 
+for (i in 1:nrow(data)) {
+  firstname <- as.character(data[i, "givenName"])
+  lastname <- as.character(data[i, "sn"])
+  data_unit_person <- paste(firstname, lastname)
+  data_unit_staff  <- c(data_unit_staff, data_unit_person)
+}
+
+### Testing 
+author_from_names <- oa_fetch(entity = "author", search = data_unit_staff[2]) 
 
 ################################ Finding Author's name, affiliation, sum of works, and total citations ##############################
 # Filter Doc: https://github.com/ropensci/openalexR/blob/main/vignettes/articles/Filters.Rmd
@@ -201,9 +221,6 @@ calculate_works_count <- function(author, affiliation, year) {
 
 ########################## TESTING PEOPLE ####################
 ### Format: Name: Year: Works/Cited
-### Yan Han: 2022: 0/0
-author_stats <- calculate_works_count(test_data_UAL_authors[1], test_data_affiliation[1], test_data_year[1])
-rm(author_stats)
 
 ############# College of Medicine Tucson Test Date:  2023-05-14: If test in a different date, result may vary
 #### U of Arizona College of Medicine Faculty and Staff Directory https://medicine.arizona.edu/directory/faculty-staff
@@ -265,6 +282,7 @@ data_COM_dept_0713_staff <- c("Andrea Morton", "Maryam Emami Neyestanak", "Zerem
                                 )
 
 unit_authors_list <- list(author_stats)
+unit_authors_list_org_arizona <- list(author_stats)
 #author_stats <-calculate_works_count(test_data_COM_Tucson_authors[1], "University of Arizona",2022)
 #unit_authors_list <- append(unit_authors_list, list(author_stats))
 #unit_authors_list
@@ -272,18 +290,22 @@ unit_authors_list <- list(author_stats)
 ###
 authors <- data_COM_dept_0713_staff
 
+authors <- data_unit_staff
+
 #### Retrieving one author at a time.
 for (author in authors) {
   print(author)
   # Setting org_name can be critical for the # of results got.
   # If org_name = "", there will be many unrelated people.
   # College of Medicine OpenAlex data some do not have affiliation with University of Arizona.
-  org_name = "Arizona"
+  org_name = "university"
   temp_author_status <- calculate_works_count(author, org_name, 2022)
   temp_author_status
   unit_authors_list <- append(unit_authors_list, list(temp_author_status))
   }
-unit_authors_list
+
+unit_authors_list_org_arizona <- unit_authors_list
+
 
 ###########################################
 
