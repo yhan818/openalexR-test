@@ -64,8 +64,6 @@ for (i in 1:nrow(data)) {
   data_unit_staff  <- c(data_unit_staff, data_unit_person)
 }
 
-### Testing 
-author_from_names <- oa_fetch(entity = "author", search = data_unit_staff[2]) 
 
 ################################ Finding Author's name, affiliation, sum of works, and total citations ##############################
 # Filter Doc: https://github.com/ropensci/openalexR/blob/main/vignettes/articles/Filters.Rmd
@@ -260,9 +258,6 @@ author_stats <- calculate_works_count(test_data_others[2], test_data_affiliation
 
 ##########################################################
 #### testing all authors in College of Medicine - Tucson ###
-### Including all faculty and staff at https://medicine.arizona.edu/directory/faculty-staff
-rm(unit_authors_list)
-
 # 10 people per line
 # Author's name only contain First name and Last name.
 # Author's middle name is not included due to index often does not contain such.
@@ -271,15 +266,8 @@ test_data_COM_Tucson_authors <- c("Che Liu", "Robert Aaronson", "Alexa Aaronson"
                                   "Richard Ablin", "Ahmed Aboul-Nasr", "Arin Aboulian", "Suzanne Abrahamson", "Amber Abrams", "Artyom Abramyan", "Edward Abril", "Anas Husni Mohamad Abu Assi", "Laila Zaid", "Joe Abuhakmeh",
                                   "Xiaohong Zhang", "Hui Zhang")
 
-
-data_COM_dept_0713_staff <- c("Andrea Morton", "Maryam Emami Neyestanak", "Zerema Nagoyev", "Haw-chih Tai", "Dianesh Bharti", "Darleen Redondo", "Rachael Bendall", "Karen Padilla", "James Liao",
-                                "Jazmine Aguilar", "Aleksandr Dekan", "Ivonne Bello", "Gary Langworthy", "Alyussa Campbell", "Yvette Marinez", "Hannah Cowling", "Hannah Gannon", "Tera Bolton",
-                                "Dorothy Campos", "Sharon Halvorsen", "Ian Boggs", "Beverly Gordon", "Palash Mallick", "Gabriela Montenegro Vargas", "Bekir Tanriover", "Meghan Gerhart",
-                                "Shasta McManus", "Katherine Mendoza", "Keyu Song", "Aline Kellerman", "Luz Badilla", "Sarah Yates", "Suzann Duan", "Edward Gelmann", "Nicole Marquez", "Courtney Smith",
-                                "Joel James", "Katherine Sepulveda", "Lin Ding", "Sulaiman Sheriff", "Neil MacDonald", "Sarah Munoz", "Juanita Merchang", "Nicole Sullivan", "Carolyn Bothwell",
-                                "Rachna Shroff", "Matthew Ollerton", "Karen Railey", "Luis Benitez", "Vivian Kominos", "Huashi Li", "Mathews Valuparampil Varghese", "Christeana Castro", "Fariba Donovan",
-                                "Xingnan Li", "Baltazar Campos", "Deborah Meyers", "Eugnene Bleecker", "Lizette Martinez", "Sicily La Rue", "Paul Langlais", "Krystal Fimbres", "Wayne Willis", "Rocio Zapata Bustos"
-                                )
+### Including all faculty and staff at https://medicine.arizona.edu/directory/faculty-staff
+rm(unit_authors_list)
 
 unit_authors_list <- list(author_stats)
 unit_authors_list_org_arizona <- list(author_stats)
@@ -287,10 +275,9 @@ unit_authors_list_org_arizona <- list(author_stats)
 #unit_authors_list <- append(unit_authors_list, list(author_stats))
 #unit_authors_list
 
-###
-authors <- data_COM_dept_0713_staff
 
-authors <- data_unit_staff
+##### Test specific unit 
+authors <- data_unit_staff    # Here is COM_0713
 
 #### Retrieving one author at a time.
 for (author in authors) {
@@ -299,6 +286,8 @@ for (author in authors) {
   # If org_name = "", there will be many unrelated people.
   # College of Medicine OpenAlex data some do not have affiliation with University of Arizona.
   org_name = "university"
+  
+  # filter results using org_name
   temp_author_status <- calculate_works_count(author, org_name, 2022)
   temp_author_status
   unit_authors_list <- append(unit_authors_list, list(temp_author_status))
