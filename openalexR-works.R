@@ -7,7 +7,10 @@
 # OpenAlex Beta explorer: https://explore.openalex.org/ (the explorer seems not to display all the possible researchers. In ohter words, You shall use API
 # The explorer can be only used as a verification/testing purpose!!!
 
-install.packages("openalexR")
+install.packages("remotes")
+remotes::install_github("ropensci/openalexR", force=TRUE)
+
+#install.packages("openalexR")  
 install.packages("readr")
 install.packages("dplyr")
 install.packages("ggplot2")
@@ -22,19 +25,32 @@ library(knitr)
 library(testthat)
 library(readr)
 
+citation("openalexR")
+
+# check to see if openAlexR has the latest entities in OpenAlex (OpenAlex updated its data model(Entities) in June 2023)
+# Before April 2023: they are [1] "works"        "authors"      "venues"       "institutions" "concepts"    
+# If not, need to use openalexR developer's version
+oa_entities()
+
 options (openalexR.mailto="yhan@arizona.edu")
 getwd()
 setwd("/home/yhan/Documents/openalexR-test")
 
 ### Test data
 test_data_COM_authors     <- c("Phillip Kuo", "Bekir Tanriover", "Ahlam Saleh")
-
-
 test_data_affiliation <- c("University of Arizona")
 test_data_year <- c("2022", "2021", "2020", "2012")
 
+author_from_names <- oa_fetch(entity = "author", search = "Bekir Tanriover" )
+author_from_names <- oa_fetch(entity = "author", search = test_data_not_updated_authors[1] )
+author_from_names <- oa_fetch(entity = "author", search = "Haw-chih Tai")
+
+# Test works 
+works_from_dois <- oa_fetch(entity = "works", doi = c("https://doi.org/10.1681/asn.2012070664", "https://doi.org/10.1007/s11192-013-1221-3"),  verbose = TRUE)
+# To see is_oa field
+
 # use "search" option with no middle name 
-author_from_names <- oa_fetch(entity = "author", search = test_data_COM_authors[2] ) 
+author_from_names <- oa_fetch(entity = "author", search = test_data_COM_authors[2]) 
 
 # first checking if author exists
 if (!is.null(author_from_names)) {

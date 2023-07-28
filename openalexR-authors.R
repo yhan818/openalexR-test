@@ -7,7 +7,11 @@
 # OpenAlex Beta explorer: https://explore.openalex.org/ (the explorer seems not to display all the possible researchers. In ohter words, You shall use API
 # The explorer can be only used as a verification/testing purpose!!!
 
-install.packages("openalexR")
+install.packages("remotes")
+remotes::install_github("ropensci/openalexR", force=TRUE) 
+
+#install.packages("openalexR") #install.packages("openalexR")  ### use the latest development version due to issue with the production version openalexR 1.10. Waiting for 1.2.0
+
 install.packages("dplyr")
 install.packages("ggplot2")
 install.packages("knitr")
@@ -46,9 +50,16 @@ test_data_COM_Tucson_authors <- c("Che Carrie Liu", "Robert M. Aaronson", "Alexa
 test_data_science_authors <- c("Marek Rychlik", "Ali Bilgin", "Beichuan Zhang")
 test_data_ischool_authors <- c("Hong Cui")
 test_data_others          <- c("Leila Hudson", "Mona Hymel")
+test_data_not_updated_authors <-c("Karen Padilla", "Haw-chih Tai")
 
 test_data_affiliation <- c("University of Arizona")
 test_data_year <- c("2022", "2021", "2020", "2012")
+
+#### Some testing first 
+author_from_names <- oa_fetch(entity = "author", search = "Bekir Tanriover" )
+## openalexR 1.10 package failed on the search below. 
+author_from_names <- oa_fetch(entity = "author", search = test_data_not_updated_authors[1] )
+author_from_names <- oa_fetch(entity = "author", search = "Haw-chih Tai")
 
 # Read test data from CSV: column: LastName, FirstName
 file_path <- "test_authors_COM_0713.csv"    #"test_authors_1.csv"
