@@ -24,8 +24,39 @@ library(ggplot2)
 library(knitr)
 library(testthat)
 
+options (openalexR.mailto="yhan@arizona.edu")
 getwd()
 setwd("/home/yhan/Documents/openalexR-test")
+
+
+#############################################################
+# check to see if openAlexR has the latest entities in OpenAlex (OpenAlex updated its data model(Entities) in June 2023)
+# Before April 2023: they are [1] "works"        "authors"      "venues"       "institutions" "concepts"    
+# If not, need to use openalexR developer's version
+oa_entities()
+
+### Test data
+test_data_COM_authors     <- c("Phillip Kuo", "Bekir Tanriover", "Ahlam Saleh")
+test_data_affiliation <- c("University of Arizona")
+test_data_year <- c("2022", "2021", "2020", "2012")
+
+################ Testing Cases #######################
+
+########################### Author matching criteria: 1) starting with ORCID; 2) using latest publication's affiliations 3) 
+#### Bekir affiliation shows "Columbia University", which is wrong. He (2009-2013) is at Columbia Univeristy, then he moved to UT Southwestern, and now he is at UA
+### This authorID does not have multiple affiliations?? 
+author_from_names <- oa_fetch(entity = "author", search = "Bekir Tanriover" )
+
+author_from_names <- oa_fetch(entity = "author", search = "Karen Padilla" )
+
+################### Results contain wrong info (Haitong Tai: https://openalex.org/A5060511275 ) 
+author_from_names <- oa_fetch(entity = "author", search = "Haw-chih Tai")
+
+#### This authorID upgrade does show my work/citation seems right with affiliation. There are 689 obs of "Yan Han". lol 
+author_from_names <- oa_fetch(entity = "author", search = "Yan Han")
+#### This upgrade found Hong Cui's ID and correct affiliation. 
+author_from_names <- oa_fetch(entity = "author", search = "Hong Cui")
+
 
 ### LDAP search
 #LDAP query against ldap.arizona.edu (public, no account required), e.g.
@@ -134,7 +165,7 @@ if (!is.null(author_from_names)) {
     # Calculate the sum of the filtered 'works_count' column
     works_sum_2022 <- sum(filtered_df_2022$works_count)
     total_works_sum_2022 <- total_works_sum_2022 + works_sum_2022
-    # Calculte the sum of the filtered 'cited_by_count' column
+    # Calculate the sum of the filtered 'cited_by_count' column
     cited_sum_2022 <- sum(filtered_df_2022$cited_by_count)
     total_cited_sum_2022 <- total_cited_sum_2022 + cited_sum_2022
 
@@ -150,6 +181,29 @@ if (!is.null(author_from_names)) {
   total_cited_sum_2022 <- 0
   total_works_sum_2022 <- 0
 }
+
+
+
+
+#####################################################
+# Function: Find author with affiliation 
+#####################################################
+search_author <- function(author, affiliation){
+  # getting data from openAlexR API
+  filtered_authors <- NULL
+  author_from_names <- oa_fetch(entity = "author", search = author )
+  if (is.null(author_from_names)) {
+    filtered_authors <- NULL
+  }
+  else {
+    # Filter out using "affiliation_display_name" column.
+    # other filtering fields can be "affiliation_id", "affiliation_ror"
+    filtered_authors <- subset(author_from_names, grepl(affiliation, affiliation_display_name, ignore.case=TRUE))
+    print(filtered_authors)
+  }
+  return (filtered_authors)
+}
+
 
 #####################################################
 # Function: Calculate works count
@@ -234,8 +288,24 @@ calculate_works_count <- function(author, affiliation, year) {
 ############# College of Medicine Tucson Test Date:  2023-05-14: If test in a different date, result may vary
 #### U of Arizona College of Medicine Faculty and Staff Directory https://medicine.arizona.edu/directory/faculty-staff
 #### Phillip Kuo: 2022: 30/133: 26 IDs
-author_stats <- calculate_works_count(test_data_COM_authors[1], test_data_affiliation[1], test_data_year[1])
-### Benkir Tanriover returns 5 openAlex ID: 2022: works 11, cited 166; 2021: works 4 cited 167
+####            : 2023-07: after authorID updates: 17/330
+author_name <- "Phillip Kuo"
+affiliation <- "University of Arizona"
+author_result_fuzzy       <- oa_fetch(entity = "author", search = author_name)
+author_result_affiliation <- search_author(author_name, affiliation )
+author_stats              <- calculate_works_count(author, affiliation, 2022)
+
+### Bekir Tanriover returns 5 openAlex ID: 2022: works 11, cited 166; 2021: works 4 cited 167
+###: 2023-07: after authorID updates: NULL (??? error )
+author_name <- "Bekir Tanriover"
+affiliation <- "University of Arizona"
+author_result_fuzzy       <- oa_fetch(entity = "author", search = author_name)
+author_result_affiliation <- search_author(author_name, affiliation )
+author_stats              <- calculate_works_count(author, affiliation, 2022)
+
+
+
+
 author_stats <- calculate_works_count(test_data_COM_authors[2], test_data_affiliation[1], test_data_year[1])
 author_stats <- calculate_works_count(test_data_COM_authors[2], test_data_affiliation[1], test_data_year[2])
 ###  Ahlam Saleh returns 0, because of "One list does not contain a valid OpenAlex collection" ????
@@ -251,17 +321,36 @@ author_stats <- calculate_works_count(test_data_COM_Tucson_authors[5], test_data
 
 ######## Science
 ### Marek Rychlik returns : works 0, cited 11
-author_stats <- calculate_works_count(test_data_science_authors[1], test_data_affiliation[1], test_data_year[1])
+author_name <- "Marek Rychlik"
+affiliation <- "University of Arizona"
+author_result_fuzzy       <- oa_fetch(entity = "author", search = author_name)
+author_result_affiliation <- search_author(author_name, affiliation )
+author_stats              <- calculate_works_count(author, affiliation, 2022)
+
 ### Ali Bilgin: works 4, cited 187
-author_stats <- calculate_works_count(test_data_science_authors[2], test_data_affiliation[1], test_data_year[1])
+### Showing 2 results. The other searches show one combined result
+author_name <- "Ali Bilgin"
+affiliation <- "University of Arizona"
+author_result_fuzzy       <- oa_fetch(entity = "author", search = author_name)
+author_result_affiliation <- search_author(author_name, affiliation )
+author_stats              <- calculate_works_count(author, affiliation, 2022)
 
 ####### iSchool
-### Hong Cui: NOT found: 2022: NULL
-author_stats <- calculate_works_count(test_data_ischool_authors[1], test_data_affiliation[1], test_data_year[1])
+### Hong Cui: NOT found: 2022: 
+### Showing 1 results. 
+author_name <- "Hong Cui"
+affiliation <- "University of Arizona"
+author_result_fuzzy       <- oa_fetch(entity = "author", search = author_name)
+author_result_affiliation <- search_author(author_name, affiliation )
+author_stats              <- calculate_works_count(author, affiliation, 2022)
 
 ###### Others
 ### Leila Hudson: 2022: 0/2
-author_stats <- calculate_works_count(test_data_others[1], test_data_affiliation[1], test_data_year[1])
+author_name <- "Leila Hudson"
+affiliation <- "University of Arizona"
+author_result_fuzzy       <- oa_fetch(entity = "author", search = author_name)
+author_result_affiliation <- search_author(author_name, affiliation )
+author_stats              <- calculate_works_count(author, affiliation, 2022)
 
 # Error in works_count[[i]] : subscript out of bounds
 author_stats <- calculate_works_count(test_data_others[2], test_data_affiliation[1], test_data_year[1])
