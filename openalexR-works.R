@@ -36,21 +36,25 @@ options (openalexR.mailto="yhan@arizona.edu")
 getwd()
 setwd("/home/yhan/Documents/openalexR-test")
 
+
 ### Test data
+test_data_UAL_authors     <- c("Yan Han", "Ellen Dubinski", "Fernando Rios", "Ahlam Saleh")
 test_data_COM_authors     <- c("Phillip Kuo", "Bekir Tanriover", "Ahlam Saleh")
+test_data_COM_Tucson_authors <- c("Che Carrie Liu", "Robert M. Aaronson", "Alexa Aasronson", "Mohammed Abbas", "")
+test_data_science_authors <- c("Marek Rychlik", "Ali Bilgin", "Beichuan Zhang")
+test_data_ischool_authors <- c("Hong Cui")
+test_data_others          <- c("Leila Hudson", "Mona Hymel")
+test_data_not_updated_authors <-c("Karen Padilla", "Haw-chih Tai")
+
 test_data_affiliation <- c("University of Arizona")
 test_data_year <- c("2022", "2021", "2020", "2012")
-
-author_from_names <- oa_fetch(entity = "author", search = "Bekir Tanriover" )
-author_from_names <- oa_fetch(entity = "author", search = test_data_not_updated_authors[1] )
-author_from_names <- oa_fetch(entity = "author", search = "Haw-chih Tai")
 
 # Test works 
 works_from_dois <- oa_fetch(entity = "works", doi = c("https://doi.org/10.1681/asn.2012070664", "https://doi.org/10.1007/s11192-013-1221-3"),  verbose = TRUE)
 # To see is_oa field
 
 # use "search" option with no middle name 
-author_from_names <- oa_fetch(entity = "author", search = test_data_COM_authors[2]) 
+author_from_names <- oa_fetch(entity = "author", search = test_data_COM_authors[1]) 
 
 # first checking if author exists
 if (!is.null(author_from_names)) {
@@ -114,15 +118,8 @@ test1 <- oa_fetch(
 print(works1)
 
 ## Questions for openAlex
-# host_organization: https://openalex.org/P4310320990 (does not display anything ) (organization from https://openalex.org/W2167151078 << search from "Bekir Tanriover"
-# so_id: https://openalex.org/S157664895 (does not display anything)
-
-
-
-
-
-
-
+# ORCID search not returning correct result. see Yan as an example
+# affiliation shall use ORCID's employment first, then the most recent publication source. see Bekir as example
 
 
 # Testing multiple authors
@@ -143,5 +140,4 @@ for (author_data in authors_data) {
   print(author_data$counts_by_year)
   
 }
-
 

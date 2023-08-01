@@ -6,7 +6,7 @@
 # Documentation: https://github.com/massimoaria/openalexR/tree/b3541e4f2695da771f15d0d92a7a050757e67e9c 
 
 # Install the released version of openalexR from CRAN 
-install.packages("openalexR")
+#install.packages("openalexR")
 install.packages("dplyr")
 install.packages("ggplot2")
 install.packages("knitr")
@@ -56,6 +56,8 @@ works_from_orcids <- oa_fetch(
   verbose = TRUE  
 ) 
 
+### Data error: certain articles not written by Yan Han (search here is using orcid! )
+### Example: https://explore.openalex.org/authors/A5056855636 
 works_from_orcids |>
   show_works()  |>
   knitr::kable()
@@ -85,7 +87,6 @@ authors_from_orcids |>
 ###  use disp_name
 # authors_from_names <- oa_fetch(entity = "authors",
 authors_from_names <- oa_fetch(entity = "author",
-                  
                                search = "Phillip Kuo")  ### Search allowing fuzzy search for middle name
 #search ="Mona  Hymel") 
 ### display_name is an exact match, which does not work for someone having a middle name
