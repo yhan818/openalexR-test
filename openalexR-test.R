@@ -62,10 +62,11 @@ works_from_orcids |>
 #> Requesting url: https://api.openalex.org/works?filter=author.orcid%3A0000-0001-9518-2684%7C0000-0002-8517-9411
 # > output to a file 
 
+### Aug 2023: Yan Han: affiliation Jilin university. Wrong
 ##### Getting authors' info using their ORCIDs
 authors_from_orcids <- oa_fetch(
   entity = "authors",
-   orcid =  c("0000-0001-6187-6610", "0000-0002-8517-9411", "0000-0003-1613-5981", "0000-0001-9518-2684") # working right
+   orcid =  c("0000-0001-6187-6610", "0000-0002-8517-9411", "0000-0003-1613-5981", "0000-0001-9518-2684")
 )
 
 str(authors_from_orcids) # show the object
@@ -78,10 +79,10 @@ authors_from_orcids |>
 
 author_from_openalex_id <-oa_fetch(entity = "author",
                                    openalex = "A4353996111" )
-author_from_openalex_id
 
+### Aug 2023: No collection find ??? 
 author_works <- oa_fetch ( entity = "works",
-                           author.id=("A4353996111"),
+                           author.id="A4353996111",
                            verbose = TRUE
                            )  
 show_works(author_works) 
