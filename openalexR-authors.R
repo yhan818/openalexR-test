@@ -29,18 +29,113 @@ getwd()
 setwd("/home/yhan/Documents/openalexR-test")
 
 
+########################## Functions ###########################33
+
+#####################################################
+# Function: Find author with affiliation 
+#####################################################
+search_author <- function(author_name, affiliation_name){
+  # getting data from openAlexR API
+  filtered_authors <- NULL
+  author_from_names <- oa_fetch(entity = "author", search = author_name )
+  if (is.null(author_from_names)) {
+    filtered_authors <- NULL
+  }
+  else {
+    # Filter out using "affiliation_display_name" column.
+    # other filtering fields can be "affiliation_id", "affiliation_ror"
+    filtered_authors <- subset(author_from_names, grepl(affiliation_name, affiliation_display_name, ignore.case=TRUE))
+    print(filtered_authors)
+  }
+  return (filtered_authors)
+}
+
+
+#####################################################
+# Function: Calculate works count
+#####################################################
+calculate_works_count <- function(author_name, affiliation_name, year) {
+  # getting data from openAlexR API
+  author_from_names <- oa_fetch(entity = "author", search = author_name )
+  if (is.null(author_from_names)) {
+    author_stats <- NULL
+  }
+  else {
+    # Filter out not "University of Arizona" authors using "affiliation_display_name" column.
+    # other filtering fields can be "affiliation_id", "affiliation_ror"
+    filtered_authors <- subset(author_from_names, grepl(affiliation_name, affiliation_display_name, ignore.case=TRUE))
+    print(filtered_authors)
+    
+    # If NOT found the author, return NULL
+    if (nrow(filtered_authors) == 0 )  {
+      author_stats <- NULL
+    }
+    else {
+      # works_count is a list, getting "counts_by_year" column
+      works_count  <- filtered_authors$counts_by_year
+      print(works_count)
+      works_sum_year <- 0
+      total_works_sum_year <- 0
+      
+      # cited_by_count is a list
+      cited_by_count <- filtered_authors$cited_by_count
+      cited_sum_year <- 0
+      total_cited_sum_year <-0
+      
+      # check the works_count
+      for (i in 1:length(works_count)) {
+        # Access the data frame within the list
+        df <- works_count[[i]]
+        
+        if (is.data.frame(df)) {
+          # Filter the data frame by year
+          filtered_df_year <- df[df$year == year, ]
+          # Calculate the sum of the filtered 'works_count' column
+          works_sum_year <- sum(filtered_df_year$works_count)
+          total_works_sum_year <- total_works_sum_year + works_sum_year
+          # Calculate the sum of the filtered 'cited_by_count' column
+          cited_sum_year <- sum(filtered_df_year$cited_by_count)
+          total_cited_sum_year <- total_cited_sum_year + cited_sum_year
+          
+          # reset this number to 0 after each iteration
+          works_sum_year <- 0
+          cited_sum_year <- 0
+        } else {
+          ##### Note: If you see error msg: Error: $ operator is invalid for atomic vectors
+          # That means certain works_count  is logical and has no data
+          print("This is NOT a dataframe. Data Wrong")
+          # set value as -1 for warning message
+          Total_sum_of_works = -1
+          Total_cited_sum_year = -1
+        }
+      } # for loop
+      
+      # Build output dataframe author_stats
+      author_stats <-data.frame (
+        Name = author_name,
+        OpenAlexId = filtered_authors$id,
+        Year = year,
+        Total_sum_of_works = total_works_sum_year,
+        Total_sum_of_cited = total_cited_sum_year
+      )
+      
+      # reset the var after done
+      total_works_sum_year <- 0
+      total_cited_sum_year <- 0
+    } # if
+    
+    return (author_stats)
+  }
+}
+
+
 #############################################################
 # check to see if openAlexR has the latest entities in OpenAlex (OpenAlex updated its data model(Entities) in June 2023)
 # Before April 2023: they are [1] "works"        "authors"      "venues"       "institutions" "concepts"    
 # If not, need to use openalexR developer's version
 oa_entities()
 
-### Test data
-test_data_COM_authors     <- c("Phillip Kuo", "Bekir Tanriover", "Ahlam Saleh")
-test_data_affiliation <- c("University of Arizona")
-test_data_year <- c("2022", "2021", "2020", "2012")
-
-################ Testing Cases #######################
+############################## Testing Cases #######################
 
 ############################## ORCID as filter ####################################
 # Download all works published by a set of authors using ORCIDs
@@ -71,7 +166,9 @@ author_from_names <- oa_fetch(entity = "author", search = "Karen Padilla" )
 author_from_names <- oa_fetch(entity = "author", search = "Haw-chih Tai")
 
 #### This authorID upgrade does show my work/citation seems right with affiliation. There are 692 obs of "Yan Han". Most have ORCIDs. 
+### Aug 2023: Yan Han: affiliation Jilin university. Wrong. 
 author_from_names <- oa_fetch(entity = "author", search = "Yan Han")
+author_from_names <- search_author("Yan Han", "University of Arizona")
 
 #### This upgrade found Hong Cui's ID and correct affiliation. 
 author_from_names <- oa_fetch(entity = "author", search = "Hong Cui")
@@ -90,10 +187,7 @@ author_from_names <- oa_fetch(entity = "author", search = "Hong Cui")
 # clean all objects from the environment to start
 rm(list = ls())
 
-# For openAlex to get faster response
-options (openalexR.mailto="yhan@arizona.edu")
-
-### Test data
+################### Test data
 test_data_UAL_authors     <- c("Yan Han", "Ellen Dubinski", "Fernando Rios", "Ahlam Saleh")
 test_data_COM_authors     <- c("Phillip Kuo", "Bekir Tanriover", "Ahlam Saleh")
 test_data_COM_Tucson_authors <- c("Che Carrie Liu", "Robert M. Aaronson", "Alexa Aasronson", "Mohammed Abbas", "")
@@ -202,105 +296,6 @@ if (!is.null(author_from_names)) {
 }
 
 
-
-
-#####################################################
-# Function: Find author with affiliation 
-#####################################################
-search_author <- function(author, affiliation){
-  # getting data from openAlexR API
-  filtered_authors <- NULL
-  author_from_names <- oa_fetch(entity = "author", search = author )
-  if (is.null(author_from_names)) {
-    filtered_authors <- NULL
-  }
-  else {
-    # Filter out using "affiliation_display_name" column.
-    # other filtering fields can be "affiliation_id", "affiliation_ror"
-    filtered_authors <- subset(author_from_names, grepl(affiliation, affiliation_display_name, ignore.case=TRUE))
-    print(filtered_authors)
-  }
-  return (filtered_authors)
-}
-
-
-#####################################################
-# Function: Calculate works count
-#####################################################
-calculate_works_count <- function(author, affiliation, year) {
-  # getting data from openAlexR API
-  author_from_names <- oa_fetch(entity = "author", search = author )
-  if (is.null(author_from_names)) {
-    author_stats <- NULL
-  }
-  else {
-    # Filter out not "University of Arizona" authors using "affiliation_display_name" column.
-    # other filtering fields can be "affiliation_id", "affiliation_ror"
-    filtered_authors <- subset(author_from_names, grepl(affiliation, affiliation_display_name, ignore.case=TRUE))
-    print(filtered_authors)
-
-    # If NOT found the author, return NULL
-    if (nrow(filtered_authors) == 0 )  {
-      author_stats <- NULL
-      }
-    else {
-      # works_count is a list, getting "counts_by_year" column
-     works_count  <- filtered_authors$counts_by_year
-     print(works_count)
-     works_sum_year <- 0
-     total_works_sum_year <- 0
-
-      # cited_by_count is a list
-      cited_by_count <- filtered_authors$cited_by_count
-      cited_sum_year <- 0
-      total_cited_sum_year <-0
-
-      # check the works_count
-      for (i in 1:length(works_count)) {
-      # Access the data frame within the list
-        df <- works_count[[i]]
-
-        if (is.data.frame(df)) {
-          # Filter the data frame by year
-          filtered_df_year <- df[df$year == year, ]
-          # Calculate the sum of the filtered 'works_count' column
-          works_sum_year <- sum(filtered_df_year$works_count)
-          total_works_sum_year <- total_works_sum_year + works_sum_year
-          # Calculate the sum of the filtered 'cited_by_count' column
-          cited_sum_year <- sum(filtered_df_year$cited_by_count)
-          total_cited_sum_year <- total_cited_sum_year + cited_sum_year
-
-          # reset this number to 0 after each iteration
-          works_sum_year <- 0
-          cited_sum_year <- 0
-        } else {
-          ##### Note: If you see error msg: Error: $ operator is invalid for atomic vectors
-          # That means certain works_count  is logical and has no data
-          print("This is NOT a dataframe. Data Wrong")
-          # set value as -1 for warning message
-          Total_sum_of_works = -1
-          Total_cited_sum_year = -1
-        }
-      } # for loop
-
-      # Build output dataframe author_stats
-      author_stats <-data.frame (
-        Name = author,
-        OpenAlexId = filtered_authors$id,
-        Year = year,
-        Total_sum_of_works = total_works_sum_year,
-        Total_sum_of_cited = total_cited_sum_year
-      )
-
-      # reset the var after done
-      total_works_sum_year <- 0
-      total_cited_sum_year <- 0
-    } # if
-
-   return (author_stats)
-  }
-}
-
 ########################## TESTING PEOPLE ####################
 ### Format: Name: Year: Works/Cited
 
@@ -309,19 +304,18 @@ calculate_works_count <- function(author, affiliation, year) {
 #### Phillip Kuo: 2022: 30 and 133: 26 IDs
 ####            : 2023-07: after authorID updates: 17 and 330
 author_name <- "Phillip Kuo"
-affiliation <- "University of Arizona"
+affiliation_name <- "University of Arizona"
 author_result_fuzzy       <- oa_fetch(entity = "author", search = author_name)
-author_result_affiliation <- search_author(author_name, affiliation )
-author_stats              <- calculate_works_count(author_name, affiliation, 2022)
+author_result_affiliation <- search_author(author_name, affiliation_name )
+author_stats              <- calculate_works_count(author_name, affiliation_name, 2022)
 
 ### Bekir Tanriover returns 5 openAlex ID: 2022: works 11, cited 166; 2021: works 4 cited 167
 ###: 2023-07: after authorID updates: NULL (??? error )
 ### 2023-08: After authorID updates: correct affiliation: 2022: 16 and 170
 author_name <- "Bekir Tanriover"
-affiliation <- "University of Arizona"
 author_result_fuzzy       <- oa_fetch(entity = "author", search = author_name)
-author_result_affiliation <- search_author(author_name, affiliation )
-author_stats              <- calculate_works_count(author_name, affiliation, 2022)
+author_result_affiliation <- search_author(author_name, affiliation_name )
+author_stats              <- calculate_works_count(author_name, affiliation_name, 2022)
 
 
 author_stats <- calculate_works_count(test_data_COM_authors[2], test_data_affiliation[1], test_data_year[1])
@@ -339,37 +333,36 @@ author_stats <- calculate_works_count(test_data_COM_Tucson_authors[5], test_data
 
 ######## Science
 ### June 2023: Marek Rychlik returns : works 0, cited 11
-### Aug 2023: 
+### Aug 2023: Good result: works 35, cited 502
 author_name <- "Marek Rychlik"
-affiliation <- "University of Arizona"
 author_result_fuzzy       <- oa_fetch(entity = "author", search = author_name)
-author_result_affiliation <- search_author(author_name, affiliation )
-author_stats              <- calculate_works_count(author, affiliation, 2022)
+author_result_affiliation <- search_author(author_name, affiliation_name )
+author_stats              <- calculate_works_count(author_name, affiliation_name, 2022)
 
 ### Ali Bilgin: works 4, cited 187
-### Showing 2 results. The other searches show one combined result
+### June 2023: Showing 2 results. The other searches show one combined result
+### Aug 2023: 2 results: "University of Arizona Medical Center" and "University of Arizona". Need to combine 
 author_name <- "Ali Bilgin"
-affiliation <- "University of Arizona"
 author_result_fuzzy       <- oa_fetch(entity = "author", search = author_name)
-author_result_affiliation <- search_author(author_name, affiliation )
-author_stats              <- calculate_works_count(author, affiliation, 2022)
+author_result_affiliation <- search_author(author_name, affiliation_name )
+author_stats              <- calculate_works_count(author_name, affiliation_name, 2022)
 
 ####### iSchool
 ### Hong Cui: NOT found: 2022: 
-### Showing 1 results. 
+### June 2023: Showing 1 results. 
+### Aug 2023: showing 2 results: one with ORCID, and the other shows none. Need to combine 
 author_name <- "Hong Cui"
-affiliation <- "University of Arizona"
 author_result_fuzzy       <- oa_fetch(entity = "author", search = author_name)
-author_result_affiliation <- search_author(author_name, affiliation )
-author_stats              <- calculate_works_count(author, affiliation, 2022)
+author_result_affiliation <- search_author(author_name, affiliation_name )
+author_stats              <- calculate_works_count(author_name, affiliation_name, 2022)
 
 ###### Others
 ### Leila Hudson: 2022: 0/2
+### Aug 2023: good result.
 author_name <- "Leila Hudson"
-affiliation <- "University of Arizona"
 author_result_fuzzy       <- oa_fetch(entity = "author", search = author_name)
-author_result_affiliation <- search_author(author_name, affiliation )
-author_stats              <- calculate_works_count(author, affiliation, 2022)
+author_result_affiliation <- search_author(author_name, affiliation_name )
+author_stats              <- calculate_works_count(author_name, affiliation_name, 2022)
 
 # Error in works_count[[i]] : subscript out of bounds
 author_stats <- calculate_works_count(test_data_others[2], test_data_affiliation[1], test_data_year[1])
@@ -425,8 +418,6 @@ filtered_author2 <- subset(author2_from_names, grepl("https://openalex.org/I1380
 author3_from_names <- oa_fetch(entity = "author", display_name = c("Bekir Tanriover", "Ahlam Saleh") ) ### "search" syntax allows fuzzy search for middle name
 filtered_author3 <- subset(author3_from_names, grepl("https://ror.org/03m2x1q45", affiliation_ror, ignore.case=TRUE))
 
-
-
 ##### Testing with multiple authors
 unit_authors_names <- list( "Phillip Kuo", "Bekir Tanriover", "Ahlam Saleh")
 unit_authors_list <- list()
@@ -457,5 +448,4 @@ for (i in 1:length(unit_authors_list)) {
   output_string <- "Researcher" + unit_authors_list[[i]]$display_name + "Year" + counts_by_year
 
   }
-
 
