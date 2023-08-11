@@ -42,18 +42,37 @@ test_data_year <- c("2022", "2021", "2020", "2012")
 
 ################ Testing Cases #######################
 
+############################## ORCID as filter ####################################
+# Download all works published by a set of authors using ORCIDs
+# use author.orcid as a filter
+# https://api.openalex.org/authors/https://orcid.org/0000-0001-9518-2684
+### NOTE: May 2023, Not all the works are there, NEED TO discuss with OpenAlex. Most likely the disambigation alg not working well. https://docs.openalex.org/api-entities/authors
+### NOTE: Aug 2023, OpenAlex has a new author data with new disambiguation model. It is getting better but there are still some bugs/errors.
+### Example: Aug 2023, there are 80 works associated with "0000-0001-9518-2684". About 40 works are NOT authored by me. (My works are all written in English. For some reasons, these works are NOT puulled from ORCID)
+
+works_from_orcids <- oa_fetch(
+  entity = "works",
+  author.orcid = c("0000-0001-9518-2684"),  
+  # author.orcid = c("0000-0001-6187-6610", "0000-0002-8517-9411"),
+  verbose = TRUE  
+) 
+
+
 ########################### Author matching criteria: 1) starting with ORCID; 2) using latest publication's affiliations 3) 
-#### Bekir affiliation shows "Columbia University", which is wrong. He (2009-2013) is at Columbia Univeristy, then he moved to UT Southwestern, and now he is at UA
-### This authorID does not have multiple affiliations?? 
+#### July 2023:  Bekir affiliation shows "Columbia University", which is wrong. He (2009-2013) is at Columbia Univeristy, then he moved to UT Southwestern, and now he is at UA
+#### Aug 11, 2023: Bekir affiliation shows "University of Arizona", which is correct now. 
 author_from_names <- oa_fetch(entity = "author", search = "Bekir Tanriover" )
 
+### July 2023, "Karen Padilla" affiliated with "University of Arizona"
+### Aug 11, 2023: "Karen Padilla" affiliated with "University of Arizona"
 author_from_names <- oa_fetch(entity = "author", search = "Karen Padilla" )
 
-################### Results contain wrong info (Haitong Tai: https://openalex.org/A5060511275 ) 
+### Aug 11, 2023: Results contain wrong info (Haitong Tai: https://openalex.org/A5060511275 ) affiliation not updated yet (probably based on last publication's affiliation)
 author_from_names <- oa_fetch(entity = "author", search = "Haw-chih Tai")
 
-#### This authorID upgrade does show my work/citation seems right with affiliation. There are 689 obs of "Yan Han". lol 
+#### This authorID upgrade does show my work/citation seems right with affiliation. There are 692 obs of "Yan Han". Most have ORCIDs. 
 author_from_names <- oa_fetch(entity = "author", search = "Yan Han")
+
 #### This upgrade found Hong Cui's ID and correct affiliation. 
 author_from_names <- oa_fetch(entity = "author", search = "Hong Cui")
 
@@ -287,23 +306,22 @@ calculate_works_count <- function(author, affiliation, year) {
 
 ############# College of Medicine Tucson Test Date:  2023-05-14: If test in a different date, result may vary
 #### U of Arizona College of Medicine Faculty and Staff Directory https://medicine.arizona.edu/directory/faculty-staff
-#### Phillip Kuo: 2022: 30/133: 26 IDs
-####            : 2023-07: after authorID updates: 17/330
+#### Phillip Kuo: 2022: 30 and 133: 26 IDs
+####            : 2023-07: after authorID updates: 17 and 330
 author_name <- "Phillip Kuo"
 affiliation <- "University of Arizona"
 author_result_fuzzy       <- oa_fetch(entity = "author", search = author_name)
 author_result_affiliation <- search_author(author_name, affiliation )
-author_stats              <- calculate_works_count(author, affiliation, 2022)
+author_stats              <- calculate_works_count(author_name, affiliation, 2022)
 
 ### Bekir Tanriover returns 5 openAlex ID: 2022: works 11, cited 166; 2021: works 4 cited 167
 ###: 2023-07: after authorID updates: NULL (??? error )
+### 2023-08: After authorID updates: correct affiliation: 2022: 16 and 170
 author_name <- "Bekir Tanriover"
 affiliation <- "University of Arizona"
 author_result_fuzzy       <- oa_fetch(entity = "author", search = author_name)
 author_result_affiliation <- search_author(author_name, affiliation )
-author_stats              <- calculate_works_count(author, affiliation, 2022)
-
-
+author_stats              <- calculate_works_count(author_name, affiliation, 2022)
 
 
 author_stats <- calculate_works_count(test_data_COM_authors[2], test_data_affiliation[1], test_data_year[1])
@@ -320,7 +338,8 @@ author_stats <- calculate_works_count(test_data_COM_Tucson_authors[5], test_data
 
 
 ######## Science
-### Marek Rychlik returns : works 0, cited 11
+### June 2023: Marek Rychlik returns : works 0, cited 11
+### Aug 2023: 
 author_name <- "Marek Rychlik"
 affiliation <- "University of Arizona"
 author_result_fuzzy       <- oa_fetch(entity = "author", search = author_name)
