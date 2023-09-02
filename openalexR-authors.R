@@ -142,8 +142,8 @@ oa_entities()
 # use author.orcid as a filter
 # https://api.openalex.org/authors/https://orcid.org/0000-0001-9518-2684
 ### NOTE: May 2023, Not all the works are there, NEED TO discuss with OpenAlex. Most likely the disambigation alg not working well. https://docs.openalex.org/api-entities/authors
-### NOTE: Aug 2023, OpenAlex has a new author data with new disambiguation model. It is getting better but there are still some bugs/errors.
-### Example: Aug 2023, there are 80 works associated with "0000-0001-9518-2684". About 40 works are NOT authored by me. (My works are all written in English. For some reasons, these works are NOT puulled from ORCID)
+### NOTE: Aug 2023, OpenAlex has a new author data with a new disambiguation model. It is getting better but there are still some bugs/errors.
+### Example: Aug 2023, there are 80 works associated with "0000-0001-9518-2684". About 40 works are NOT authored by me. (My works are all written in English. For some reason, these works are NOT pulled from ORCID)
 
 works_from_orcids <- oa_fetch(
   entity = "works",
