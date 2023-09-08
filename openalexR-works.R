@@ -50,18 +50,20 @@ test_data_affiliation <- c("University of Arizona")
 test_data_year <- c("2022", "2021", "2020", "2012")
 
 # Test works 
-works_from_dois <- oa_fetch(entity = "works", doi = c("https://doi.org/10.1681/asn.2012070664", "https://doi.org/10.1007/s11192-013-1221-3"),  verbose = TRUE)
+works_from_dois <- oa_fetch(entity = "works", doi = c("https://doi.org/10.1093/ofid/ofac186", "https://doi.org/10.1007/s11192-013-1221-3"),  verbose = TRUE)
+
+
 # To see is_oa field
 
 # use "search" option with no middle name 
-author_from_names <- oa_fetch(entity = "author", search = test_data_COM_authors[1]) 
+author_from_names <- oa_fetch(entity = "author", search = test_data_COM_authors[2]) 
 
 # first checking if author exists
 if (!is.null(author_from_names)) {
   print("author found")
   # Filter out not "University of Arizona" authors using "affiliation_display_name" column.
   # other filtering fields can be "affiliation_id", "affiliation_ror"
-  filtered_authors <- subset(author_from_names, grepl("University of Arizona", affiliation_display_name, ignore.case=TRUE))
+  filtered_authors <- subset(author_from_names, grepl("University", affiliation_display_name, ignore.case=TRUE))
   if (nrow(filtered_authors) == 0 )  {
     print("The filtered_authors dataframe is empty")
   }
@@ -72,6 +74,7 @@ print(filtered_authors[1][1])
 
 
 ## Testing 
+# 2023-08: openalex changed id to id[1]. it was id[2]
 openalex_author_id <- filtered_authors$id[1]
 author_works <- oa_fetch ( entity = "works",
                            author.id=(openalex_author_id),
@@ -79,9 +82,9 @@ author_works <- oa_fetch ( entity = "works",
 object_type <- class(author_works)
 print(object_type)
 
-# Filter publications after year 2020
+# Filter publications after year 2010
 filtered_author_works <- author_works %>%
-  filter(substr(publication_date, 1,4) >"2020")
+  filter(substr(publication_date, 1,4) >"2010")
 
 # Filter source of work
 so_values <- filtered_author_works$so
@@ -103,8 +106,8 @@ field_names <-colnames(filtered_author_works)
 print(field_names)
 
 
-
-selected_columns <- filtered_author_works[c("id", "display_name", "author", "ab", "publication_date",  "relevance_score", "so", "so_id", "host_organization", "issn_l", "url"
+# 2023-08: "relevance_score" removed
+selected_columns <- filtered_author_works[c("id", "display_name", "author", "ab", "publication_date", "so", "so_id", "host_organization", "issn_l", "url"
                                             , "pdf_url", "license", "version", "first_page", "last_page", "volume", "issue", "is_oa", "cited_by_count", "publication_year"
                                             ,"cited_by_api_url", "ids", "doi", "type", "referenced_works", "related_works")]
 write.csv(selected_columns, file = "author_works.csv", row.names = TRUE)
