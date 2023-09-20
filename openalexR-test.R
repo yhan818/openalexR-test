@@ -76,16 +76,11 @@ authors_from_orcids |>
  knitr::kable()
 
 #################### Author's openAlex ID ###########################
+### Sep 2023: old authorID was removed. 
 
 author_from_openalex_id <-oa_fetch(entity = "author",
                                    openalex = "A4353996111" )
 
-### Aug 2023: No collection find ??? 
-author_works <- oa_fetch ( entity = "works",
-                           author.id="A4353996111",
-                           verbose = TRUE
-                           )  
-show_works(author_works) 
 
 ###################### Author's name ####################################
 ###  use search for fuzzy name (middle name), 
@@ -112,7 +107,8 @@ org_args <- list(
   last_known_institution.id = "I138006243", # University of Arizona OpenAlex ID
   works_count = ">0"
 )
-# 58,183 records. Downloading will take a while
+# July 2023: 58,183 records. 
+# Sep 2023: 26,801 records. (Note: author disambuition system changed in Aug 2023)
 do.call(oa_fetch, c(org_args, list(count_only = TRUE)))
 
 # Download the list
@@ -140,6 +136,18 @@ library(listviewer)
 jsonedit(top_authors)
 head(top_authors)
 ###############
+
+#### University's multiple IDs'
+### Go to: https://api.openalex.org/institutions/ror:03m2x1q45 (which can be saved as a JSON file) or : https://api.openalex.org/institutions/I138006243 (which can be saved as a JSON file) 
+### Both JSON files are extact the same. 
+### On the above page: Check "ids", which shows that UArizona 
+### OpenAlex ID: I138006243, ROR: https://ror.org/03m2x1q45 , mag: "138006243", grid: "grid.134563.6", wikipedia: "https://en.wikipedia.org/wiki/University%20of%20Arizona", wikidata:"https://www.wikidata.org/wiki/Q503419"
+###
+### Sep 2023: Works count: 189,945, Citation count: 6,114,948
+
+### Fitering using name "University of Arizona" only (which is in the above openAlex id and ror record showing "display_name" as "University of Arizona")
+
+
 
 
 ###################### Rank institutions by the number of citations ############### 
