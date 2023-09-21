@@ -145,9 +145,40 @@ head(top_authors)
 ###
 ### Sep 2023: Works count: 189,945, Citation count: 6,114,948
 
-### Fitering using name "University of Arizona" only (which is in the above openAlex id and ror record showing "display_name" as "University of Arizona")
+### Removing Identifier will return all of U.S. institutions, currently 4,344
+### Flitering using name "University of Arizona" only (which is in the above openAlex id and ror record showing "display_name" as "University of Arizona")
+### 2022: 7856 : 444545  (total works: citations)
+### 2021: 8499 : 448383
+### 2020: 9007: 406828
 
+#### Method 1: using ROR ID
+university1 <-oa_fetch(
+  entity = "institutions",
+  identifier = "ror:03m2x1q45",
+  country_code = "us",
+  type = "education",
+  verbose = TRUE
+)
+### Method 2: using openAlex ID (MAG ID)
+university2 <-oa_fetch(
+  entity = "institutions",
+  identifier = "I138006243",
+  country_code = "us",
+  type = "education",
+  verbose = TRUE
+)
 
+#### Method 3: using dplyr package
+institutions <-oa_fetch(
+  entity = "institutions",
+  country_code = "us",
+  type = "education",
+  verbose = TRUE
+)
+
+### filtering by name
+filtered_university <- institutions %>% 
+  filter(display_name == "University of Arizona")
 
 
 ###################### Rank institutions by the number of citations ############### 
