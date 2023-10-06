@@ -177,8 +177,92 @@ institutions <-oa_fetch(
 )
 
 ### filtering by name
-filtered_university <- institutions %>% 
+filtered_university1 <- institutions %>% 
   filter(display_name == "University of Arizona")
+
+filtered_university2 <- institutions %>% 
+  filter(display_name == "Arizona")
+
+
+
+
+########## Banner : 2023-10 ### 
+##### Date: 2023-10
+### output
+install.packages("writexl")
+library(writexl)
+
+banner2 <-oa_fetch(
+  entity = "institutions",
+  identifier = "ror:039wwwz66",
+  country_code = "us",
+  type = "education",
+  verbose = TRUE
+)
+
+banner3 <-oa_fetch(
+  entity = "institutions",
+  identifier = "ror:01cjjjf51",
+  country_code = "us",
+  type = "education",
+  verbose = TRUE
+)
+
+
+banner2 <- lapply(banner2, function(x) if(is.list(x)) toString(x) else x)
+write.csv(banner2, file="banner2.csv")
+
+banner3 <- lapply(banner3, function(x) if(is.list(x)) toString(x) else x)
+write.csv(banner3, file="banner3.csv")
+
+
+# why no colleciton found?? 
+banner2_authors <- oa_fetch(entity = "author", last_known_institution.ror="039wwwz66" )
+
+### Getting all the works for an institution! 
+banner2_works <- oa_fetch (entity = "works", authorships.institutions.ror="039wwwz66", verbose = TRUE)
+
+# you can ALSO use library (dplyr) to run: 
+# filtered_works_2020_2 <- works_from_institution %>% filter(publication_year == 2020)
+banner2_works_2020 <- subset(banner2_works, publication_year == 2020)
+banner2_works_2021 <- subset(banner2_works, publication_year == 2021)
+banner2_works_2022 <- subset(banner2_works, publication_year == 2022)
+
+banner2_works_2020_df <-as.data.frame(banner2_works_2020)
+# output to XLSX
+write_xlsx(banner2_works_2020_df, "banner2_works_2020.xlsx")
+
+#### output to CSV. File is too big.  
+banner2_works_2020_df <- lapply(banner2_works_2020, function(x) if(is.list(x)) toString(x) else x)
+class(banner2_works_2020_df)
+# write.csv(banner2_works_2020_df, file = "banner2_works_2020.csv", row.names = FALSE, fileEncoding = "UTF-8")
+
+### Getting all the works for an institution! 
+banner3_works <- oa_fetch (entity = "works", authorships.institutions.ror="01cjjjf51", verbose = TRUE)
+
+banner3_works_2020 <- subset(banner3_works, publication_year == 2020)
+banner3_works_2021 <- subset(banner3_works, publication_year == 2021)
+banner3_works_2022 <- subset(banner3_works, publication_year == 2022)
+
+banner3_works_2020_df <-as.data.frame(banner3_works_2020)
+write_xlsx(banner3_works_2020_df, "banner3_works_2020.xlsx")
+
+
+# ROR "023jwkg52": 0 record 
+# ROR "00sr2h055": 0 record
+# ROR "01jjm6w53": 110 records
+banner4_works <- oa_fetch (entity = "works", authorships.institutions.ror="01jjm6w53", verbose = TRUE)
+banner4_works_2020 <- subset(banner4_works, publication_year == 2020)
+banner4_works_2021 <- subset(banner4_works, publication_year == 2021)
+banner4_works_2022 <- subset(banner4_works, publication_year == 2022)
+
+banner4_works_2020_df <-as.data.frame(banner4_works_2020)
+write_xlsx(banner4_works_2020_df, "banner4_works_2020.xlsx")
+
+
+
+
+
 
 
 ###################### Rank institutions by the number of citations ############### 
