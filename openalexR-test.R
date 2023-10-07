@@ -1,14 +1,18 @@
 ##################################################
 ######## Author: Yan Han 
-######## Date: Jan 16, 2023; Updated: May 3, 2023
+######## Date: Jan 16, 2023; Updated: Oct 6, 2023
+#### 2023-05: 
+#### 2023-08: OpenAlex changed its old authorID
+#### 2023-09: Compare UArizona ROR, display_name, and OpenAlexID
+#### 2023-10: Add each unit of Banner Health query and dedup
 
-# OpenAlex R
-# Documentation: https://github.com/ropensci/openalexR
+# OpenAlex R Documentation: https://github.com/ropensci/openalexR
 
 install.packages("openalexR")
 install.packages("dplyr")
 install.packages("ggplot2")
 install.packages("knitr")
+install.packages("writexl")
 
 # Before we go any further, we highly recommend you set openalexR.mailto option so that your requests go to the polite pool for faster response times: 
 options (openalexR.mailto="yhan@arizona.edu")
@@ -18,6 +22,7 @@ library(openalexR)
 library(dplyr)
 library(ggplot2)
 library(knitr)
+library(writexl)
 
 ############################################################
 #### Using API directly
@@ -77,10 +82,7 @@ authors_from_orcids |>
 
 #################### Author's openAlex ID ###########################
 ### Sep 2023: old authorID was removed. 
-
-author_from_openalex_id <-oa_fetch(entity = "author",
-                                   openalex = "A4353996111" )
-
+author_from_openalex_id <-oa_fetch(entity = "author", openalex = "A4353996111" )
 
 ###################### Author's name ####################################
 ###  use search for fuzzy name (middle name), 
@@ -183,15 +185,7 @@ filtered_university1 <- institutions %>%
 filtered_university2 <- institutions %>% 
   filter(display_name == "Arizona")
 
-
-
-
-########## Banner : 2023-10 ### 
-##### Date: 2023-10
-### output
-install.packages("writexl")
-library(writexl)
-
+####################################
 banner2 <-oa_fetch(
   entity = "institutions",
   identifier = "ror:039wwwz66",
@@ -208,13 +202,8 @@ banner3 <-oa_fetch(
   verbose = TRUE
 )
 
-
-banner2 <- lapply(banner2, function(x) if(is.list(x)) toString(x) else x)
-write.csv(banner2, file="banner2.csv")
-
-banner3 <- lapply(banner3, function(x) if(is.list(x)) toString(x) else x)
-write.csv(banner3, file="banner3.csv")
-
+### banner2 <- lapply(banner2, function(x) if(is.list(x)) toString(x) else x)
+## write.csv(banner2, file="banner2.csv")
 
 # why no colleciton found?? 
 banner2_authors <- oa_fetch(entity = "author", last_known_institution.ror="039wwwz66" )
@@ -228,18 +217,13 @@ banner2_works_2020 <- subset(banner2_works, publication_year == 2020)
 banner2_works_2021 <- subset(banner2_works, publication_year == 2021)
 banner2_works_2022 <- subset(banner2_works, publication_year == 2022)
 
-banner2_works_2020_df <-as.data.frame(banner2_works_2020)
-# output to XLSX
-write_xlsx(banner2_works_2020_df, "banner2_works_2020.xlsx")
-
 #### output to CSV. File is too big.  
-banner2_works_2020_df <- lapply(banner2_works_2020, function(x) if(is.list(x)) toString(x) else x)
-class(banner2_works_2020_df)
+# banner2_works_2020_df <- lapply(banner2_works_2020, function(x) if(is.list(x)) toString(x) else x)
+# class(banner2_works_2020_df)
 # write.csv(banner2_works_2020_df, file = "banner2_works_2020.csv", row.names = FALSE, fileEncoding = "UTF-8")
 
-### Getting all the works for an institution! 
+### banner3: 
 banner3_works <- oa_fetch (entity = "works", authorships.institutions.ror="01cjjjf51", verbose = TRUE)
-
 banner3_works_2020 <- subset(banner3_works, publication_year == 2020)
 banner3_works_2021 <- subset(banner3_works, publication_year == 2021)
 banner3_works_2022 <- subset(banner3_works, publication_year == 2022)
@@ -247,22 +231,136 @@ banner3_works_2022 <- subset(banner3_works, publication_year == 2022)
 banner3_works_2020_df <-as.data.frame(banner3_works_2020)
 write_xlsx(banner3_works_2020_df, "banner3_works_2020.xlsx")
 
+duplicates3 <-banner3_works_2020$display_name %in% banner2_works_2020$display_name
+duplicates4 <-banner4_works_2020$display_name %in% banner3_works_2020$display_name
+duplicates5 <-banner4_works_2020$display_name %in% banner2_works_2020$display_name
 
-# ROR "023jwkg52": 0 record 
-# ROR "00sr2h055": 0 record
-# ROR "01jjm6w53": 110 records
-banner4_works <- oa_fetch (entity = "works", authorships.institutions.ror="01jjm6w53", verbose = TRUE)
-banner4_works_2020 <- subset(banner4_works, publication_year == 2020)
-banner4_works_2021 <- subset(banner4_works, publication_year == 2021)
-banner4_works_2022 <- subset(banner4_works, publication_year == 2022)
+#########################################################
+## Define a custom function to fetch and subset data
+fetch_ror_year <- function(ror_id, year) {
+  # Fetch data for the given ROR ID
+  data <- oa_fetch(entity = "works", authorships.institutions.ror = ror_id, verbose = TRUE)
+  # Subset data for the specified year
+  subset_data <- subset(data, publication_year == year)
+  
+  return(subset_data)
+}
 
-banner4_works_2020_df <-as.data.frame(banner4_works_2020)
-write_xlsx(banner4_works_2020_df, "banner4_works_2020.xlsx")
+# find all the records by ROR and year. 
+# Ran on 2023-10-06:
+# Banner Health
+b2_works_2020 <- fetch_ror_year("039wwwz66", 2020)  # 2023-10-06: 92 
+# Banner – University Medical Center Phoenix
+b3_works_2020 <- fetch_ror_year("01cjjjf51", 2020)  # 2023-10-06: 139
+
+
+b6_works_2020 <- fetch_ror_year("023jwkg52", 2020) # 2023-10-06: 0
+
+
+
+
+b13_works_2020 <- fetch_ror_year("00sr2h055", 2020) # 2023-10-06: 0
+
+b15_works_2020 <- fetch_ror_year("01jjm6w53", 2020) # 4
+
+b16_works_2020 <- fetch_ror_year("04mvgap27", 2020) # 3
+# Banner Estrella Medical Center
+b17_works_2020 <- fetch_ror_year("05ct0ag17", 2020) # 11 
+
+b19_works_2020 <- fetch_ror_year("05gfbdk85", 2020) # 0
+b20_works_2020 <- fetch_ror_year("049c9q337", 2020) # 0
+
+
+b23_works_2020 <- fetch_ror_year("03y8jje75", 2020) # 1
+
+b25_works_2020 <- fetch_ror_year("03vq5n859", 2020) # 0
+
+
+
+
+b29_works_2020 <- fetch_ror_year("02s49nq19", 2020) # 0
+
+b31_works_2020 <- fetch_ror_year("033a24x98", 2020) # 0
+
+# Banner Sun Health Research Institute
+# check "Highly Sensitive and Multiplexed In-Situ Protein Profiling with Cleavable Fluorescent Streptavidin". why included? 
+b35_works_2020 <- fetch_ror_year("04gjkkf30", 2020) # 55
+
+
+# Banner Thunderbird Medical Center
+b37_works_2020 <- fetch_ror_year("01kqrgb09", 2020) # 18 
+
+# Banner - University Medical Center Tucson
+b39_works_2020 <- fetch_ror_year("02xbk5j62", 2020) # 2023-10-06: 241 
+
+
+b42_works_2020 <- fetch_ror_year("035dcj063", 2020) # 4
 
 
 
 
 
+b51_works_2020 <- fetch_ror_year("05e33tw76", 2020) # 6
+b53_works_2020 <- fetch_ror_year("01phkkj35", 2020) # 4
+
+#### Merge all the units' df
+banner_works_2020 <- rbind(b2_works_2020, b3_works_2020, b15_works_2020, b16_works_2020, b17_works_2020)
+# use unique() to dedup
+unique_df <- unique(banner_works_2020)
+
+# Continue to merge b20 - b50 
+banner_works_2020 <- rbind(banner_works_2020, b23_works_2020, b29_works_2020, b35_works_2020, b37_works_2020, b39_works_2020, b42_works_2020, b51_works_2020, b53_works_2020)
+# This is the final 
+all_banner_works_2020 <- unique(banner_works_2020)
+
+### Verify if "Banner" "Banner Health" in author
+###################################################################
+
+class(all_banner_works_2020)
+class(all_banner_works_2020$author)
+
+# Assuming all_banner_works_2020$author is a list of data frames
+column_name <- "institution_display_name"
+
+# Use sapply() to check the class of the specified column in each data frame
+column_classes <- sapply(all_banner_works_2020$author, function(df) {
+  class(df[[column_name]])
+})
+
+# Assuming all_banner_works_2020$author is a list of data frames
+word_to_find <- "Banner"
+
+# Use lapply() to search for the word in each data frame within the list
+word_found_list <- lapply(all_banner_works_2020$author, function(df) {
+  grepl(word_to_find, df$institution_display_name)
+})
+
+# Assuming word_found_list is a list containing logical vectors
+# Check if the first logical vector contains at least one "TRUE" value
+contains_true <- any(word_found_list[[1]])
+# The 'contains_true' variable will be TRUE if at least one "TRUE" is present, otherwise FALSE
+
+contains_true_list <- sapply(word_found_list, function(vector) {
+  any(vector)
+})
+# The 'contains_true_list' will be a logical vector indicating whether each vector contains at least one "TRUE"
+# Find the row numbers where contains_true_list is FALSE
+false_rows <- which(!contains_true_list)
+
+
+
+
+# Assuming you have two data frames: b2_works_2020 and b3_works_2020
+# Find duplicate rows in b2_works_2020 and b3_works_2020
+duplicates_b2 <- banner_works_2020[duplicated(banner_works_2020), ]
+duplicates_b3 <- all_banner_works_2020[duplicated(all_banner_works_2020), ]
+
+write_xlsx(duplicates_b2, "final_banner_collab_works_2020.xls")
+
+# Output to xls 
+getwd()
+setwd("/home/yhan/Documents/UA-datasets/openalexR-test")
+write_xlsx(all_banner_works_2020, "final_banner_works_2020.xls")
 
 
 ###################### Rank institutions by the number of citations ############### 
