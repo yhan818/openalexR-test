@@ -248,8 +248,9 @@ fetch_ror_year <- function(ror_id, year) {
 
 # find all the records by ROR and year. 
 # Ran on 2023-10-06:
-
+# Banner Health
 b2_works_2020 <- fetch_ror_year("039wwwz66", 2020)  # 2023-10-06: 92 
+# Banner – University Medical Center Phoenix
 b3_works_2020 <- fetch_ror_year("01cjjjf51", 2020)  # 2023-10-06: 139
 
 
@@ -263,6 +264,7 @@ b13_works_2020 <- fetch_ror_year("00sr2h055", 2020) # 2023-10-06: 0
 b15_works_2020 <- fetch_ror_year("01jjm6w53", 2020) # 4
 
 b16_works_2020 <- fetch_ror_year("04mvgap27", 2020) # 3
+# Banner Estrella Medical Center
 b17_works_2020 <- fetch_ror_year("05ct0ag17", 2020) # 11 
 
 b19_works_2020 <- fetch_ror_year("05gfbdk85", 2020) # 0
@@ -280,12 +282,16 @@ b29_works_2020 <- fetch_ror_year("02s49nq19", 2020) # 0
 
 b31_works_2020 <- fetch_ror_year("033a24x98", 2020) # 0
 
-
+# Banner Sun Health Research Institute
+# check "Highly Sensitive and Multiplexed In-Situ Protein Profiling with Cleavable Fluorescent Streptavidin". why included? 
 b35_works_2020 <- fetch_ror_year("04gjkkf30", 2020) # 55
 
+
+# Banner Thunderbird Medical Center
 b37_works_2020 <- fetch_ror_year("01kqrgb09", 2020) # 18 
 
-b39_works_2020 <- fetch_ror_year("02xbk5j62", 2020) # 2023-10-06: 241
+# Banner - University Medical Center Tucson
+b39_works_2020 <- fetch_ror_year("02xbk5j62", 2020) # 2023-10-06: 241 
 
 
 b42_works_2020 <- fetch_ror_year("035dcj063", 2020) # 4
@@ -306,6 +312,43 @@ unique_df <- unique(banner_works_2020)
 banner_works_2020 <- rbind(banner_works_2020, b23_works_2020, b29_works_2020, b35_works_2020, b37_works_2020, b39_works_2020, b42_works_2020, b51_works_2020, b53_works_2020)
 # This is the final 
 all_banner_works_2020 <- unique(banner_works_2020)
+
+### Verify if "Banner" "Banner Health" in author
+###################################################################
+
+class(all_banner_works_2020)
+class(all_banner_works_2020$author)
+
+# Assuming all_banner_works_2020$author is a list of data frames
+column_name <- "institution_display_name"
+
+# Use sapply() to check the class of the specified column in each data frame
+column_classes <- sapply(all_banner_works_2020$author, function(df) {
+  class(df[[column_name]])
+})
+
+# Assuming all_banner_works_2020$author is a list of data frames
+word_to_find <- "Banner"
+
+# Use lapply() to search for the word in each data frame within the list
+word_found_list <- lapply(all_banner_works_2020$author, function(df) {
+  grepl(word_to_find, df$institution_display_name)
+})
+
+# Assuming word_found_list is a list containing logical vectors
+# Check if the first logical vector contains at least one "TRUE" value
+contains_true <- any(word_found_list[[1]])
+# The 'contains_true' variable will be TRUE if at least one "TRUE" is present, otherwise FALSE
+
+contains_true_list <- sapply(word_found_list, function(vector) {
+  any(vector)
+})
+# The 'contains_true_list' will be a logical vector indicating whether each vector contains at least one "TRUE"
+# Find the row numbers where contains_true_list is FALSE
+false_rows <- which(!contains_true_list)
+
+
+
 
 # Assuming you have two data frames: b2_works_2020 and b3_works_2020
 # Find duplicate rows in b2_works_2020 and b3_works_2020
