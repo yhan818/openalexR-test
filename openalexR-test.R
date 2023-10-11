@@ -362,6 +362,91 @@ getwd()
 setwd("/home/yhan/Documents/UA-datasets/openalexR-test")
 write_xlsx(all_banner_works_2020, "final_banner_works_2020.xls")
 
+###################### compare openAlex data with Scopus data ####
+
+scopus_data <- read.csv("scopus_banner_health_2020.csv")
+
+# we will compare the titles on the two datasets: 
+scopus_data_titles <- scopus_data$Title
+openalex_data_titles <- all_banner_works_2020$display_name
+
+# Find common titles. only 141 are exactly the same 
+scopus_data_titles   <- tolower(scopus_data_titles)
+openalex_data_titles <- tolower(openalex_data_titles)
+
+common_titles <-intersect( scopus_data_titles, openalex_data_titles)
+print(common_titles)
+
+scopus_distinct_titles <- setdiff(scopus_data_titles, common_titles)
+print(scopus_distinct_titles)
+writeLines(scopus_distinct_titles, "scopus_distinct_title.txt")
+
+
+### Analysis:
+## For example. Scopus has this title "Noninvasive Input.." https://doi.org/10.1109/trpms.2020.3010844 
+## OpenAlex has this titel at https://openalex.org/W3045489656 
+## It  has the author "Kewei Chen", https://openalex.org/A5063303709   https://orcid.org/0000-0001-8497-3069, which has the following 
+# raw_author_name: "Kewei Chen",
+# raw_affiliation_string: "Banner Alzheimer’s Institute, Phoenix, Arizona, AZ, USA",
+# raw_affiliation_strings: ["Banner Alzheimer’s Institute, Phoenix, Arizona, AZ, USA" ]
+# the "institutions:" [] is empty. so I assume that when I run search on ROR "023jwkg52" , this article will not be found 
+
+
+
+
+
+
+
+
+
+
+
+
+# try finding alike titles
+install.packages("stringdist")
+library(stringdist)
+# calculate Jaccard similarity
+find_similar_strings <- function(query, string_array, threshold = 0.8) {
+  # Calculate Jaccard similarity between the query string and the array
+  similarity <- stringdist::stringdistmatrix(query, string_array, method = "cosine")
+  # Find indices of similar strings
+  similar_indices <- which(similarity > threshold)
+  # Extract the similar strings from the array
+  similar_strings <- string_array[similar_indices]
+  
+  return(similar_strings)
+}
+
+print(scopus_data_titles[1])
+### does not seem working right
+similar_string <- find_similar_strings(scopus_data_titles[1], openalex_data_titles)
+print(similar_string)
+
+
+####################################################################
+search_string_in_array <- function(search_string, string_array) {
+  # Use grepl() with ignore.case = TRUE to perform a case-insensitive search
+  is_string_present <- grepl(search_string, string_array, ignore.case = TRUE)
+  
+  # If is_string_present is TRUE, the string is found; if FALSE, it's not found
+  if (any(is_string_present)) {
+    message(paste(search_string, "is found in the array (case-insensitive search)."))
+    return(TRUE)
+  } else {
+    message(paste(search_string, "is not found in the array (case-insensitive search)."))
+    return(FALSE)
+  }
+}
+
+count =0
+for (string in scopus_data_titles) {
+  is_found <-search_string_in_array(string, openalex_data_titles)
+  if (is_found) {
+    count <- count+1
+  }
+}
+
+
 
 ###################### Rank institutions by the number of citations ############### 
 italy_insts <- oa_fetch(
