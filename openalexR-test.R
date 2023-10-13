@@ -305,12 +305,9 @@ b53_works_2020 <- fetch_ror_year("01phkkj35", 2020) # 4
 
 #### Merge all the units' df
 banner_works_2020 <- rbind(b2_works_2020, b3_works_2020, b15_works_2020, b16_works_2020, b17_works_2020)
-# use unique() to dedup
-unique_df <- unique(banner_works_2020)
-
 # Continue to merge b20 - b50 
 banner_works_2020 <- rbind(banner_works_2020, b23_works_2020, b29_works_2020, b35_works_2020, b37_works_2020, b39_works_2020, b42_works_2020, b51_works_2020, b53_works_2020)
-# This is the final 
+# This is the final. 2023-10-10: 554 
 all_banner_works_2020 <- unique(banner_works_2020)
 
 ### Verify if "Banner" "Banner Health" in author
@@ -348,8 +345,6 @@ contains_true_list <- sapply(word_found_list, function(vector) {
 false_rows <- which(!contains_true_list)
 
 
-
-
 # Assuming you have two data frames: b2_works_2020 and b3_works_2020
 # Find duplicate rows in b2_works_2020 and b3_works_2020
 duplicates_b2 <- banner_works_2020[duplicated(banner_works_2020), ]
@@ -362,7 +357,9 @@ getwd()
 setwd("/home/yhan/Documents/UA-datasets/openalexR-test")
 write_xlsx(all_banner_works_2020, "final_banner_works_2020.xls")
 
-###################### compare openAlex data with Scopus data ####
+#######################################################################
+###################### compare openAlex data with Scopus data #########
+#######################################################################
 
 scopus_data <- read.csv("scopus_banner_health_2020.csv")
 
@@ -381,20 +378,46 @@ scopus_distinct_titles <- setdiff(scopus_data_titles, common_titles)
 print(scopus_distinct_titles)
 writeLines(scopus_distinct_titles, "scopus_distinct_title.txt")
 
+### to see record: add "api" to the URL and open it in Firefox:  https://openalex.org/A5063303709  >>>>>>>>> https://api.openalex.org/A5063303709 (since A indicateds "author")
+### How to search via title: https://api.openalex.org/works?filter=title.search:patient travel concerns after treatment with 177lu-dotatate 
 
-### Analysis:
-## For example. Scopus has this title "Noninvasive Input.." https://doi.org/10.1109/trpms.2020.3010844 
-## OpenAlex has this titel at https://openalex.org/W3045489656 
-## It  has the author "Kewei Chen", https://openalex.org/A5063303709   https://orcid.org/0000-0001-8497-3069, which has the following 
+#######################################################################
+
+### Analysis: Scopus has 215 unique titles (not available from OpenAlex)
+# For example. Scopus has this title "Noninvasive Input.." https://doi.org/10.1109/trpms.2020.3010844 
+# OpenAlex has this at https://openalex.org/W3045489656 
+# It  has the author "Kewei Chen", https://openalex.org/A5063303709   https://orcid.org/0000-0001-8497-3069, which has the following 
 # raw_author_name: "Kewei Chen",
 # raw_affiliation_string: "Banner Alzheimer’s Institute, Phoenix, Arizona, AZ, USA",
 # raw_affiliation_strings: ["Banner Alzheimer’s Institute, Phoenix, Arizona, AZ, USA" ]
-# the "institutions:" [] is empty. so I assume that when I run search on ROR "023jwkg52" , this article will not be found 
+### Reason:  the "institutions:" [] is empty. so when I run search on ROR "023jwkg52" , this article will not be found 
 
+### Record [214] "development of the nec-zero toolkit:
+# https://openalex.org/W2999936980
+### Reason: This record shall not be included. There is no author affiliated with Banner
 
+### Record [205] "risk factors for alzheimer’s disease and related dementia diagnoses in american indians"                                                                                                                                                                                                                                                                                                           
+# https://api.openalex.org/works/W3089091526 
+# Saner, Don: Banner Alzheimer's institute
+# raw_author_name	"Don Saner"
+# raw_affiliation_string	"Banner Alzheimer's Institute, Phoenix, AZ."
+### Reason: the "institutions:" [] is empty. so when I run search on ROR "023jwkg52" , this article will not be found 
 
+### [172] "patient travel concerns after treatment with 177lu-dotatate"   
+# https://openalex.org/W3011305417                                                                                                                                                                                                                                                                                                                                       
+# Naraev, Boris: BAnner M.D. Anderson Cancer Center
+# raw_affiliation_string	"Banner M.D. Anderson Cancer Center, Gilbert, Arizona."
+# the "institutions:" [] is empty
+### Reason: Same as the other
 
-
+### 147: brain imaging measurements of fibrillar amyloid-β burden
+# https://openalex.org/W2996615980
+# 
+#raw_affiliation_strings	
+# 0	"Arizona Alzheimer's Consortium, Phoenix, AZ, USA"
+#  1	"Banner Alzheimer's Institute, Phoenix, AZ, USA"
+# institutions	0	 id	"https://openalex.org/I1279571640" display_name	"Alzheimer's Association"
+### Reason: institutions only list 1, while the author has two affiliations! 
 
 
 
