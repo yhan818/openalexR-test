@@ -236,7 +236,7 @@ duplicates4 <-banner4_works_2020$display_name %in% banner3_works_2020$display_na
 duplicates5 <-banner4_works_2020$display_name %in% banner2_works_2020$display_name
 
 #########################################################
-## Define a custom function to fetch and subset data
+### Define a custom function to fetch and subset data
 fetch_ror_year <- function(ror_id, year) {
   # Fetch data for the given ROR ID
   data <- oa_fetch(entity = "works", authorships.institutions.ror = ror_id, verbose = TRUE)
@@ -245,6 +245,11 @@ fetch_ror_year <- function(ror_id, year) {
   
   return(subset_data)
 }
+
+
+### Define a function to find a string in a column 
+
+
 
 # find all the records by ROR and year. 
 # Ran on 2023-10-06:
@@ -291,7 +296,7 @@ b35_works_2020 <- fetch_ror_year("04gjkkf30", 2020) # 55
 b37_works_2020 <- fetch_ror_year("01kqrgb09", 2020) # 18 
 
 # Banner - University Medical Center Tucson
-b39_works_2020 <- fetch_ror_year("02xbk5j62", 2020) # 2023-10-06: 241 
+b39_works_2020 <- fetch_ror_year("02xbk5j62", 2020) # 2023-10-13: 243 
 
 
 b42_works_2020 <- fetch_ror_year("035dcj063", 2020) # 4
@@ -308,19 +313,16 @@ banner_works_2020 <- rbind(b2_works_2020, b3_works_2020, b15_works_2020, b16_wor
 # Continue to merge b20 - b50 
 banner_works_2020 <- rbind(banner_works_2020, b23_works_2020, b29_works_2020, b35_works_2020, b37_works_2020, b39_works_2020, b42_works_2020, b51_works_2020, b53_works_2020)
 # This is the final. 2023-10-10: 554 
-all_banner_works_2020 <- unique(banner_works_2020)
+all_banner_works_openalex_2020 <- unique(banner_works_2020)
 
 ### Verify if "Banner" "Banner Health" in author
 ###################################################################
-
-class(all_banner_works_2020)
-class(all_banner_works_2020$author)
 
 # Assuming all_banner_works_2020$author is a list of data frames
 column_name <- "institution_display_name"
 
 # Use sapply() to check the class of the specified column in each data frame
-column_classes <- sapply(all_banner_works_2020$author, function(df) {
+column_classes <- sapply(all_banner_works_openalex_2020$author, function(df) {
   class(df[[column_name]])
 })
 
@@ -328,7 +330,7 @@ column_classes <- sapply(all_banner_works_2020$author, function(df) {
 word_to_find <- "Banner"
 
 # Use lapply() to search for the word in each data frame within the list
-word_found_list <- lapply(all_banner_works_2020$author, function(df) {
+word_found_list <- lapply(all_banner_works_openalex_2020$author, function(df) {
   grepl(word_to_find, df$institution_display_name)
 })
 
@@ -348,14 +350,14 @@ false_rows <- which(!contains_true_list)
 # Assuming you have two data frames: b2_works_2020 and b3_works_2020
 # Find duplicate rows in b2_works_2020 and b3_works_2020
 duplicates_b2 <- banner_works_2020[duplicated(banner_works_2020), ]
-duplicates_b3 <- all_banner_works_2020[duplicated(all_banner_works_2020), ]
+duplicates_b3 <- all_banner_works_openalex_2020[duplicated(all_banner_works_2020), ]
 
 write_xlsx(duplicates_b2, "final_banner_collab_works_2020.xls")
 
 # Output to xls 
 getwd()
 setwd("/home/yhan/Documents/UA-datasets/openalexR-test")
-write_xlsx(all_banner_works_2020, "final_banner_works_2020.xls")
+write_xlsx(all_banner_works_openalex_2020, "final_banner_works_2020.xls")
 
 #######################################################################
 ###################### compare openAlex data with Scopus data #########
@@ -364,26 +366,42 @@ write_xlsx(all_banner_works_2020, "final_banner_works_2020.xls")
 scopus_data <- read.csv("scopus_banner_health_2020.csv")
 
 # we will compare the titles on the two datasets: 
-scopus_data_titles <- scopus_data$Title
-openalex_data_titles <- all_banner_works_2020$display_name
+titles_scopus <- scopus_data$Title
+titles_openalex <- all_banner_works_openalex_2020$display_name
 
-# Find common titles. only 141 are exactly the same 
-scopus_data_titles   <- tolower(scopus_data_titles)
-openalex_data_titles <- tolower(openalex_data_titles)
+# All titles are converted to lower cases, trim white space and handle special characters. Because if you do not do that, there will be many mis-matches. 
+# cannot use tolower() and trimws() along, because of special characters like '. 
+# Write my own function to improve results, increasing matching of 10%. Convert to lowercase and remove special characters and whitespace
+clean_string <- function(input_str) { 
+  cleaned_str <- tolower(gsub("[^A-Za-z0-9]+", "", input_str))
+  return(cleaned_str)
+}
 
-common_titles <-intersect( scopus_data_titles, openalex_data_titles)
-print(common_titles)
 
-scopus_distinct_titles <- setdiff(scopus_data_titles, common_titles)
-print(scopus_distinct_titles)
-writeLines(scopus_distinct_titles, "scopus_distinct_title.txt")
+############################## Common titles 166 ####### 
+clean_titles_scopus   <- clean_string(titles_scopus)
+clean_titles_openalex <- clean_string(titles_openalex)
+common_titles <-intersect(clean_titles_scopus, clean_titles_openalex)
+print(common_titles) # 166 common ones vs. 141 if using tolower()
+
+
+########################################### Distinct titles from OpenAlex ######### 
+#### Analysis: openAlex has distinct titles of 556 - 166 = 390 (not available from Scopus)
+#### Did a few searches on Scopus. cannot find the titles at all. 
+distinct_titles_openalex <- setdiff( titles_openalex, titles_scopus)
+print(distinct_titles_openalex)
+writeLines(distinct_titles_openalex, "distinct_title_openalex.txt")
 
 ### to see record: add "api" to the URL and open it in Firefox:  https://openalex.org/A5063303709  >>>>>>>>> https://api.openalex.org/A5063303709 (since A indicateds "author")
 ### How to search via title: https://api.openalex.org/works?filter=title.search:patient travel concerns after treatment with 177lu-dotatate 
 
 #######################################################################
+distinct_titles_scopus <- setdiff(titles_scopus, titles_openalex)
+print(distinct_titles_scopus)
+writeLines(distinct_titles_scopus, "distinct_title_scopus.txt")
 
-### Analysis: Scopus has 215 unique titles (not available from OpenAlex)
+########################################### Distinct titles from Scopus ######### 
+### Analysis: Scopus has 191 unique titles out of 357 (53.5%) (not available from OpenAlex)
 # For example. Scopus has this title "Noninvasive Input.." https://doi.org/10.1109/trpms.2020.3010844 
 # OpenAlex has this at https://openalex.org/W3045489656 
 # It  has the author "Kewei Chen", https://openalex.org/A5063303709   https://orcid.org/0000-0001-8497-3069, which has the following 
@@ -420,6 +438,21 @@ writeLines(scopus_distinct_titles, "scopus_distinct_title.txt")
 ### Reason: institutions only list 1, while the author has two affiliations! 
 
 
+### [24] "when it comes to snakebites, kids are little adults: a comparison of adults and children with rattlesnake bites"                                                                                                       
+# https://openalex.org/W4205513522
+# This is a different case: # BAnner - University Medical Center Phoenix is listed .https://ror.org/01cjjjf51 
+### This is in all_banner_works.... DO NOT KNOW WHY? R library has a bug??
+
+### [98] about that leaky ostomy pouch
+# MEDSURG NursingVolume 29, Issue 5, Pages 347 and 354September-October 2020 
+# OpenAlex does not have this record. (or I cannot find it)
+
+### [119] cottonmouth snake bites reported to the toxic north american snakebite registry 2013–2017
+# Scoups: puslished year 2020 with Clinical ToxicologyVolume 58, Issue 3, Pages 178 - 1823 March 2020
+# DOI: 10.1080/15563650.2019.1627367
+# openalex: published in 2019. 
+### Reason: publishing year has discrepancy. 
+
 
 
 
@@ -445,6 +478,7 @@ print(scopus_data_titles[1])
 similar_string <- find_similar_strings(scopus_data_titles[1], openalex_data_titles)
 print(similar_string)
 
+print(common_titles)
 
 ####################################################################
 search_string_in_array <- function(search_string, string_array) {

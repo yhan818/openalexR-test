@@ -1,215 +1,190 @@
-noninvasive input function acquisition and simultaneous estimations with physiological parameters for pet quantification: a brief review
-2019 annual report of the american association of poison control centers' national poison data system (npds): 37th annual report
-a modified delphi study to prioritize content for a simulation-based pediatric curriculum for emergency medicine residency training programs
-impact of a sbrt/srs longitudinal telehealth training pilot course in latin america
-female-specific effects of the catechol-o-methyl transferase val158met gene polymorphism on working memory-related brain function
-"babywearing" in the nicu: an intervention for infants with neonatal abstinence syndrome
-perinephric abscess in a renal transplant recipient due to mycoplasma hominis: case report and review of the literature
-differential diagnosis of diarrhea in patients with neuroendocrine tumors
-effect of implementing a standardized shoulder dystocia documentation form on quality of delivery notes
-tumor infiltrating lymphocytes after neoadjuvant irx-2 immunotherapy in oral squamous cell carcinoma: interim findings from the inspire trial
-health outcomes associated with adherence to antidepressant use during acute and continuation phases of depression treatment among older adults with dementia and major depressive disorder
-relations of mindfulness and illness acceptance with psychosocial functioning in patients with metastatic breast cancer and caregivers
-outcomes of liver transplantation among older recipients with nonalcoholic steatohepatitis in a large multicenter us cohort: the re-evaluating age limits in transplantation consortium
-crispr/cas9-mediated point mutation in nkx3.1 prolongs protein half-life and reverses effects nkx3.1 allelic loss
-joint recommendations and resources for clinical ultrasound education amidst the covid-19 era
-the latin american spanish version of the face-name associative memory exam is sensitive to cognitive and pathological changes in preclinical autosomal dominant alzheimer's disease
-osteopathic considerations for the pregnant patient with covid-19
-acute generalized exanthematous pustulosis and stevens-johnson syndrome overlap due to hydroxychloroquine: a case report
-thrombectomy technique predicts outcome in posterior circulation stroke⇔insights from the star collaboration
-utility of transjugular intrahepatic portosystemic shunt placement for maintaining portal vein patency in candidates on wait lists who develop thrombus
-fam222a encodes a protein which accumulates in plaques in alzheimer’s disease
-associative memory and in vivo brain pathology in asymptomatic presenilin-1 e280a carriers
-expression profiling of precuneus layer iii cathepsin d-immunopositive pyramidal neurons in mild cognitive impairment and alzheimer's disease: evidence for neuronal signaling vulnerability
-suture cerclage for stabilizing the humeral shaft during shoulder arthroplasty
-association between personality and tau-pet binding in cognitively normal older adults
-publisher correction: exuberant fibroblast activity compromises lung function via adamts4 (nature, (2020), 587, 7834, (466-471), 10.1038/s41586-020-2877-5)
-erratum: cluster identification, selection, and description in cluster randomized crossover trials: the prep-it trials (trials (2020) 21 (712) doi: 10.1186/s13063-020-04611-9)
-a telescope gwas analysis strategy, based on snps-genes-pathways ensamble and on multivariate algorithms, to characterize late onset alzheimer’s disease
-cytomegalovirus (cmv) cell-mediated immunity and cmv infection after allogeneic hematopoietic cell transplantation: the react study
-author correction: multimodal hippocampal subfield grading for alzheimer’s disease classification (scientific reports, (2019), 9, 1, (13845), 10.1038/s41598-019-49970-9)
-exuberant fibroblast activity compromises lung function via adamts4
-standard-of-care axicabtagene ciloleucel for relapsed or refractory large b-cell lymphoma: results from the us lymphoma car t consortium
-comparison of [11c]-pbr28 binding between persons living with hiv and hiv-uninfected individuals
-the toxicology investigators consortium case registry—the 2019 annual report
-safety of bariatric surgery in patients with inflammatory bowel disease: a systematic review and meta-analysis
-computing univariate neurodegenerative biomarkers with volumetric optimal transportation: a pilot study
-functional brain architecture is associated with the rate of tau accumulation in alzheimer’s disease
-a minimally invasive endoscopic technique for fascia lata graft acquisition and fascial reapproximation
-non-small cell lung cancer: part i
-cognitive outcomes in trials of two bace inhibitors in alzheimer's disease
-continuous glucose monitoring and use of alternative markers to assess glycemia in chronic kidney disease
-longitudinal data in peripheral blood confirm that pm20d1 is a quantitative trait locus (qtl) for alzheimer’s disease and implicate its dynamic role in disease progression
-outcomes with retrograde versus antegrade chronic total occlusion revascularization
-longitudinal white matter and cognitive development in pediatric carriers of the apolipoprotein ε4 allele
-exceptionally low likelihood of alzheimer’s dementia in apoe2 homozygotes from a 5,000-person neuropathological study
-missing and murdered indigenous women and girls: a case for abuse screening in at-risk paediatric populations
-association of blood-based transcriptional risk scores with biomarkers for alzheimer disease
-blinded rt-quic analysis of α-synuclein biomarker in skin tissue from parkinson's disease patients
-improvement in left ventricular function following higher-risk percutaneous coronary intervention in patients with ischemic cardiomyopathy
-bace inhibition causes rapid, regional, and non-progressive volume reduction in alzheimer's disease brain
-zanubrutinib for the treatment of patients with waldenstrom macroglobulinemia: 3 years of follow-up
-a phase ii randomized trial of sodium oligomannate in alzheimer's dementia
-spread of pathological tau proteins through communicating neurons in human alzheimer's disease
-penile ultrasound
-talazoparib versus chemotherapy in patients with germline brca1/2-mutated her2-negative advanced breast cancer: final overall survival results from the embraca trial
-challenges and opportunities with causal discovery algorithms: application to alzheimer’s pathophysiology
-developing an effective inpatient learning climate
-accuracy of dopamine transporter imaging with 123i-ioflupane in hispanic and non-hispanic patients
-impairment of flow-sensitive inwardly rectifying k+ channels via disruption of glycocalyx mediates obesity-induced endothelial dysfunction
-the alzheimer's prevention initiative composite cognitive test: a practical measure for tracking cognitive decline in preclinical alzheimer's disease
-arizona health care systems' coordinated response to covid-19 - "in it together"
-marijuana self-report compared with testing in trauma patients before and after legalization
-integrated analysis of ultra-deep proteomes in cortex, cerebrospinal fluid and serum reveals a mitochondrial signature in alzheimer's disease
-orthopaedic systems response to and return from the covid-19 pandemic: lessons for future crisis management
-age-related regional network covariance of magnetic resonance imaging gray matter in the rat
-population level analysis of adhesive small bowel obstruction: sustained advantage of a laparoscopic approach
-impact of recent methamphetamine use on vancomycin clearance
-randomized phase 2 study of adjunctive cenobamate in patients with uncontrolled focal seizures
-plasma neurofilament light chain in the presenilin 1 e280a autosomal dominant alzheimer's disease kindred: a cross-sectional and longitudinal cohort study
-the role of interprofessional practice in sustainability of a sequential compression devices project
-the alzheimer’s prevention registry: a large internet-based participant recruitment registry to accelerate referrals to alzheimer’s-focused studies
-corrigendum: “randomized, double-blind, placebo-controlled phase ii study of istiratumab (mm-141) plus nab-paclitaxel and gemcitabine versus nab-paclitaxel and gemcitabine in front-line metastatic pancreatic cancer (carrie)” (annals of oncology (2020) 31(1) (79–87), (s0923753419354055), (10.1016/j.annonc.2019.09.004))
-bowel preparation prior to minimally invasive sacrocolpopexy: a randomized controlled trial
-a brief review of liver injury in patients with corona virus disease-19 during the pandemic
-advanced pulmonary and cardiac support of covid-19 patients: emerging recommendations from asaio - a "living working document"
-plasmonic gel nanocomposites for detection of high energy electrons
-serious adverse health events, including death, associated with ingesting alcohol-based hand sanitizers containing methanol - arizona and new mexico, may-june 2020
-risks, time trends, and mortality of colonoscopy-induced perforation in hospitalized patients
-what's new in orthopaedic trauma
-musculoskeletal infection in orthopaedic trauma: assessment of the 2018 international consensus meeting on musculoskeletal infection
-modified subintimal transcatheter withdrawal: a novel technique for hematoma decompression to facilitate distal reentry during coronary chronic total occlusion recanalization
-echocardiographic results of transcatheter versus surgical aortic valve replacement in low-risk patients: the partner 3 trial
-alzheimer's patient microglia exhibit enhanced aging and unique transcriptional activation
-standardizing the approach to late onset sepsis in neonates through antimicrobial stewardship: a quality improvement initiative
-clinical efficacy of gastric per-oral endoscopic myotomy (g-poem) in the treatment of refractory gastroparesis and predictors of outcomes: a systematic review and meta-analysis using surgical pyloroplasty as a comparator group
-hemophilia a in females: considerations for clinical management
-advanced pulmonary and cardiac support of covid-19 patients: emerging recommendations from asaio - a living working document
-bicuspid aortic valve morphology and outcomes after transcatheter aortic valve replacement
-the application of indocyanine green videoangiography as an adjunct for arteriovenous malformation surgery
-transesophageal echocardiogram to the rescue in diagnosing ascending aortic pseudoaneurysm: reply
-erratum: different aspects of alzheimer's disease-related amyloid β-peptide pathology and their relationship to amyloid positron emission tomography imaging and dementia (acta neuropathologica communications (2019) 7 (178) doi: 10.1186/s40478-019-0837-9)
-age-related decline in the topological efficiency of the brain structural connectome and cognitive aging
-outcomes of older patients in zuma-1, a pivotal study of axicabtagene ciloleucel in refractory large b-cell lymphoma
-myocardial infarction can be safely excluded by high-sensitivity troponin i testing 3 hours after emergency department presentation
-the north american neuroendocrine tumor society consensus guidelines for surveillance and medical management of pancreatic neuroendocrine tumors
-exploratory ingestions of novel anticoagulants and antiplatelets: what is the risk?
-reduced intensity conditioning for acute myeloid leukemia using melphalan-vs busulfan-based regimens: a cibmtr report
-about that leaky ostomy pouch
-goodsall’s flaw
-characterization of respiratory compromise and the potential clinical utility of capnography in the post-anesthesia care unit: a blinded observational trial
-sexual side effects and prostate cancer
-the role of cognitive bias in breast radiology diagnostic and judgment errors
-rehabilitation for a complex patient following cerebellar hemorrhage and obstructive hydrocephalus: a case report
-serum neurofilament light chain levels are associated with white matter integrity in autosomal dominant alzheimer's disease
-apoe ε4 allele accelerates age-related multi-cognitive decline and white matter damage in non-demented elderly
-commentary: optimal perioperative fluid administration for elective colorectal operations: a call for reason amidst the eras blitz
-guidelines for management of urgent symptoms in patients with cholangiocarcinoma and biliary stents or catheters using the modified rand/ucla delphi process
-27-plex tandem mass tag mass spectrometry for profiling brain proteome in alzheimer's disease
-osseous integration of the central peg of an all-polyethylene glenoid with 3 different surgical techniques
-visual short-term memory relates to tau and amyloid burdens in preclinical autosomal dominant alzheimer's disease
-effect of apoe isoforms on mitochondria in alzheimer disease
-positron emission tomography imaging with [18f]flortaucipir and postmortem assessment of alzheimer disease neuropathologic changes
-approach and strategy for repeat catheter ablation of recurrent atrial fibrillation
-neurological manifestations of hereditary hemorrhagic telangiectasia (hht)
-baseline demographic, clinical, and cognitive characteristics of the alzheimer's prevention initiative (api) autosomal-dominant alzheimer's disease colombia trial
-choosing wisely® in hematology: have we made a difference?
-morphogenesis, environmental stress and reverse evolution
-complexity science fosters professional advanced nurse practitioner role emergence
-cottonmouth snake bites reported to the toxic north american snakebite registry 2013–2017
-radiotherapy for hepatocellular carcinoma in russia: a survey-based analysis of current practice and the impact of an educational workshop on clinical expertise
-overview of colon cancer for the medical-surgical nurse
-eshrd: deconvolution of brain homogenate rna expression data to identify novel cell-type-specific alterations in alzheimer's disease
-thirty-day outcomes of transcatheter mitral valve replacement for degenerated mitral bioprostheses (valve-in-valve), failed surgical rings (valve-in-ring), and native valve with severe mitral annular calcification (valve-in-mitral annular calcification) in the united states: data from the society of thoracic surgeons/american college of cardiology/transcatheter valve therapy registry
-clinical efficacy of per-oral endoscopic myotomy (poem) for spastic esophageal disorders: a systematic review and meta-analysis
-long-term safety and efficacy of the pi3k inhibitor copanlisib in patients with relapsed or refractory indolent lymphoma: 2-year follow-up of the chronos-1 study
-disruption of cholinergic neurotransmission, within a cognitive challenge paradigm, is indicative of aβ-related cognitive impairment in preclinical alzheimer's disease after a 27-month delay interval
-correction to: readmission-free period and in-hospital mortality at the time of first readmission in acute heart failure patients—nrd-based analysis of 40,000 heart failure readmissions (heart failure reviews, (2020), 10.1007/s10741-019-09912-z)
-differences in sleep architecture according to body mass index in children with type 1 diabetes
-febrile neutropenia hospitalization due to pegfilgrastim on-body injector failure compared to single-injection pegfilgrastim and daily injections with reference and biosimilar filgrastim: us cost simulation for lung cancer and non-hodgkin lymphoma
-development of an interprofessional program to prevent postoperative pneumonia
-impact of education about physical punishment of children on the attitudes of future physicians
-pre-transplant marital status and hematopoietic cell transplantation outcomes
-collaborations and connections: the value of the aonl nursing executive fellowship
-endothelial immune activation by medin: potential role in cerebrovascular disease and reversal by monosialoganglioside-containing nanoliposomes
-limitations of amyloid imaging in alzheimer’s disease
-effects of semantic categorization strategy training on episodic memory in children and adolescents
-kte-x19 car t-cell therapy in relapsed or refractory mantle-cell lymphoma
-clinical pharmacist–led impact on inappropriate albumin use and costs in the critically ill
-rivaroxaban versus warfarin for stroke prevention and venous thromboembolism treatment in extreme obesity and high body weight
-it is time to retire goodsall’s rule: the midline rule is a more accurate predictor of the true and natural course of anal fistulas
-current state of short-stem implants in total shoulder arthroplasty: a systematic review of the literature
-non-amyloid approaches to disease modification for alzheimer’s disease: an eu/us ctad task force report
-abnormalities of hepatic protein metabolism
-simplified preoperative tool predicting discharge destination after major oncologic gastrointestinal surgery
-a role for α-synuclein in axon growth and its implications in corticostriatal glutamatergic plasticity in parkinson's disease
-the role of parathyroidectomy in treating hypertension and other cardiac manifestations of primary hyperparathyroidism
-brain imaging measurements of fibrillar amyloid-β burden, paired helical filament tau burden, and atrophy in cognitively unimpaired persons with two, one, and no copies of the apoe ε4 allele
-five-year radiographic evaluation of stress shielding with a press-fit standard length humeral stem
-lymphoproliferative disorders of the orbit and ocular adnexa
-long-term physical exercise and mindfulness practice in an aging population
-brentuximab vedotin with chemotherapy for stage iii/iv classical hodgkin lymphoma: 3-year update of the echelon-1 study
-neuropsychological decline up to 20 years before incident mild cognitive impairment
-predicting brain age of healthy adults based on structural mri parcellation using convolutional neural networks
-errors in leadership: lessons from exceptional leaders
-maceration, induration, excoriation: what do these words mean?
-preoperative endoscopic and radiologic evaluation of bariatric patients: what do they add?
-precise and programmable detection of mutations using ultraspecific riboregulators
-social leisure activity, physical activity, and valuation of life: findings from a longevity study
-universal electrocardiographic screening for long qt syndrome in hospitalized neonates
-triptan and ergotamine overdoses in the united states: analysis of the national poison data system
-leading the compassionate charge
-early enteral nutrition is associated with improved clinical outcomes in critically ill children: a secondary analysis of nutrition support in the heart and lung failure-pediatric insulin titration trial
-the sup-icu trial: does it confirm or condemn the practice of stress ulcer prophylaxis?
-role of the pharmacist in research
-safety, efficacy, and timeliness of intravenous potassium chloride replacement protocols in a pediatric cardiothoracic intensive care unit
-deep multilayer brain proteomics identifies molecular networks in alzheimer's disease progression
-frontal cortex chitinase and pentraxin neuroinflammatory alterations during the progression of alzheimer's disease
-self-pu: self boosted and calibrated positive-unlabeled training
-focal segmental glomerulosclerosis in waldenström's macroglobulinemia
-transcatheter treatment of acquired coronary sinus ostium atresia in a child with complex congenital heart disease
-corrigendum: experimental traumatic brain injury induces chronic glutamatergic dysfunction in amygdala circuitry known to regulate anxiety-like behavior (frontiers in neuroscience, (2020), 13, 10.3389/fnins.2019.01434)
-patient travel concerns after treatment with 177lu-dotatate
-hyperoncotic albumin reduces net fluid loss associated with hemodialysis
-diagnosis and management of acute gastroenteritis in the emergency department
-the effect of 4-methylpyrazole on oxidative metabolism of acetaminophen in human volunteers
-hippocampal avoidance during whole-brain radiotherapy plus memantine for patients with brain metastases: phase iii trial nrg oncology cc001
-utility of quantitative spect/ct lymphoscintigraphy in guiding sentinel lymph node biopsy in head and neck melanoma
-the shape framework: empowering millennials to lead the future of health care
-efficacy and safety of lanabecestat for treatment of early and mild alzheimer disease: the amaranth and daybreak-alz randomized clinical trials
-extent and factors associated with adherence to antidepressant treatment during acute and continuation phase depression treatment among older adults with dementia and major depressive disorder
-racial and ethnic disparities among participants in us-based phase 3 randomized cancer clinical trials
-lower-dose, intravenous chlorothiazide is an effective adjunct diuretic to furosemide following pediatric cardiac surgery
-blood glucose reduction in patients treated with insulin and dextrose for hyperkalaemia
-metabolic changes detected by 18f-fdg pet in the preclinical stage of familial creutzfeldt-jakob disease
-partnering with robotic technology in electrophysiology: have we arrived at a tipping point?
-interaction between bdnf val66met and apoe4 on biomarkers of alzheimer's disease and cognitive decline
-examining sex differences in markers of cognition and neurodegeneration in autosomal dominant alzheimer's disease: preliminary findings from the colombian alzheimer's prevention initiative biomarker study
-treatment response and bleeding events associated with anticoagulant therapy of portal vein thrombosis in cirrhotic patients: systematic review and meta-analysis
-risk of progression in barrett's esophagus indefinite for dysplasia: a systematic review and meta-analysis
-effects of ldl cholesterol and statin use on verbal learning and memory in older adults at genetic risk for alzheimer's disease
-patch-based surface morphometry feature selection with federated group lasso regression
-does the pattern of bicuspid aortic valve leaflet fusion determine the success of the ross procedure?
-medication use in schools
-cardiac sympathetic denervation and synucleinopathy in alzheimer's disease with brain lewy body disease
-endoscopic ultrasound-guided gallbladder drainage, transpapillary drainage, or percutaneous drainage in high risk acute cholecystitis patients: a systematic review and comparative meta-analysis
-developing retinal biomarkers for the earliest stages of alzheimer's disease: what we know, what we don't, and how to move forward
-curcumin use in ulcerative colitis: is it ready for prime time? a systematic review and meta-analysis of clinical trials
-medication use in schools: current trends, challenges, and best practices
-evolving understanding and categorization of prostate cancer: preventing progression to metastatic castration-resistant prostate cancer: radar iv
-accelerating structural degeneration in temporal regions and their effects on cognition in aging of mci patients
-posterior minimally invasive plate osteosynthesis of humeral shaft fractures: an anatomic study of "danger zones"
-a review of the current treatment of tourette syndrome
-applying surface-based morphometry to study ventricular abnormalities of cognitively unimpaired subjects prior to clinically significant memory decline
-radiofrequency versus cryoballoon ablation for atrial fibrillation: an argument for a 'cryo-first' approach
-risk factors for alzheimer’s disease and related dementia diagnoses in american indians
-thromboelastography with platelet studies (teg® with plateletmapping®) after rattlesnake envenomation in the southwestern united states demonstrates inhibition of adp-induced platelet activation as well as clot lysis
-randomized, double-blind, placebo-controlled phase ii study of istiratumab (mm-141) plus nab-paclitaxel and gemcitabine versus nab-paclitaxel and gemcitabine in front-line metastatic pancreatic cancer (carrie)
-ad-net: age-adjust neural network for improved mci to ad conversion prediction
-prevalence of marijuana use among trauma patients before and after legalization of medical marijuana: the arizona experience
-comparing cortical signatures of atrophy between late-onset and autosomal dominant alzheimer disease
-braak stage, cerebral amyloid angiopathy, and cognitive decline in early alzheimer's disease
-evidence-based tools for premenstrual disorders
-magnetic resonance imaging of the elbow
-development of the nec-zero toolkit: supporting reliable implementation of necrotizing enterocolitis prevention and recognition
-use of antibiotic prophylaxis is not needed for endoscopic ultrasound-guided fine needle aspiration of pancreatic cysts: a meta-analysis
+noninvasiveinputfunctionacquisitionandsimultaneousestimationswithphysiologicalparametersforpetquantificationabriefreview
+amodifieddelphistudytoprioritizecontentforasimulationbasedpediatriccurriculumforemergencymedicineresidencytrainingprograms
+impactofasbrtsrslongitudinaltelehealthtrainingpilotcourseinlatinamerica
+femalespecificeffectsofthecatecholomethyltransferaseval158metgenepolymorphismonworkingmemoryrelatedbrainfunction
+babywearinginthenicuaninterventionforinfantswithneonatalabstinencesyndrome
+perinephricabscessinarenaltransplantrecipientduetomycoplasmahominiscasereportandreviewoftheliterature
+differentialdiagnosisofdiarrheainpatientswithneuroendocrinetumors
+effectofimplementingastandardizedshoulderdystociadocumentationformonqualityofdeliverynotes
+tumorinfiltratinglymphocytesafterneoadjuvantirx2immunotherapyinoralsquamouscellcarcinomainterimfindingsfromtheinspiretrial
+healthoutcomesassociatedwithadherencetoantidepressantuseduringacuteandcontinuationphasesofdepressiontreatmentamongolderadultswithdementiaandmajordepressivedisorder
+relationsofmindfulnessandillnessacceptancewithpsychosocialfunctioninginpatientswithmetastaticbreastcancerandcaregivers
+crisprcas9mediatedpointmutationinnkx31prolongsproteinhalflifeandreverseseffectsnkx31allelicloss
+thelatinamericanspanishversionofthefacenameassociativememoryexamissensitivetocognitiveandpathologicalchangesinpreclinicalautosomaldominantalzheimersdisease
+osteopathicconsiderationsforthepregnantpatientwithcovid19
+utilityoftransjugularintrahepaticportosystemicshuntplacementformaintainingportalveinpatencyincandidatesonwaitlistswhodevelopthrombus
+fam222aencodesaproteinwhichaccumulatesinplaquesinalzheimersdisease
+associativememoryandinvivobrainpathologyinasymptomaticpresenilin1e280acarriers
+expressionprofilingofprecuneuslayeriiicathepsindimmunopositivepyramidalneuronsinmildcognitiveimpairmentandalzheimersdiseaseevidenceforneuronalsignalingvulnerability
+suturecerclageforstabilizingthehumeralshaftduringshoulderarthroplasty
+associationbetweenpersonalityandtaupetbindingincognitivelynormalolderadults
+publishercorrectionexuberantfibroblastactivitycompromiseslungfunctionviaadamts4nature20205877834466471101038s4158602028775
+erratumclusteridentificationselectionanddescriptioninclusterrandomizedcrossovertrialstheprepittrialstrials202021712doi101186s13063020046119
+atelescopegwasanalysisstrategybasedonsnpsgenespathwaysensambleandonmultivariatealgorithmstocharacterizelateonsetalzheimersdisease
+cytomegaloviruscmvcellmediatedimmunityandcmvinfectionafterallogeneichematopoieticcelltransplantationthereactstudy
+authorcorrectionmultimodalhippocampalsubfieldgradingforalzheimersdiseaseclassificationscientificreports20199113845101038s41598019499709
+exuberantfibroblastactivitycompromiseslungfunctionviaadamts4
+standardofcareaxicabtageneciloleucelforrelapsedorrefractorylargebcelllymphomaresultsfromtheuslymphomacartconsortium
+comparisonof11cpbr28bindingbetweenpersonslivingwithhivandhivuninfectedindividuals
+thetoxicologyinvestigatorsconsortiumcaseregistrythe2019annualreport
+safetyofbariatricsurgeryinpatientswithinflammatoryboweldiseaseasystematicreviewandmetaanalysis
+computingunivariateneurodegenerativebiomarkerswithvolumetricoptimaltransportationapilotstudy
+functionalbrainarchitectureisassociatedwiththerateoftauaccumulationinalzheimersdisease
+aminimallyinvasiveendoscopictechniqueforfascialatagraftacquisitionandfascialreapproximation
+nonsmallcelllungcancerparti
+cognitiveoutcomesintrialsoftwobaceinhibitorsinalzheimersdisease
+continuousglucosemonitoringanduseofalternativemarkerstoassessglycemiainchronickidneydisease
+longitudinaldatainperipheralbloodconfirmthatpm20d1isaquantitativetraitlocusqtlforalzheimersdiseaseandimplicateitsdynamicroleindiseaseprogression
+outcomeswithretrogradeversusantegradechronictotalocclusionrevascularization
+longitudinalwhitematterandcognitivedevelopmentinpediatriccarriersoftheapolipoprotein4allele
+exceptionallylowlikelihoodofalzheimersdementiainapoe2homozygotesfroma5000personneuropathologicalstudy
+associationofbloodbasedtranscriptionalriskscoreswithbiomarkersforalzheimerdisease
+blindedrtquicanalysisofsynucleinbiomarkerinskintissuefromparkinsonsdiseasepatients
+improvementinleftventricularfunctionfollowinghigherriskpercutaneouscoronaryinterventioninpatientswithischemiccardiomyopathy
+baceinhibitioncausesrapidregionalandnonprogressivevolumereductioninalzheimersdiseasebrain
+zanubrutinibforthetreatmentofpatientswithwaldenstrommacroglobulinemia3yearsoffollowup
+aphaseiirandomizedtrialofsodiumoligomannateinalzheimersdementia
+spreadofpathologicaltauproteinsthroughcommunicatingneuronsinhumanalzheimersdisease
+penileultrasound
+talazoparibversuschemotherapyinpatientswithgermlinebrca12mutatedher2negativeadvancedbreastcancerfinaloverallsurvivalresultsfromtheembracatrial
+challengesandopportunitieswithcausaldiscoveryalgorithmsapplicationtoalzheimerspathophysiology
+developinganeffectiveinpatientlearningclimate
+accuracyofdopaminetransporterimagingwith123iioflupaneinhispanicandnonhispanicpatients
+impairmentofflowsensitiveinwardlyrectifyingkchannelsviadisruptionofglycocalyxmediatesobesityinducedendothelialdysfunction
+thealzheimerspreventioninitiativecompositecognitivetestapracticalmeasurefortrackingcognitivedeclineinpreclinicalalzheimersdisease
+marijuanaselfreportcomparedwithtestingintraumapatientsbeforeandafterlegalization
+orthopaedicsystemsresponsetoandreturnfromthecovid19pandemiclessonsforfuturecrisismanagement
+agerelatedregionalnetworkcovarianceofmagneticresonanceimaginggraymatterintherat
+populationlevelanalysisofadhesivesmallbowelobstructionsustainedadvantageofalaparoscopicapproach
+randomizedphase2studyofadjunctivecenobamateinpatientswithuncontrolledfocalseizures
+plasmaneurofilamentlightchaininthepresenilin1e280aautosomaldominantalzheimersdiseasekindredacrosssectionalandlongitudinalcohortstudy
+theroleofinterprofessionalpracticeinsustainabilityofasequentialcompressiondevicesproject
+thealzheimerspreventionregistryalargeinternetbasedparticipantrecruitmentregistrytoacceleratereferralstoalzheimersfocusedstudies
+corrigendumrandomizeddoubleblindplacebocontrolledphaseiistudyofistiratumabmm141plusnabpaclitaxelandgemcitabineversusnabpaclitaxelandgemcitabineinfrontlinemetastaticpancreaticcancercarrieannalsofoncology20203117987s0923753419354055101016jannonc201909004
+bowelpreparationpriortominimallyinvasivesacrocolpopexyarandomizedcontrolledtrial
+plasmonicgelnanocompositesfordetectionofhighenergyelectrons
+seriousadversehealtheventsincludingdeathassociatedwithingestingalcoholbasedhandsanitizerscontainingmethanolarizonaandnewmexicomayjune2020
+musculoskeletalinfectioninorthopaedictraumaassessmentofthe2018internationalconsensusmeetingonmusculoskeletalinfection
+modifiedsubintimaltranscatheterwithdrawalanoveltechniqueforhematomadecompressiontofacilitatedistalreentryduringcoronarychronictotalocclusionrecanalization
+echocardiographicresultsoftranscatheterversussurgicalaorticvalvereplacementinlowriskpatientsthepartner3trial
+standardizingtheapproachtolateonsetsepsisinneonatesthroughantimicrobialstewardshipaqualityimprovementinitiative
+clinicalefficacyofgastricperoralendoscopicmyotomygpoeminthetreatmentofrefractorygastroparesisandpredictorsofoutcomesasystematicreviewandmetaanalysisusingsurgicalpyloroplastyasacomparatorgroup
+hemophiliaainfemalesconsiderationsforclinicalmanagement
+bicuspidaorticvalvemorphologyandoutcomesaftertranscatheteraorticvalvereplacement
+theapplicationofindocyaninegreenvideoangiographyasanadjunctforarteriovenousmalformationsurgery
+transesophagealechocardiogramtotherescueindiagnosingascendingaorticpseudoaneurysmreply
+erratumdifferentaspectsofalzheimersdiseaserelatedamyloidpeptidepathologyandtheirrelationshiptoamyloidpositronemissiontomographyimaginganddementiaactaneuropathologicacommunications20197178doi101186s4047801908379
+agerelateddeclineinthetopologicalefficiencyofthebrainstructuralconnectomeandcognitiveaging
+outcomesofolderpatientsinzuma1apivotalstudyofaxicabtageneciloleucelinrefractorylargebcelllymphoma
+thenorthamericanneuroendocrinetumorsocietyconsensusguidelinesforsurveillanceandmedicalmanagementofpancreaticneuroendocrinetumors
+exploratoryingestionsofnovelanticoagulantsandantiplateletswhatistherisk
+reducedintensityconditioningforacutemyeloidleukemiausingmelphalanvsbusulfanbasedregimensacibmtrreport
+aboutthatleakyostomypouch
+goodsallsflaw
+characterizationofrespiratorycompromiseandthepotentialclinicalutilityofcapnographyinthepostanesthesiacareunitablindedobservationaltrial
+sexualsideeffectsandprostatecancer
+theroleofcognitivebiasinbreastradiologydiagnosticandjudgmenterrors
+rehabilitationforacomplexpatientfollowingcerebellarhemorrhageandobstructivehydrocephalusacasereport
+serumneurofilamentlightchainlevelsareassociatedwithwhitematterintegrityinautosomaldominantalzheimersdisease
+apoe4alleleacceleratesagerelatedmulticognitivedeclineandwhitematterdamageinnondementedelderly
+commentaryoptimalperioperativefluidadministrationforelectivecolorectaloperationsacallforreasonamidsttheerasblitz
+guidelinesformanagementofurgentsymptomsinpatientswithcholangiocarcinomaandbiliarystentsorcathetersusingthemodifiedranducladelphiprocess
+osseousintegrationofthecentralpegofanallpolyethyleneglenoidwith3differentsurgicaltechniques
+visualshorttermmemoryrelatestotauandamyloidburdensinpreclinicalautosomaldominantalzheimersdisease
+effectofapoeisoformsonmitochondriainalzheimerdisease
+positronemissiontomographyimagingwith18fflortaucipirandpostmortemassessmentofalzheimerdiseaseneuropathologicchanges
+approachandstrategyforrepeatcatheterablationofrecurrentatrialfibrillation
+neurologicalmanifestationsofhereditaryhemorrhagictelangiectasiahht
+baselinedemographicclinicalandcognitivecharacteristicsofthealzheimerspreventioninitiativeapiautosomaldominantalzheimersdiseasecolombiatrial
+choosingwiselyinhematologyhavewemadeadifference
+morphogenesisenvironmentalstressandreverseevolution
+complexitysciencefostersprofessionaladvancednursepractitionerroleemergence
+cottonmouthsnakebitesreportedtothetoxicnorthamericansnakebiteregistry20132017
+radiotherapyforhepatocellularcarcinomainrussiaasurveybasedanalysisofcurrentpracticeandtheimpactofaneducationalworkshoponclinicalexpertise
+overviewofcoloncancerforthemedicalsurgicalnurse
+eshrddeconvolutionofbrainhomogenaternaexpressiondatatoidentifynovelcelltypespecificalterationsinalzheimersdisease
+thirtydayoutcomesoftranscathetermitralvalvereplacementfordegeneratedmitralbioprosthesesvalveinvalvefailedsurgicalringsvalveinringandnativevalvewithseveremitralannularcalcificationvalveinmitralannularcalcificationintheunitedstatesdatafromthesocietyofthoracicsurgeonsamericancollegeofcardiologytranscathetervalvetherapyregistry
+clinicalefficacyofperoralendoscopicmyotomypoemforspasticesophagealdisordersasystematicreviewandmetaanalysis
+longtermsafetyandefficacyofthepi3kinhibitorcopanlisibinpatientswithrelapsedorrefractoryindolentlymphoma2yearfollowupofthechronos1study
+disruptionofcholinergicneurotransmissionwithinacognitivechallengeparadigmisindicativeofarelatedcognitiveimpairmentinpreclinicalalzheimersdiseaseaftera27monthdelayinterval
+correctiontoreadmissionfreeperiodandinhospitalmortalityatthetimeoffirstreadmissioninacuteheartfailurepatientsnrdbasedanalysisof40000heartfailurereadmissionsheartfailurereviews2020101007s1074101909912z
+differencesinsleeparchitectureaccordingtobodymassindexinchildrenwithtype1diabetes
+febrileneutropeniahospitalizationduetopegfilgrastimonbodyinjectorfailurecomparedtosingleinjectionpegfilgrastimanddailyinjectionswithreferenceandbiosimilarfilgrastimuscostsimulationforlungcancerandnonhodgkinlymphoma
+developmentofaninterprofessionalprogramtopreventpostoperativepneumonia
+impactofeducationaboutphysicalpunishmentofchildrenontheattitudesoffuturephysicians
+pretransplantmaritalstatusandhematopoieticcelltransplantationoutcomes
+collaborationsandconnectionsthevalueoftheaonlnursingexecutivefellowship
+limitationsofamyloidimaginginalzheimersdisease
+effectsofsemanticcategorizationstrategytrainingonepisodicmemoryinchildrenandadolescents
+ktex19cartcelltherapyinrelapsedorrefractorymantlecelllymphoma
+clinicalpharmacistledimpactoninappropriatealbuminuseandcostsinthecriticallyill
+rivaroxabanversuswarfarinforstrokepreventionandvenousthromboembolismtreatmentinextremeobesityandhighbodyweight
+itistimetoretiregoodsallsrulethemidlineruleisamoreaccuratepredictorofthetrueandnaturalcourseofanalfistulas
+currentstateofshortstemimplantsintotalshoulderarthroplastyasystematicreviewoftheliterature
+nonamyloidapproachestodiseasemodificationforalzheimersdiseaseaneuusctadtaskforcereport
+abnormalitiesofhepaticproteinmetabolism
+simplifiedpreoperativetoolpredictingdischargedestinationaftermajoroncologicgastrointestinalsurgery
+theroleofparathyroidectomyintreatinghypertensionandothercardiacmanifestationsofprimaryhyperparathyroidism
+brainimagingmeasurementsoffibrillaramyloidburdenpairedhelicalfilamenttauburdenandatrophyincognitivelyunimpairedpersonswithtwooneandnocopiesoftheapoe4allele
+fiveyearradiographicevaluationofstressshieldingwithapressfitstandardlengthhumeralstem
+lymphoproliferativedisordersoftheorbitandocularadnexa
+longtermphysicalexerciseandmindfulnesspracticeinanagingpopulation
+brentuximabvedotinwithchemotherapyforstageiiiivclassicalhodgkinlymphoma3yearupdateoftheechelon1study
+neuropsychologicaldeclineupto20yearsbeforeincidentmildcognitiveimpairment
+predictingbrainageofhealthyadultsbasedonstructuralmriparcellationusingconvolutionalneuralnetworks
+errorsinleadershiplessonsfromexceptionalleaders
+macerationindurationexcoriationwhatdothesewordsmean
+preoperativeendoscopicandradiologicevaluationofbariatricpatientswhatdotheyadd
+preciseandprogrammabledetectionofmutationsusingultraspecificriboregulators
+socialleisureactivityphysicalactivityandvaluationoflifefindingsfromalongevitystudy
+universalelectrocardiographicscreeningforlongqtsyndromeinhospitalizedneonates
+triptanandergotamineoverdosesintheunitedstatesanalysisofthenationalpoisondatasystem
+leadingthecompassionatecharge
+earlyenteralnutritionisassociatedwithimprovedclinicaloutcomesincriticallyillchildrenasecondaryanalysisofnutritionsupportintheheartandlungfailurepediatricinsulintitrationtrial
+thesupicutrialdoesitconfirmorcondemnthepracticeofstressulcerprophylaxis
+roleofthepharmacistinresearch
+safetyefficacyandtimelinessofintravenouspotassiumchloridereplacementprotocolsinapediatriccardiothoracicintensivecareunit
+frontalcortexchitinaseandpentraxinneuroinflammatoryalterationsduringtheprogressionofalzheimersdisease
+selfpuselfboostedandcalibratedpositiveunlabeledtraining
+transcathetertreatmentofacquiredcoronarysinusostiumatresiainachildwithcomplexcongenitalheartdisease
+corrigendumexperimentaltraumaticbraininjuryinduceschronicglutamatergicdysfunctioninamygdalacircuitryknowntoregulateanxietylikebehaviorfrontiersinneuroscience202013103389fnins201901434
+patienttravelconcernsaftertreatmentwith177ludotatate
+hyperoncoticalbuminreducesnetfluidlossassociatedwithhemodialysis
+diagnosisandmanagementofacutegastroenteritisintheemergencydepartment
+theeffectof4methylpyrazoleonoxidativemetabolismofacetaminopheninhumanvolunteers
+hippocampalavoidanceduringwholebrainradiotherapyplusmemantineforpatientswithbrainmetastasesphaseiiitrialnrgoncologycc001
+utilityofquantitativespectctlymphoscintigraphyinguidingsentinellymphnodebiopsyinheadandneckmelanoma
+theshapeframeworkempoweringmillennialstoleadthefutureofhealthcare
+efficacyandsafetyoflanabecestatfortreatmentofearlyandmildalzheimerdiseasetheamaranthanddaybreakalzrandomizedclinicaltrials
+extentandfactorsassociatedwithadherencetoantidepressanttreatmentduringacuteandcontinuationphasedepressiontreatmentamongolderadultswithdementiaandmajordepressivedisorder
+racialandethnicdisparitiesamongparticipantsinusbasedphase3randomizedcancerclinicaltrials
+lowerdoseintravenouschlorothiazideisaneffectiveadjunctdiuretictofurosemidefollowingpediatriccardiacsurgery
+bloodglucosereductioninpatientstreatedwithinsulinanddextroseforhyperkalaemia
+metabolicchangesdetectedby18ffdgpetinthepreclinicalstageoffamilialcreutzfeldtjakobdisease
+partneringwithrobotictechnologyinelectrophysiologyhavewearrivedatatippingpoint
+interactionbetweenbdnfval66metandapoe4onbiomarkersofalzheimersdiseaseandcognitivedecline
+examiningsexdifferencesinmarkersofcognitionandneurodegenerationinautosomaldominantalzheimersdiseasepreliminaryfindingsfromthecolombianalzheimerspreventioninitiativebiomarkerstudy
+treatmentresponseandbleedingeventsassociatedwithanticoagulanttherapyofportalveinthrombosisincirrhoticpatientssystematicreviewandmetaanalysis
+effectsofldlcholesterolandstatinuseonverballearningandmemoryinolderadultsatgeneticriskforalzheimersdisease
+patchbasedsurfacemorphometryfeatureselectionwithfederatedgrouplassoregression
+doesthepatternofbicuspidaorticvalveleafletfusiondeterminethesuccessoftherossprocedure
+medicationuseinschools
+endoscopicultrasoundguidedgallbladderdrainagetranspapillarydrainageorpercutaneousdrainageinhighriskacutecholecystitispatientsasystematicreviewandcomparativemetaanalysis
+developingretinalbiomarkersfortheearlieststagesofalzheimersdiseasewhatweknowwhatwedontandhowtomoveforward
+curcuminuseinulcerativecolitisisitreadyforprimetimeasystematicreviewandmetaanalysisofclinicaltrials
+medicationuseinschoolscurrenttrendschallengesandbestpractices
+evolvingunderstandingandcategorizationofprostatecancerpreventingprogressiontometastaticcastrationresistantprostatecancerradariv
+acceleratingstructuraldegenerationintemporalregionsandtheireffectsoncognitioninagingofmcipatients
+posteriorminimallyinvasiveplateosteosynthesisofhumeralshaftfracturesananatomicstudyofdangerzones
+areviewofthecurrenttreatmentoftourettesyndrome
+applyingsurfacebasedmorphometrytostudyventricularabnormalitiesofcognitivelyunimpairedsubjectspriortoclinicallysignificantmemorydecline
+radiofrequencyversuscryoballoonablationforatrialfibrillationanargumentforacryofirstapproach
+riskfactorsforalzheimersdiseaseandrelateddementiadiagnosesinamericanindians
+thromboelastographywithplateletstudiestegwithplateletmappingafterrattlesnakeenvenomationinthesouthwesternunitedstatesdemonstratesinhibitionofadpinducedplateletactivationaswellasclotlysis
+randomizeddoubleblindplacebocontrolledphaseiistudyofistiratumabmm141plusnabpaclitaxelandgemcitabineversusnabpaclitaxelandgemcitabineinfrontlinemetastaticpancreaticcancercarrie
+adnetageadjustneuralnetworkforimprovedmcitoadconversionprediction
+prevalenceofmarijuanauseamongtraumapatientsbeforeandafterlegalizationofmedicalmarijuanathearizonaexperience
+comparingcorticalsignaturesofatrophybetweenlateonsetandautosomaldominantalzheimerdisease
+braakstagecerebralamyloidangiopathyandcognitivedeclineinearlyalzheimersdisease
+magneticresonanceimagingoftheelbow
+developmentoftheneczerotoolkitsupportingreliableimplementationofnecrotizingenterocolitispreventionandrecognition
