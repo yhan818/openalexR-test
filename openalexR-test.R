@@ -7,8 +7,10 @@
 #### 2023-10: Add each unit of Banner Health query and dedup
 
 # OpenAlex R Documentation: https://github.com/ropensci/openalexR
+#install.packages("openalexR")
+install.packages("remotes")
+remotes::install_github("ropensci/openalexR", force=TRUE) 
 
-install.packages("openalexR")
 install.packages("dplyr")
 install.packages("ggplot2")
 install.packages("knitr")
@@ -235,7 +237,8 @@ duplicates3 <-banner3_works_2020$display_name %in% banner2_works_2020$display_na
 duplicates4 <-banner4_works_2020$display_name %in% banner3_works_2020$display_name
 duplicates5 <-banner4_works_2020$display_name %in% banner2_works_2020$display_name
 
-#########################################################
+################################################################################
+#############################################################################
 ### Define a custom function to fetch and subset data
 fetch_ror_year <- function(ror_id, year) {
   # Fetch data for the given ROR ID
@@ -254,6 +257,7 @@ fetch_ror_year <- function(ror_id, year) {
 # find all the records by ROR and year. 
 # Ran on 2023-10-06:
 # Banner Health
+# Note: b[0-9] number is based on the row number on the banner_healty_entity.xlsx 
 b2_works_2020 <- fetch_ror_year("039wwwz66", 2020)  # 2023-10-06: 92 
 # Banner – University Medical Center Phoenix
 b3_works_2020 <- fetch_ror_year("01cjjjf51", 2020)  # 2023-10-06: 139
@@ -368,6 +372,8 @@ scopus_data <- read.csv("scopus_banner_health_2020.csv")
 # we will compare the titles on the two datasets: 
 titles_scopus <- scopus_data$Title
 titles_openalex <- all_banner_works_openalex_2020$display_name
+class(titles_openalex)
+is.vector(titles_openalex)
 
 # All titles are converted to lower cases, trim white space and handle special characters. Because if you do not do that, there will be many mis-matches. 
 # cannot use tolower() and trimws() along, because of special characters like '. 
@@ -379,18 +385,56 @@ clean_string <- function(input_str) {
 
 
 ############################## Common titles 166 ####### 
-clean_titles_scopus   <- clean_string(titles_scopus)
-clean_titles_openalex <- clean_string(titles_openalex)
-common_titles <-intersect(clean_titles_scopus, clean_titles_openalex)
+
+# 1. Normalized the string to remove special char, white space etc. and save it back to the DF
+clean_titles_scopus   <- clean_string(titles_scopus)                   # 556 
+clean_titles_openalex <- clean_string(titles_openalex)                 # 357
+
+all_banner_works_openalex_2020$normlized_display_name <- clean_titles_openalex
+scopus_data$normalized_display_name <- clean_titles_scopus
+
+common_titles <-intersect(clean_titles_scopus, clean_titles_openalex)  # 166 same ones
+distinct_titles <- setdiff(clean_titles_scopus, clean_titles_openalex) # 189 different
 print(common_titles) # 166 common ones vs. 141 if using tolower()
 
 
 ########################################### Distinct titles from OpenAlex ######### 
 #### Analysis: openAlex has distinct titles of 556 - 166 = 390 (not available from Scopus)
-#### Did a few searches on Scopus. cannot find the titles at all. 
+
 distinct_titles_openalex <- setdiff( titles_openalex, titles_scopus)
+class(distinct_titles_openalex)
 print(distinct_titles_openalex)
 writeLines(distinct_titles_openalex, "distinct_title_openalex.txt")
+
+
+### scopus distinct titles: 234 
+distinct_titles_scopus <- setdiff( titles_scopus, titles_openalex)
+
+
+############ Testing using scopus_string
+matching_titles_scopus_in_openalex <- data.frame()
+for (string in ) {
+  
+  cs_str <- clean_string(titles_scopus)
+  co_str <- clean_string(all_banner_works_openalex_2020$display_name)
+  matching_rows <- all_banner_works_openalex_2020[grep(cs_str, co_str), ]
+  #matching_rows <- all_banner_works_openalex_2020[grep(string, all_banner_works_openalex_2020$display_name), ]
+  stinct_titles_openalex_df <- rbind(matching_titles_scopus_in_openalex, matching_rows)
+}
+
+
+
+
+war# Initialize an empty data frame to store matching rows
+distinct_titles_openalex_df <- data.frame()
+for (string in distinct_titles_openalex) {
+  matching_rows <- all_banner_works_openalex_2020[grep(string, all_banner_works_openalex_2020$display_name), ]
+  distinct_titles_openalex_df <- rbind(distinct_titles_openalex_df, matching_rows)
+}
+# 
+write_xlsx(distinct_titles_openalex_df, "distinct_titles_openalex_df.xls")
+
+
 
 ### to see record: add "api" to the URL and open it in Firefox:  https://openalex.org/A5063303709  >>>>>>>>> https://api.openalex.org/A5063303709 (since A indicateds "author")
 ### How to search via title: https://api.openalex.org/works?filter=title.search:patient travel concerns after treatment with 177lu-dotatate 
@@ -453,8 +497,34 @@ writeLines(distinct_titles_scopus, "distinct_title_scopus.txt")
 # openalex: published in 2019. 
 ### Reason: publishing year has discrepancy. 
 
+########################################### Distinct titles from OpenAlex ################
+# Analysis: OpenAlex has ~397 distinct titles (where 6 has slightly different character in titles)
 
+# Scoupus is down this morning. I was able to search a few titles from OpenAlex. Scopus has no such data. 
 
+### 1. Clinician Practice Patterns That Result in the Diagnosis of Coccidioidomycosis Before or During Hospitalization
+###  https://openalex.org/W3033861128     doi: 10.1093/cid/ciaa739
+### OpenAlex: publication year 2020 
+### Scopus: publication year 2020 Clinical Infectious DiseasesVolume 73, Issue 7, Pages E1587 - E15931 October 2021
+### Journal: June 2020 https://academic.oup.com/cid/article/73/7/e1587/5854736 
+
+### 2. 372. Comparing the Outcome of COVID-19 in Cancer and Non-Cancer Patients: an International Multicenter Study
+### https://openalex.org/W3119074239
+### Scopus: no data
+### PubMed: Oct 2020 https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7776865/ 
+
+#### 3. Antifibrotics in COVID-19 Lung Disease: Let Us Stay Focused 
+## https://openalex.org/W3084380850 
+#### OpenAlex: Title "Antifibrotics in COVID-19 Lung Disease: Let Us Stay Focused"
+### Year: 
+### Scopus: slight diff title "Corrigendum: Antifibrotics in COVID-19 Lung Disease: Let Us Stay Focused"
+### Frontiers in MedicineOpen AccessVolume 711 March 2021 Article number 604640 
+### PubMed: 2020 Sep. https://pubmed.ncbi.nlm.nih.gov/33072773/ 
+
+### Population Level Analysis of Adhesive Small Bowel Obstruction
+### OpenAlex: https://openalex.org/W2903107208
+### Scopus: No data
+### PubMed: https://pubmed.ncbi.nlm.nih.gov/30499802/
 
 
 
