@@ -25,7 +25,7 @@ library(dplyr)
 library(ggplot2)
 library(knitr)
 library(writexl)
-
+library(tibble)
 ############################################################
 #### Using API directly
 # Info about UArizona ror":"https://ror.org/03m2x1q45
@@ -115,7 +115,7 @@ org_args <- list(
 # Sep 2023: 26,801 records. (Note: author disambuition system changed in Aug 2023)
 do.call(oa_fetch, c(org_args, list(count_only = TRUE)))
 
-# Download the list
+# Download the list. It may take 2-5 min to run
 all_authors <- do.call(oa_fetch, org_args) |>
   show_authors() |>
   knitr::kable()
@@ -127,9 +127,10 @@ org_args2 <- list(
   last_known_institution.id = "I138006243", # University of Arizona OpenAlex ID
   works_count = ">499"
 )
-# 72 authors
+# 2023-09: 72 authors; 2023-11: 76 authors
 do.call(oa_fetch, c(org_args2, list(count_only = TRUE)))
 
+# Noam Chomsky: 1254 cited count: 77125; Albrecht Classen : 1621; Hyung Jun Kim: 1593 / 17540
 top_authors <- do.call(oa_fetch, org_args) |>
   show_authors() |>
   knitr::kable()
@@ -187,26 +188,15 @@ filtered_university1 <- institutions %>%
 filtered_university2 <- institutions %>% 
   filter(display_name == "Arizona")
 
-####################################
-banner2 <-oa_fetch(
-  entity = "institutions",
-  identifier = "ror:039wwwz66",
-  country_code = "us",
-  type = "education",
-  verbose = TRUE
-)
 
-banner3 <-oa_fetch(
-  entity = "institutions",
-  identifier = "ror:01cjjjf51",
-  country_code = "us",
-  type = "education",
-  verbose = TRUE
-)
+
+
+####################################
+banner2 <-oa_fetch(  entity = "institutions",   identifier = "ror:039wwwz66",   country_code = "us",   type = "education",   verbose = TRUE)
+banner3 <-oa_fetch(  entity = "institutions",  identifier = "ror:01cjjjf51",  country_code = "us",  type = "education", verbose = TRUE)
 
 ### banner2 <- lapply(banner2, function(x) if(is.list(x)) toString(x) else x)
 ## write.csv(banner2, file="banner2.csv")
-
 # why no colleciton found?? 
 banner2_authors <- oa_fetch(entity = "author", last_known_institution.ror="039wwwz66" )
 
@@ -237,8 +227,23 @@ duplicates3 <-banner3_works_2020$display_name %in% banner2_works_2020$display_na
 duplicates4 <-banner4_works_2020$display_name %in% banner3_works_2020$display_name
 duplicates5 <-banner4_works_2020$display_name %in% banner2_works_2020$display_name
 
-################################################################################
-#############################################################################
+
+
+##########################################################
+############# Read Banner Health Provided Excel ########## 
+###########################################################
+install.packages("readxl")
+library(readxl)
+
+getwd()
+setwd("/home/yhan/Documents/UA-datasets/openalexR-test")
+banner_df <- read_excel("Banner_health_entity.xlsx", sheet = "Sheet1")
+head(banner_df)
+class(banner_df)
+# The banner_df is a tibble. To hold data from openAlex
+# Add a list as an additional column to banner_df, which holds works or anything else
+banner_df
+
 ### Define a custom function to fetch and subset data
 fetch_ror_year <- function(ror_id, year) {
   # Fetch data for the given ROR ID
@@ -249,68 +254,121 @@ fetch_ror_year <- function(ror_id, year) {
   return(subset_data)
 }
 
+# initiate empty dfs
+list_of_dfs <- vector("list", length = nrow(banner_df))
 
-### Define a function to find a string in a column 
+for (i in seq_len(nrow(banner_df))) {
+  ror <- banner_df$ROR[i]
+  
+  if (!is.null(ror) && ror != "") {
+    list_of_dfs[[i]] <- tryCatch({
+      # Fetch and return the data frame
+      fetch_ror_year(ror, 2020)
+    }, error = function(e) {
+      # Handle errors, e.g., by returning NULL or an empty data frame
+      message("Error fetching data for ROR: ", ror, ". Error: ", e$message)
+      NULL  # Or return an empty data frame if that's more appropriate
+    })
+  } else {
+    # Handle cases where ROR is NULL or empty
+    list_of_dfs[[i]] <- NULL  # Or an empty data frame
+  }
+}
+
+banner_df$nested_df <- list_of_dfs
 
 
 
-# find all the records by ROR and year. 
-# Ran on 2023-10-06:
-# Banner Health
-# Note: b[0-9] number is based on the row number on the banner_healty_entity.xlsx 
-b2_works_2020 <- fetch_ror_year("039wwwz66", 2020)  # 2023-10-06: 92 
-# Banner – University Medical Center Phoenix
-b3_works_2020 <- fetch_ror_year("01cjjjf51", 2020)  # 2023-10-06: 139
+# Example list of data frames
+#list_of_dfs <- list(df1, df2, df3, ..., df55)  # Replace df1, df2, etc., with your actual data frames
+
+#banner_df$nested_df <- list_of_dfs
+# Define the number of lists you want to create
+#num_rows <- 55
+# Initialize an empty list to store your lists
+#vector_of_banner_dfs <- vector("list", num_rows)
+
+# Use a for loop to populate the list
+for (i in 1:num_rows) {
+  org <- banner_df[i,1]
+  ROR <- banner_df[i,3]
+  Scopus <- banner_df[i,4]
+  df <- data.frame()   
+  vector_of_banner_dfs[[i]] <- list(org, ROR, Scopus, df)
+}
+
+### Showing 2-D array: the first index is the : the 2nd index is column "Organization Name", "ROR": 
+print(vector_of_banner_dfs[[1]][[1]])
+print(vector_of_banner_dfs[[1]][[3]])
+# vector_of_lists now contains 5 lists
 
 
-b6_works_2020 <- fetch_ror_year("023jwkg52", 2020) # 2023-10-06: 0
+### Testing
+if (debug = 1 ) {
+  banner_dfs[[1]]$works_2020 <- list(fetch_ror_year(banner_dfs[[1]]$ROR, 2020))  # 2023-10-06: 92 ; 2023-11-17: 94
+}
+
+# After getting all the info into the banner_dfs. Loop through it to fetch works
+# This may run some minutes. 
+for (i in seq_along(banner_dfs) ) {
+  if ( !is.empty(banner_dfs[[i]]$ROR) ) {
+    banner_dfs[[i]]$works_2020 <- list(fetch_ror_year(banner_dfs[[i]]$ROR, 2020)) 
+  }
+}
 
 
 
 
-b13_works_2020 <- fetch_ror_year("00sr2h055", 2020) # 2023-10-06: 0
+b2_works_2020 <- fetch_ror_year("039wwwz66", 2020)  # 2023-10-06: 92 ; 2023-11-17: 94
+b3_works_2020 <- fetch_ror_year("01cjjjf51", 2020)  # 2023-10-06: 139; 2023-11-17: 140
 
-b15_works_2020 <- fetch_ror_year("01jjm6w53", 2020) # 4
+b6_works_2020 <- fetch_ror_year("023jwkg52", 2020) # 2023-10-06: 0 ; 2023-11-17: 0
 
-b16_works_2020 <- fetch_ror_year("04mvgap27", 2020) # 3
+
+
+b13_works_2020 <- fetch_ror_year("00sr2h055", 2020) # 2023-10-06: 0; 2023-11-17: 0
+
+b15_works_2020 <- fetch_ror_year("01jjm6w53", 2020) # 2023-10-06: 4; 2023-11-17: 4
+
+b16_works_2020 <- fetch_ror_year("04mvgap27", 2020) # 2023-10-06: 3; 2023-11-17: 3
 # Banner Estrella Medical Center
-b17_works_2020 <- fetch_ror_year("05ct0ag17", 2020) # 11 
+b17_works_2020 <- fetch_ror_year("05ct0ag17", 2020) # 2023-10-06: 11; 2023-11-17: 11 
 
-b19_works_2020 <- fetch_ror_year("05gfbdk85", 2020) # 0
-b20_works_2020 <- fetch_ror_year("049c9q337", 2020) # 0
-
-
-b23_works_2020 <- fetch_ror_year("03y8jje75", 2020) # 1
-
-b25_works_2020 <- fetch_ror_year("03vq5n859", 2020) # 0
+b19_works_2020 <- fetch_ror_year("05gfbdk85", 2020) # 2023-10-06: 0; 2023-11-17: 0
+b20_works_2020 <- fetch_ror_year("049c9q337", 2020) # 2023-10-06: 0; 2023-11-17: 0
 
 
+b23_works_2020 <- fetch_ror_year("03y8jje75", 2020) # 2023-10-06: 1; 2023-11-17: 1 
+
+b25_works_2020 <- fetch_ror_year("03vq5n859", 2020) # 2023-10-06: 0; 2023-11-17: 0
 
 
-b29_works_2020 <- fetch_ror_year("02s49nq19", 2020) # 0
 
-b31_works_2020 <- fetch_ror_year("033a24x98", 2020) # 0
+
+b29_works_2020 <- fetch_ror_year("02s49nq19", 2020) # 2023-10-06: 0; 2023-11-17: 0
+
+b31_works_2020 <- fetch_ror_year("033a24x98", 2020) # 2023-10-06: 0; 2023-11-17: 0
 
 # Banner Sun Health Research Institute
 # check "Highly Sensitive and Multiplexed In-Situ Protein Profiling with Cleavable Fluorescent Streptavidin". why included? 
-b35_works_2020 <- fetch_ror_year("04gjkkf30", 2020) # 55
+b35_works_2020 <- fetch_ror_year("04gjkkf30", 2020) # 2023-10-06: 35; 2023-11-17: 56
 
 
 # Banner Thunderbird Medical Center
-b37_works_2020 <- fetch_ror_year("01kqrgb09", 2020) # 18 
+b37_works_2020 <- fetch_ror_year("01kqrgb09", 2020) # 2023-10-06: 18; 2023-11-17: 18
 
 # Banner - University Medical Center Tucson
-b39_works_2020 <- fetch_ror_year("02xbk5j62", 2020) # 2023-10-13: 243 
+b39_works_2020 <- fetch_ror_year("02xbk5j62", 2020) # 2023-10-13: 243; 2023-11-17: 248
 
 
-b42_works_2020 <- fetch_ror_year("035dcj063", 2020) # 4
+b42_works_2020 <- fetch_ror_year("035dcj063", 2020) # 2023-10-13: 4; 2023-11-17: 4
 
 
 
 
 
-b51_works_2020 <- fetch_ror_year("05e33tw76", 2020) # 6
-b53_works_2020 <- fetch_ror_year("01phkkj35", 2020) # 4
+b51_works_2020 <- fetch_ror_year("05e33tw76", 2020) # 2023-10-06: 6; 2023-11-17: 6
+b53_works_2020 <- fetch_ror_year("01phkkj35", 2020) # 2023-10-06: 4; 2023-11-17: 4
 
 #### Merge all the units' df
 banner_works_2020 <- rbind(b2_works_2020, b3_works_2020, b15_works_2020, b16_works_2020, b17_works_2020)
@@ -363,6 +421,54 @@ getwd()
 setwd("/home/yhan/Documents/UA-datasets/openalexR-test")
 write_xlsx(all_banner_works_openalex_2020, "final_banner_works_2020.xls")
 
+######################### Data Visualization ######
+install.packages("ggplot2")
+library(ggplot2)
+# Example vectors
+affiliations <- c("Banner - University Medical Center Tucson",
+                  "The University of Arizona",
+                  "Banner - University Medical Center Phoenix",
+                  "Banner Alzheimer's Institute",
+                  "University of Arizona College of Medicine - Tucson",
+                  "Banner Sun Health Research Institute",
+                  "University of Arizona College of Medicine - Phoenix",
+                  "Mayo Clinic",
+                  "Harvard Medical School",
+                  "Banner Health")
+
+document_counts <- c(120, 80, 60, 50, 45, 30, 25, 20, 15, 10)  # Example counts
+
+# Create the data frame
+df <- data.frame(Affiliation = affiliations, Documents = document_counts)
+
+# Order the data frame by document count in descending order
+df <- df[order(-df$Documents),]
+
+# Reset the row names to avoid confusion
+rownames(df) <- seq(length(df$Documents))
+# View the data frame
+print(df)
+
+library(ggplot2)
+
+# Assuming df is your data frame with 'Affiliation' and 'Documents' columns
+# and it's already sorted in descending order by 'Documents'
+
+ggplot(df, aes(x = reorder(Affiliation, -Documents), y = Documents)) + 
+  geom_bar(stat = "identity", aes(fill = Affiliation)) +  # Use 'identity' to tell ggplot to use the actual 'Documents' values
+  coord_flip() +  # Flip the axes to make the bars horizontal
+  labs(x = "Number of Documents", y = "Affiliation", title = "Documents by Affiliation") +
+  theme_minimal() +  # Use a minimal theme for a clean look
+  scale_fill_viridis_d(guide = FALSE) +  # Optional: Use a discrete viridis color scale and remove the legend
+  theme(axis.text.x = element_text(size = 10),  # Adjust the size of x-axis texts
+        axis.title.x = element_text(size = 12),  # Adjust the size of x-axis title
+        axis.title.y = element_blank(),  # Remove y-axis title
+        panel.grid.major.x = element_line(color = "gray80", size = 0.5),  # Lighten the grid lines
+        panel.grid.minor.x = element_blank(),  # Remove minor grid lines
+        panel.background = element_blank(),  # Remove panel background
+        plot.title = element_text(hjust = 0.5))  # Center the plot title
+
+
 #######################################################################
 ###################### compare openAlex data with Scopus data #########
 #######################################################################
@@ -390,45 +496,21 @@ clean_string <- function(input_str) {
 clean_titles_scopus   <- clean_string(titles_scopus)                   # 556 
 clean_titles_openalex <- clean_string(titles_openalex)                 # 357
 
-all_banner_works_openalex_2020$normlized_display_name <- clean_titles_openalex
+all_banner_works_openalex_2020$normalized_display_name <- clean_titles_openalex
 scopus_data$normalized_display_name <- clean_titles_scopus
 
 common_titles <-intersect(clean_titles_scopus, clean_titles_openalex)  # 166 same ones
-distinct_titles <- setdiff(clean_titles_scopus, clean_titles_openalex) # 189 different
-print(common_titles) # 166 common ones vs. 141 if using tolower()
-
+common_titles <-intersect(clean_titles_openalex, clean_titles_scopus)  # 166 same ones
+distinct_titles_scopus <- setdiff(clean_titles_scopus, clean_titles_openalex) # 189 Scopus unique
+distinct_titles_openalex <- setdiff(clean_titles_openalex, clean_titles_scopus) # 383 openAlex unique
 
 ########################################### Distinct titles from OpenAlex ######### 
-#### Analysis: openAlex has distinct titles of 556 - 166 = 390 (not available from Scopus)
+#### Analysis: openAlex has distinct titles of 556 - 166 = 390 (not available from Scopus) (not sure where 7 ? 383 vs. 390)
 
-distinct_titles_openalex <- setdiff( titles_openalex, titles_scopus)
-class(distinct_titles_openalex)
-print(distinct_titles_openalex)
-writeLines(distinct_titles_openalex, "distinct_title_openalex.txt")
-
-
-### scopus distinct titles: 234 
-distinct_titles_scopus <- setdiff( titles_scopus, titles_openalex)
-
-
-############ Testing using scopus_string
-matching_titles_scopus_in_openalex <- data.frame()
-for (string in ) {
-  
-  cs_str <- clean_string(titles_scopus)
-  co_str <- clean_string(all_banner_works_openalex_2020$display_name)
-  matching_rows <- all_banner_works_openalex_2020[grep(cs_str, co_str), ]
-  #matching_rows <- all_banner_works_openalex_2020[grep(string, all_banner_works_openalex_2020$display_name), ]
-  stinct_titles_openalex_df <- rbind(matching_titles_scopus_in_openalex, matching_rows)
-}
-
-
-
-
-war# Initialize an empty data frame to store matching rows
+# Initialize an empty data frame to store matching rows
 distinct_titles_openalex_df <- data.frame()
 for (string in distinct_titles_openalex) {
-  matching_rows <- all_banner_works_openalex_2020[grep(string, all_banner_works_openalex_2020$display_name), ]
+  matching_rows <- all_banner_works_openalex_2020[grep(string, all_banner_works_openalex_2020$normalized_display_name), ]
   distinct_titles_openalex_df <- rbind(distinct_titles_openalex_df, matching_rows)
 }
 # 
@@ -525,6 +607,44 @@ writeLines(distinct_titles_scopus, "distinct_title_scopus.txt")
 ### OpenAlex: https://openalex.org/W2903107208
 ### Scopus: No data
 ### PubMed: https://pubmed.ncbi.nlm.nih.gov/30499802/
+
+### Low-Risk Transcatheter Versus Surgical Aortic Valve Replacement – An Updated Meta-Analysis of Randomized Controlled Trials
+### OpenAlex: https://openalex.org/W2967665527
+### Scopus: https://www.sciencedirect.com/science/article/abs/pii/S1553838919304762 (author's affiliation is University of Arizona, Banner, United States of America) 
+### 
+
+### 67: Repair of a complex rectovaginal fistula
+### Scopus: no data
+### Journal : https://www.ajog.org/article/S0002-9378(19)33035-2/fulltext 
+
+### Exercise as a treatment for sleep apnea
+### OpenAlex: https://openalex.org/W3028017057
+### Scopus: Has the data listed as 
+### Reason: not sure. String matching did not find this (need to find out why)
+
+### 617 Changing Onboarding to Increase Retention
+### OpenAlex: https://openalex.org/W3009432943
+### Scopus: No data
+### Original: https://academic.oup.com/jbcr/article-abstract/41/Supplement_1/S153/5776081 
+
+### 774: Stillbirth rates in relation to maternal age and race/ethnicity: A population-based study in the US
+### Original: https://doi.org/10.1016/j.ajog.2019.11.788 
+### Scopus: No data
+
+### SUN-481 A Coexisting Primary Papillary Thyroid Carcinoma in a Case of Malignant Struma Ovarii with Follicular Thyroid Carcinoma: 2 Types of Thyroid Cancer in the Same Patient
+### Original: https://doi.org/10.1210/jendso/bvaa046.284
+### Scopus: No data
+
+### S3283 Reducing Hospital Readmission Rates of Cirrhotics Using Nutrition Counseling
+### Original: https://journals.lww.com/ajg/Fulltext/2020/10001/S3283_Reducing_Hospital_Readmission_Rates_of.3281.aspx
+### Scopus: No data
+
+### Kindling Change: A Case for Sustainable Development Work
+### Original: https://link.springer.com/chapter/10.1007/978-3-030-39554-4_14 
+### Scopus: 10.1007/978-3-030-39554-4_14  Socio-Tech Innovation: Harnessing Technology for Social GoodPages 261 - 2881 January 2020
+### Reason: OpenAlex data authors do not belong to all of Banner Health?? 
+
+
 
 
 
