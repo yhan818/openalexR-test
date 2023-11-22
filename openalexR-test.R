@@ -250,17 +250,18 @@ fetch_ror_year <- function(ror_id, year) {
   data <- oa_fetch(entity = "works", authorships.institutions.ror = ror_id, verbose = TRUE)
   # Subset data for the specified year
   subset_data <- subset(data, publication_year == year)
-  
   return(subset_data)
 }
 
 # initiate empty dfs
 list_of_dfs <- vector("list", length = nrow(banner_df))
 
+## For each org's ROR, use fetch_ror_year()  to get works on the year
+## Then the works per ROR is stored in list_of_dfs
 for (i in seq_len(nrow(banner_df))) {
   ror <- banner_df$ROR[i]
-  
-  if (!is.null(ror) && ror != "") {
+  print(paste("the orgnation's ROR: ", ror))
+  if (!is.null(ror) && !is.na(ror) && ror != "") {
     list_of_dfs[[i]] <- tryCatch({
       # Fetch and return the data frame
       fetch_ror_year(ror, 2020)
@@ -275,98 +276,34 @@ for (i in seq_len(nrow(banner_df))) {
   }
 }
 
-banner_df$nested_df <- list_of_dfs
+### Attached each org's works to the banner_df
+### success: 
+banner_df$works_yr_2000 <- list_of_dfs
 
 
-
-# Example list of data frames
-#list_of_dfs <- list(df1, df2, df3, ..., df55)  # Replace df1, df2, etc., with your actual data frames
-
-#banner_df$nested_df <- list_of_dfs
-# Define the number of lists you want to create
-#num_rows <- 55
-# Initialize an empty list to store your lists
-#vector_of_banner_dfs <- vector("list", num_rows)
-
-# Use a for loop to populate the list
-for (i in 1:num_rows) {
-  org <- banner_df[i,1]
-  ROR <- banner_df[i,3]
-  Scopus <- banner_df[i,4]
-  df <- data.frame()   
-  vector_of_banner_dfs[[i]] <- list(org, ROR, Scopus, df)
-}
-
-### Showing 2-D array: the first index is the : the 2nd index is column "Organization Name", "ROR": 
-print(vector_of_banner_dfs[[1]][[1]])
-print(vector_of_banner_dfs[[1]][[3]])
-# vector_of_lists now contains 5 lists
-
-
-### Testing
-if (debug = 1 ) {
-  banner_dfs[[1]]$works_2020 <- list(fetch_ror_year(banner_dfs[[1]]$ROR, 2020))  # 2023-10-06: 92 ; 2023-11-17: 94
-}
-
-# After getting all the info into the banner_dfs. Loop through it to fetch works
-# This may run some minutes. 
-for (i in seq_along(banner_dfs) ) {
-  if ( !is.empty(banner_dfs[[i]]$ROR) ) {
-    banner_dfs[[i]]$works_2020 <- list(fetch_ror_year(banner_dfs[[i]]$ROR, 2020)) 
-  }
-}
-
-
-
-
+### You can also run one by one 
 b2_works_2020 <- fetch_ror_year("039wwwz66", 2020)  # 2023-10-06: 92 ; 2023-11-17: 94
 b3_works_2020 <- fetch_ror_year("01cjjjf51", 2020)  # 2023-10-06: 139; 2023-11-17: 140
-
 b6_works_2020 <- fetch_ror_year("023jwkg52", 2020) # 2023-10-06: 0 ; 2023-11-17: 0
-
-
-
 b13_works_2020 <- fetch_ror_year("00sr2h055", 2020) # 2023-10-06: 0; 2023-11-17: 0
-
 b15_works_2020 <- fetch_ror_year("01jjm6w53", 2020) # 2023-10-06: 4; 2023-11-17: 4
-
 b16_works_2020 <- fetch_ror_year("04mvgap27", 2020) # 2023-10-06: 3; 2023-11-17: 3
 # Banner Estrella Medical Center
 b17_works_2020 <- fetch_ror_year("05ct0ag17", 2020) # 2023-10-06: 11; 2023-11-17: 11 
-
 b19_works_2020 <- fetch_ror_year("05gfbdk85", 2020) # 2023-10-06: 0; 2023-11-17: 0
 b20_works_2020 <- fetch_ror_year("049c9q337", 2020) # 2023-10-06: 0; 2023-11-17: 0
-
-
 b23_works_2020 <- fetch_ror_year("03y8jje75", 2020) # 2023-10-06: 1; 2023-11-17: 1 
-
 b25_works_2020 <- fetch_ror_year("03vq5n859", 2020) # 2023-10-06: 0; 2023-11-17: 0
-
-
-
-
 b29_works_2020 <- fetch_ror_year("02s49nq19", 2020) # 2023-10-06: 0; 2023-11-17: 0
-
 b31_works_2020 <- fetch_ror_year("033a24x98", 2020) # 2023-10-06: 0; 2023-11-17: 0
-
 # Banner Sun Health Research Institute
 # check "Highly Sensitive and Multiplexed In-Situ Protein Profiling with Cleavable Fluorescent Streptavidin". why included? 
 b35_works_2020 <- fetch_ror_year("04gjkkf30", 2020) # 2023-10-06: 35; 2023-11-17: 56
-
-
 # Banner Thunderbird Medical Center
 b37_works_2020 <- fetch_ror_year("01kqrgb09", 2020) # 2023-10-06: 18; 2023-11-17: 18
-
 # Banner - University Medical Center Tucson
 b39_works_2020 <- fetch_ror_year("02xbk5j62", 2020) # 2023-10-13: 243; 2023-11-17: 248
-
-
 b42_works_2020 <- fetch_ror_year("035dcj063", 2020) # 2023-10-13: 4; 2023-11-17: 4
-
-
-
-
-
 b51_works_2020 <- fetch_ror_year("05e33tw76", 2020) # 2023-10-06: 6; 2023-11-17: 6
 b53_works_2020 <- fetch_ror_year("01phkkj35", 2020) # 2023-10-06: 4; 2023-11-17: 4
 
@@ -440,7 +377,6 @@ document_counts <- c(120, 80, 60, 50, 45, 30, 25, 20, 15, 10)  # Example counts
 
 # Create the data frame
 df <- data.frame(Affiliation = affiliations, Documents = document_counts)
-
 # Order the data frame by document count in descending order
 df <- df[order(-df$Documents),]
 
@@ -449,12 +385,7 @@ rownames(df) <- seq(length(df$Documents))
 # View the data frame
 print(df)
 
-library(ggplot2)
-
-# Assuming df is your data frame with 'Affiliation' and 'Documents' columns
-# and it's already sorted in descending order by 'Documents'
-
-ggplot(df, aes(x = reorder(Affiliation, -Documents), y = Documents)) + 
+ggplot(df, aes(x = reorder(affiliations, -Documents), y = Documents)) + 
   geom_bar(stat = "identity", aes(fill = Affiliation)) +  # Use 'identity' to tell ggplot to use the actual 'Documents' values
   coord_flip() +  # Flip the axes to make the bars horizontal
   labs(x = "Number of Documents", y = "Affiliation", title = "Documents by Affiliation") +
@@ -467,6 +398,83 @@ ggplot(df, aes(x = reorder(Affiliation, -Documents), y = Documents)) +
         panel.grid.minor.x = element_blank(),  # Remove minor grid lines
         panel.background = element_blank(),  # Remove panel background
         plot.title = element_text(hjust = 0.5))  # Center the plot title
+
+
+######################
+# The works_yr is a tibble. To calculate the number of row use nrow() 
+# To get the tibble itself (and not a one-column tibble containing the tibble), you should use double square brackets [[ ]] for subsetting. 
+banner_df$works_yr_2000[[1]]
+nrow(banner_df$works_yr_2000[[1]])
+banner_df$`Organization Name`[i]
+
+# Create a new tibble with org_name and the number of publications from the last column 
+org_works <- tibble(
+  `Organization Name` = character(),
+  total_works_by_year = numeric(),
+)
+
+for (i in seq_len(nrow(banner_df))) {
+  organization_name <- banner_df$`Organization Name`[i]
+  works_tibble <- banner_df$works_yr_2000[[i]]
+  
+  if (is.null(works_tibble)) {
+    total_works <- 0
+  } else {
+    total_works <- nrow(works_tibble)
+  }
+  
+  # Create a new row and add it to the org_works tibble
+  new_row <- tibble(`Organization Name` = organization_name, total_works_by_year = total_works)
+  org_works <- bind_rows(org_works, new_row)
+}
+
+# Assuming df is your data frame with 'Affiliation' and 'Documents' columns
+# and it's already sorted in descending order by 'Documents'
+org_works_sorted <- org_works %>%
+  arrange(desc(total_works_by_year))
+
+### Plot all org. 
+ggplot(org_works, aes(x = reorder(`Organization Name`, total_works_by_year), y = total_works_by_year)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  coord_flip() +
+  labs(title = "Total Works by Organization",
+       x = "Organization Name",
+       y = "Total Works") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(size = 10),
+        axis.text.y = element_text(size = 10),
+        plot.title = element_text(hjust = 0.5))
+
+### Filter out org > 0 works. 
+org_works_filtered <- org_works %>%
+  filter(total_works_by_year > 0)
+
+### Display the bar chart
+ggplot(org_works_filtered, aes(x = reorder(`Organization Name`, total_works_by_year), y = total_works_by_year, fill = `Organization Name`)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  labs(title = "Total Works by Organization",
+       x = "Organization Name",
+       y = "Total Works") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(size = 10),
+        axis.text.y = element_text(size = 10),
+        plot.title = element_text(hjust = 0.5))
+
+### Diplay the pie chart
+ggplot(org_works_filtered, aes(x = "", y = total_works_by_year, fill = `Organization Name`)) +
+  geom_bar(stat = "identity", width = 1) +
+  coord_polar(theta = "y") +
+  labs(title = "Total Works by Organization",
+       x = "",
+       y = "",
+       fill = "Organization Name") +
+  theme_minimal() +
+  theme(axis.line = element_blank(),
+        axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        plot.title = element_text(hjust = 0.5))
+
 
 
 #######################################################################
