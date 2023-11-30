@@ -15,6 +15,7 @@ install.packages("dplyr")
 install.packages("ggplot2")
 install.packages("knitr")
 install.packages("writexl")
+install.packages("plotly")
 
 # Before we go any further, we highly recommend you set openalexR.mailto option so that your requests go to the polite pool for faster response times: 
 options (openalexR.mailto="yhan@arizona.edu")
@@ -22,10 +23,12 @@ options (openalexR.mailto="yhan@arizona.edu")
 # common libraries to add
 library(openalexR)
 library(dplyr)
-library(ggplot2)
 library(knitr)
 library(writexl)
 library(tibble)
+library(ggplot2)
+library(plotly)
+
 ############################################################
 #### Using API directly
 # Info about UArizona ror":"https://ror.org/03m2x1q45
@@ -39,8 +42,6 @@ library(tibble)
 # Get retracted papers by UArizona:
 # https://api.openalex.org/works?filter=institutions.ror:03m2x1q45&group_by=is_retracted
 # https://api.openalex.org/works?filter=institutions.ror:https://ror.org/03m2x1q45&group_by=is_retracted
-
-
 
 
 ################################ Author ##############################
@@ -187,9 +188,6 @@ filtered_university1 <- institutions %>%
 
 filtered_university2 <- institutions %>% 
   filter(display_name == "Arizona")
-
-
-
 
 ####################################
 banner2 <-oa_fetch(  entity = "institutions",   identifier = "ror:039wwwz66",   country_code = "us",   type = "education",   verbose = TRUE)
@@ -433,6 +431,8 @@ for (i in seq_len(nrow(banner_df))) {
 org_works_sorted <- org_works %>%
   arrange(desc(total_works_by_year))
 
+#####################################################################
+####################### Bar Charts ###################################
 ### Plot all org. 
 ggplot(org_works, aes(x = reorder(`Organization Name`, total_works_by_year), y = total_works_by_year)) +
   geom_bar(stat = "identity", fill = "steelblue") +
@@ -449,23 +449,50 @@ ggplot(org_works, aes(x = reorder(`Organization Name`, total_works_by_year), y =
 org_works_filtered <- org_works %>%
   filter(total_works_by_year > 0)
 
-### Display the bar chart
-ggplot(org_works_filtered, aes(x = reorder(`Organization Name`, total_works_by_year), y = total_works_by_year, fill = `Organization Name`)) +
+# Calculate the percentages for each org
+org_works_filtered <- org_works_filtered %>%
+  mutate(Percentage = total_works_by_year / sum(total_works_by_year) * 100)
+
+### Display the bar chart: descending order
+ggplot(org_works_filtered, aes(x = reorder(`Organization Name`, -total_works_by_year), y = total_works_by_year, fill = `Organization Name`)) +
   geom_bar(stat = "identity") +
   coord_flip() +
-  labs(title = "Total Works by Organization",
-       x = "Organization Name",
-       y = "Total Works") +
+  geom_text(aes(label = paste0(round(Percentage, 1), "%")), 
+            position = position_stack(vjust = 0.5), 
+            hjust = 1) +
+  labs(title = "Banner Health: Total Works by Organization",
+       x = "Total Works",
+       y = "Organization Name") +
   theme_minimal() +
   theme(axis.text.x = element_text(size = 10),
         axis.text.y = element_text(size = 10),
-        plot.title = element_text(hjust = 0.5))
+        plot.title = element_text(hjust = 0.5),
+        legend.position = "none")  # Hide the legend if not needed
 
-### Diplay the pie chart
+# Bar char in descending order
+ggplot(org_works_filtered, aes(x = reorder(`Organization Name`, total_works_by_year), y = total_works_by_year, fill = `Organization Name`)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  geom_text(aes(label = paste0(round(Percentage, 1), "%")), 
+            position = position_stack(vjust = 0.5), 
+            hjust = 0, check_overlap = TRUE) +
+  labs(title = "Banner Health: Total Works by Organization",
+       x = "Total Works",
+       y = "Organization Name") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(size = 10),
+        axis.text.y = element_text(size = 10),
+        plot.title = element_text(hjust = 0.5),
+        legend.position = "none")  # Optionally hide the legend if it's not needed
+
+
+################################# Pie Char #################################
+########################################################################## 
+### Display the pie chart
 ggplot(org_works_filtered, aes(x = "", y = total_works_by_year, fill = `Organization Name`)) +
   geom_bar(stat = "identity", width = 1) +
   coord_polar(theta = "y") +
-  labs(title = "Total Works by Organization",
+  labs(title = "Banner Health: Total Works by Organization",
        x = "",
        y = "",
        fill = "Organization Name") +
@@ -475,6 +502,42 @@ ggplot(org_works_filtered, aes(x = "", y = total_works_by_year, fill = `Organiza
         axis.ticks = element_blank(),
         plot.title = element_text(hjust = 0.5))
 
+# display interactive plot
+banner_pie_interactive <- plot_ly(org_works_filtered, labels = ~`Organization Name`, values = ~Percentage, type = 'pie',
+                         textinfo = 'label+percent',
+                         insidetextorientation = 'radial') %>%
+  layout(title = 'Banner Health: Total Works by Organization')
+
+# Display the plot
+banner_pie_interactive
+
+
+### Display the total number of work with org (a little messy)
+ggplot(org_works_filtered, aes(x = "", y = total_works_by_year, fill = `Organization Name`)) +
+  geom_bar(stat = "identity", width = 1) +
+  coord_polar(theta = "y") +
+  geom_text(aes(label = paste(`Organization Name`, total_works_by_year)), 
+            position = position_stack(vjust = 0.5)) +
+  labs(title = "Total Works by Organization",
+       x = "",
+       y = "",
+       fill = "Organization Name") +
+  theme_void() +
+  theme(legend.position = "bottom",
+        plot.title = element_text(hjust = 0.5))
+
+
+ggplot(org_works_filtered, aes(x = reorder(`Organization Name`, -total_works_by_year), y = total_works_by_year)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  geom_text(aes(label = paste0(round(Percentage, 1), "%")), position = position_dodge(width = 0.9), hjust = -0.1) +
+  labs(title = "Total Works by Organization",
+       x = "Organization Name",
+       y = "Total Works") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(size = 10),
+        axis.text.y = element_text(size = 10),
+        plot.title = element_text(hjust = 0.5))
 
 
 #######################################################################
