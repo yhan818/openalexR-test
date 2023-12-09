@@ -5,6 +5,7 @@
 #### 2023-08: OpenAlex changed its old authorID
 #### 2023-09: Compare UArizona ROR, display_name, and OpenAlexID
 #### 2023-10: Add each unit of Banner Health query and dedup
+#### 
 
 # OpenAlex R Documentation: https://github.com/ropensci/openalexR
 #install.packages("openalexR")
@@ -12,9 +13,10 @@ install.packages("remotes")
 remotes::install_github("ropensci/openalexR", force=TRUE) 
 
 install.packages("dplyr")
-install.packages("ggplot2")
 install.packages("knitr")
 install.packages("writexl")
+install.packages("ggplot2")
+install.packages("bibliometrix")
 install.packages("plotly")
 
 # Before we go any further, we highly recommend you set openalexR.mailto option so that your requests go to the polite pool for faster response times: 
@@ -27,6 +29,7 @@ library(knitr)
 library(writexl)
 library(tibble)
 library(ggplot2)
+library(bibliometrix)
 library(plotly)
 
 ############################################################
@@ -225,8 +228,6 @@ duplicates3 <-banner3_works_2020$display_name %in% banner2_works_2020$display_na
 duplicates4 <-banner4_works_2020$display_name %in% banner3_works_2020$display_name
 duplicates5 <-banner4_works_2020$display_name %in% banner2_works_2020$display_name
 
-
-
 ##########################################################
 ############# Read Banner Health Provided Excel ########## 
 ###########################################################
@@ -280,7 +281,7 @@ banner_df$works_yr_2000 <- list_of_dfs
 
 
 ### You can also run one by one 
-b2_works_2020 <- fetch_ror_year("039wwwz66", 2020)  # 2023-10-06: 92 ; 2023-11-17: 94
+b2_works_2020 <- fetch_ror_year("039wwwz66", 2020)  # 2023-10-06: 92 ; 2023-11-17: 94; 2023
 b3_works_2020 <- fetch_ror_year("01cjjjf51", 2020)  # 2023-10-06: 139; 2023-11-17: 140
 b6_works_2020 <- fetch_ror_year("023jwkg52", 2020) # 2023-10-06: 0 ; 2023-11-17: 0
 b13_works_2020 <- fetch_ror_year("00sr2h055", 2020) # 2023-10-06: 0; 2023-11-17: 0
@@ -311,6 +312,119 @@ banner_works_2020 <- rbind(b2_works_2020, b3_works_2020, b15_works_2020, b16_wor
 banner_works_2020 <- rbind(banner_works_2020, b23_works_2020, b29_works_2020, b35_works_2020, b37_works_2020, b39_works_2020, b42_works_2020, b51_works_2020, b53_works_2020)
 # This is the final. 2023-10-10: 554 
 all_banner_works_openalex_2020 <- unique(banner_works_2020)
+
+
+
+##########################################################################
+######## Bibliometrix ###################################################
+# The openalex returns 36 columns, 
+# After oa2bibliometrix returns 50 columns. It includes most of the 36 columns (from openAlex), and additional 14 columns analysis data 
+# see Bibliometrix documentation: https://github.com/massimoaria/bibliometrix
+# At the moment, Bibliometrix only has openAlexR function oa2bibliometrix(). I have an open issue with Bibliometrix https://github.com/massimoaria/bibliometrix/issues/404
+
+# AU: Author names.
+# RP: Reprint author or corresponding author.
+# C1: Author affiliations.
+# AU_UN: Author's university or institutional affiliation.
+# AU_CO: Author's country.
+# ID: Keywords-Plus 
+# id_url: openAlex URL
+# id_oa: Identifier related to Open Access status.
+# CR: Cited references.
+# TI: Title of the work.
+# AB: Abstract of the work.
+# SO: Source of the publication (journal, conference, etc.).
+# DT: Document type.
+# DB: Database where the record is indexed.
+# JI: Journal ISSN.
+# J9: Abbreviated journal name.
+# PY: Publication year.
+# TC: Times cited.
+# DI: Digital Object Identifier (DOI).
+# SR_FULL: Possibly a full source rating.
+# SR: Source rating.
+
+# Testing bibliometrix
+library(bibliometrix)
+works_search <- oa_fetch(
+  entity = "works",
+  title.search = c("bibliometric analysis", "science mapping"),
+  cited_by_count = ">50",
+  from_publication_date = "2020-01-01",
+  to_publication_date = "2021-12-31",
+  options = list(sort = "cited_by_count:desc"),
+  verbose = TRUE
+)
+M <- oa2bibliometrix(works_search)
+summary(biblioAnalysis(M))
+
+com <- missingData(M)
+NetMatrix <- biblioNetwork(M, analysis = "co-citation", network = "references", sep = ";")
+
+
+
+### Testing B2 for analysis
+test_works_2020 <-oa_fetch(entity = "works", 
+                         authorships.institutions.ror = "039wwwz66", 
+                         from_publication_date = "2019-01-01",
+                         to_publication_date = "2022-12-31",
+                         options = list(sort = "cited_by_count:desc"),
+                         verbose = TRUE)
+test_works_2020_analysis <- oa2bibliometrix(test_works_2020)
+summary(test_works_2020_analysis)
+
+com <- missingData(test_works_2020_analysis)
+# showing analysis: any missing value in these tag status: Excellent, good, acceptable, poor, critical, completely missing 
+com$mandatoryTags
+
+# Create a co-citation network; n = 30 is number of nodes (references) to be in the network.
+NetMatrix <- biblioNetwork(test_works_2020_analysis, analysis = "co-citation", network = "references", n=30, sep = ";")
+
+# Plot the network. type options are: "auto", "circle", "sphere", "mds", "fruchterman", "kamada"
+net = networkPlot(NetMatrix, Title ="Co-Citation Network", type = "fruchterman", size=T, remove.multiple=FALSE, labelsize=0.7,edgesize = 5)
+net2= networkPlot(NetMatrix, Title ="Co-Citation Network", type ="circle", size = T, remove.multiple = FALSE, labelsize =0.7, edgesize = 5)
+net3= networkPlot(NetMatrix, Title ="Co-Citation Network", type ="sphere", size = T, remove.multiple = FALSE, labelsize =0.7, edgesize = 5)
+net4= networkPlot(NetMatrix, Title ="Co-Citation Network", type ="mds", size = T, remove.multiple = FALSE, labelsize =0.7, edgesize = 5)
+net5= networkPlot(NetMatrix, Title ="Co-Citation Network", type ="kamada", size = T, remove.multiple = FALSE, labelsize =0.7, edgesize = 5)
+
+# Create keyword co-occurrences network
+NetMatrix2 <- biblioNetwork(test_works_2020_analysis, analysis = "co-occurrences", network = "keywords", sep = ";")
+
+# Plot the network
+net = networkPlot(NetMatrix2, normalize="association", weighted=T, n = 30, Title = "Keyword Co-occurrences", type = "fruchterman", size=T,edgesize = 5,labelsize=0.7)
+net = networkPlot(NetMatrix2, normalize="association", weighted=T, n = 30, Title = "Keyword Co-occurrences", type = "circle", size=T,edgesize = 5,labelsize=0.7)
+net = networkPlot(NetMatrix2, normalize="association", weighted=T, n = 30, Title = "Keyword Co-occurrences", type = "sphere", size=T,edgesize = 5,labelsize=0.7)
+
+
+# Conceptual Structure using keywords (method="CA")
+CS <- conceptualStructure(test_works_2020_analysis, field="ID", method="MCA", minDegree=10, clust=5, stemming=FALSE, labelsize=15, documents=20, graph=FALSE)
+plot(CS$graph_terms)
+
+
+### output new analysis columns added by Bibliometrix
+unique_columns_in_analysis <- setdiff(names(test_works_2020_analysis), names(test_works_2020))
+print(unique_columns_in_analysis)
+
+############## Get a biblioMetrix object
+results <- biblioAnalysis(test_works_2020_analysis)
+
+#### Top 20 results (country, author, source, etc)
+S <- summary(object = results, k = 10, pause = FALSE)
+
+#### Basic plots
+plot(x = results, k = 10, pause = FALSE)
+
+
+
+
+
+
+
+
+
+### Use web-based interface. It will download, compile and install a server on your local computer and run it. The default web browser will run via 127.0.0.1
+### It will ask for loading files
+# biblioshiny()
 
 ### Verify if "Banner" "Banner Health" in author
 ###################################################################
@@ -511,11 +625,10 @@ banner_pie_interactive <- plot_ly(org_works_filtered, labels = ~`Organization Na
 # Display the plot
 banner_pie_interactive
 
-
 ### Display the total number of work with org (a little messy)
 ggplot(org_works_filtered, aes(x = "", y = total_works_by_year, fill = `Organization Name`)) +
   geom_bar(stat = "identity", width = 1) +
-  coord_polar(theta = "y") +
+  coord_polar(theta = "y", start=pi/2) +
   geom_text(aes(label = paste(`Organization Name`, total_works_by_year)), 
             position = position_stack(vjust = 0.5)) +
   labs(title = "Total Works by Organization",
@@ -524,19 +637,6 @@ ggplot(org_works_filtered, aes(x = "", y = total_works_by_year, fill = `Organiza
        fill = "Organization Name") +
   theme_void() +
   theme(legend.position = "bottom",
-        plot.title = element_text(hjust = 0.5))
-
-
-ggplot(org_works_filtered, aes(x = reorder(`Organization Name`, -total_works_by_year), y = total_works_by_year)) +
-  geom_bar(stat = "identity") +
-  coord_flip() +
-  geom_text(aes(label = paste0(round(Percentage, 1), "%")), position = position_dodge(width = 0.9), hjust = -0.1) +
-  labs(title = "Total Works by Organization",
-       x = "Organization Name",
-       y = "Total Works") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(size = 10),
-        axis.text.y = element_text(size = 10),
         plot.title = element_text(hjust = 0.5))
 
 
