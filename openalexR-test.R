@@ -378,6 +378,8 @@ com <- missingData(test_works_2020_analysis)
 com$mandatoryTags
 
 # Create a co-citation network; n = 30 is number of nodes (references) to be in the network.
+# Analysis parameters can be: “co-citation”, “coupling”, “collaboration”, or “co-occurrences”.
+# network argument can be “authors”, “references”, “sources”, “countries”, “universities”, “keywords”, “author_keywords”, “titles” and “abstracts”.
 NetMatrix <- biblioNetwork(test_works_2020_analysis, analysis = "co-citation", network = "references", n=30, sep = ";")
 
 # Plot the network. type options are: "auto", "circle", "sphere", "mds", "fruchterman", "kamada"
@@ -387,14 +389,29 @@ net3= networkPlot(NetMatrix, Title ="Co-Citation Network", type ="sphere", size 
 net4= networkPlot(NetMatrix, Title ="Co-Citation Network", type ="mds", size = T, remove.multiple = FALSE, labelsize =0.7, edgesize = 5)
 net5= networkPlot(NetMatrix, Title ="Co-Citation Network", type ="kamada", size = T, remove.multiple = FALSE, labelsize =0.7, edgesize = 5)
 
-# Create keyword co-occurrences network
+library(dplyr)
+library(stringr)
+filtered_df <-test_works_2020 %>% filter(str_detect(test_works_2020$author, regex("kewei", ignore_case = TRUE)))
+
+
+
+# Create keyword co-occurrences network 
 NetMatrix2 <- biblioNetwork(test_works_2020_analysis, analysis = "co-occurrences", network = "keywords", sep = ";")
-
 # Plot the network
-net = networkPlot(NetMatrix2, normalize="association", weighted=T, n = 30, Title = "Keyword Co-occurrences", type = "fruchterman", size=T,edgesize = 5,labelsize=0.7)
-net = networkPlot(NetMatrix2, normalize="association", weighted=T, n = 30, Title = "Keyword Co-occurrences", type = "circle", size=T,edgesize = 5,labelsize=0.7)
-net = networkPlot(NetMatrix2, normalize="association", weighted=T, n = 30, Title = "Keyword Co-occurrences", type = "sphere", size=T,edgesize = 5,labelsize=0.7)
+net = networkPlot(NetMatrix2, normalize="association", weighted=T, n = 30, Title = "Keyword Co-occurrences", size=T, edgesize=5,labelsize=1.2, type = "fruchterman")
+net = networkPlot(NetMatrix2, normalize="association", weighted=T, n = 30, Title = "Keyword Co-occurrences", size=T, edgesize=5,labelsize=1.2, type = "circle")
+net = networkPlot(NetMatrix2, normalize="association", weighted=T, n = 30, Title = "Keyword Co-occurrences", size=T, edgesize=5,labelsize=1.2, type = "sphere")
 
+
+#####################
+
+NetMatrix3 <- biblioNetwork(test_works_2020_analysis, analysis = "collaboration", network = "authors", n=30, sep = ";")
+# Plot the network. type options are: "auto", "circle", "sphere", "mds", "fruchterman", "kamada"
+net = networkPlot(NetMatrix3, Title ="Author Network", size=T, remove.multiple=FALSE, labelsize=1.2,edgesize = 5, type = "fruchterman")
+net = networkPlot(NetMatrix3, Title ="Author Network", size=T, remove.multiple=FALSE, labelsize=1.2,edgesize = 5, type = "circle")
+net = networkPlot(NetMatrix3, Title ="Author Network", size=T, remove.multiple=FALSE, labelsize=1.2,edgesize = 5, type = "sphere")
+
+#
 
 # Conceptual Structure using keywords (method="CA")
 CS <- conceptualStructure(test_works_2020_analysis, field="ID", method="MCA", minDegree=10, clust=5, stemming=FALSE, labelsize=15, documents=20, graph=FALSE)
