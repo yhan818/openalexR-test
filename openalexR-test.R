@@ -404,7 +404,7 @@ net = networkPlot(NetMatrix2, normalize="association", weighted=T, n = 30, Title
 
 
 #####################
-
+# Author collaboration network 
 NetMatrix3 <- biblioNetwork(test_works_2020_analysis, analysis = "collaboration", network = "authors", n=30, sep = ";")
 # Plot the network. type options are: "auto", "circle", "sphere", "mds", "fruchterman", "kamada"
 net = networkPlot(NetMatrix3, Title ="Author Network", size=T, remove.multiple=FALSE, labelsize=1.2,edgesize = 5, type = "fruchterman")
@@ -430,12 +430,6 @@ S <- summary(object = results, k = 10, pause = FALSE)
 
 #### Basic plots
 plot(x = results, k = 10, pause = FALSE)
-
-
-
-
-
-
 
 
 
