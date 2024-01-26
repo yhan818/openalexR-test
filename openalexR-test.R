@@ -73,18 +73,6 @@ works_from_orcids |>
 #> Requesting url: https://api.openalex.org/works?filter=author.orcid%3A0000-0001-9518-2684%7C0000-0002-8517-9411
 # > output to a file 
 
-### Aug 2023: Yan Han: affiliation Jilin university. Wrong
-##### Getting authors' info using their ORCIDs
-authors_from_orcids <- oa_fetch(
-  entity = "authors",
-   orcid =  c("0000-0001-6187-6610", "0000-0002-8517-9411", "0000-0003-1613-5981", "0000-0001-9518-2684")
-)
-
-str(authors_from_orcids) # show the object
-
-authors_from_orcids |> 
- show_authors() |>
- knitr::kable()
 
 #################### Author's openAlex ID ###########################
 ### Sep 2023: old authorID was removed. 
@@ -611,7 +599,7 @@ ggplot(org_works_filtered, aes(x = reorder(`Organization Name`, total_works_by_y
         legend.position = "none")  # Optionally hide the legend if it's not needed
 
 
-################################# Pie Char #################################
+################################# Pie Chart #################################
 ########################################################################## 
 ### Display the pie chart
 ggplot(org_works_filtered, aes(x = "", y = total_works_by_year, fill = `Organization Name`)) +
