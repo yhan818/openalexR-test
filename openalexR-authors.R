@@ -1,7 +1,7 @@
 ############# Author's search ##########
 ######## Author: Yan Han
 ######## Date: May 9, 2023
-######## Updated: June 21, 2023
+######## Updated: Jan, 2024
 ##### Search authors' publication using openAlex data ####
 # OpenAlex R Documentation: https://github.com/ropensci/openalexR
 # OpenAlex Beta explorer: https://explore.openalex.org/ (the explorer seems not to display all the possible researchers. In ohter words, You shall use API
@@ -11,7 +11,6 @@ install.packages("remotes")
 remotes::install_github("ropensci/openalexR", force=TRUE) 
 
 #install.packages("openalexR") #install.packages("openalexR")  ### use the latest development version due to issue with the production version openalexR 1.10. Waiting for 1.2.0
-
 install.packages("dplyr")
 install.packages("ggplot2")
 install.packages("knitr")
@@ -26,15 +25,66 @@ library(testthat)
 
 options (openalexR.mailto="yhan@arizona.edu")
 getwd()
-setwd("/home/yhan/Documents/openalexR-test")
+setwd("/home/yhan/Documents/UA-datasets/openalexR-test")
+
+######### Step1 :  Get unit/dept/college authors ######################
+######### LDAP search
+#LDAP query against ldap.arizona.edu (public, no account required), e.g.
+# Via linux terminal: ldapsearch -H ldap://ldap.arizona.edu -D "" -b "o=University of Arizona,c=US" -w -x 'departmentNumber=1705' givenName sn
+
+# To find Dept HR code: log into apps.iam.arizona.edu to search person >> OrgSearch (partent org, child orgs) 
+# Example: https://apps.iam.arizona.edu/orgs/ua_orgs/view/1705
+
+# Department of Medicine at College of Medicine (UMC-Tucson): code : 0713
+# 1. Get LDAP data by running 
+#    > "ldapsearch -H ldap://ldap.arizona.edu -D "" -b "o=University of Arizona,c=US" -w -x 'departmentNumber=0713' sn > dept0713.ldif
+# 2. Convert the LDAP data to CSV file and then compare it with Funk's CSV (XLSV converted to CSV), which generates two CSV files: 
+#   {dept}.csv = dept LDAP ; {dept}_common.csv = common entries between the {dept}.csv and Funk's CSV
+#   This is by Using "common_entries.py" to convert LDIF (LDAP data interchange format) to CSV format. 
+#   > "Python common_entries.py" to enter dept name such as "dept0713". 
 
 
 ########################## Functions ###########################33
 
 #####################################################
-# Function: Find author with affiliation 
+# Function: Find author via his/her affiliation 
 #####################################################
-search_author <- function(author_name, affiliation_name){
+search_author <- function(author_name, affiliation_name) {
+  # Initialize filtered_authors as NULL
+  filtered_authors <- NULL
+  
+  # Fetch data from openAlexR API
+  author_from_names <- oa_fetch(entity = "author", search = author_name)
+  
+  # Check if data is retrieved and non-empty
+  if (!is.null(author_from_names) && nrow(author_from_names) > 0) {
+    # Check if 'affiliation_display_name' column exists
+    if ("affiliation_display_name" %in% names(author_from_names)) {
+      # Filter using 'affiliation_display_name' column
+      matches <- sapply(author_from_names$affiliation_display_name, function(affiliation_display) {
+        !is.na(affiliation_display) && grepl(affiliation_name, affiliation_display, ignore.case = TRUE)
+      })
+      
+      filtered_authors <- author_from_names[matches, ]
+      
+      if (nrow(filtered_authors) == 0) {
+        message("No authors found matching the given affiliation.")
+      } else {
+        print(filtered_authors)
+      }
+    } else {
+      message("Column 'affiliation_display_name' not found in the data.")
+      return(author_from_names)
+    }
+  } else {
+    message("No data retrieved from API.")
+  }
+  
+  return(filtered_authors)
+}
+
+
+search_author2 <- function(author_name, affiliation_name){
   # getting data from openAlexR API
   filtered_authors <- NULL
   author_from_names <- oa_fetch(entity = "author", search = author_name )
@@ -49,6 +99,27 @@ search_author <- function(author_name, affiliation_name){
   }
   return (filtered_authors)
 }
+
+
+### 2024-01-24: These have  ('affiliation_display_name' not found). 
+author_name <- "Vivian Kominos"
+affiliation_name <- "University"
+author_result_affiliation <- search_author(author_name, affiliation_name )
+
+author_name <- "Tejo K Vemulapalli"
+author_result_affiliation <- search_author(author_name, affiliation_name )
+
+### These have no affiliation with "University". https://openalex.org/authors/a5019422724
+
+author_name <- "Lise Alschuler"  
+author_result_affiliation <- search_author(author_name,"University") 
+author_from_names <- oa_fetch(entity = "author", search = author_name)
+author_from_names <- oa_fetch(entity = "author", search = "Lise Alschuler") 
+
+### Affiliations data is accurate
+
+
+
 
 
 #####################################################
@@ -129,6 +200,55 @@ calculate_works_count <- function(author_name, affiliation_name, year) {
 }
 
 
+#### Dept of Medicine (HR code: 0713 and 0788) Test date: 2024-01-24 
+
+# First get a list of all the authors in this dept. The list is saved in a CSV with col 1 "surname" and 2 "first_name"
+library(readr)
+
+################### Function ######################
+get_dept_author_data <- function(dept_code, affiliation_name) {
+  file_path <- sprintf("%s_common.csv", dept_code)
+  if (!file.exists(file_path)) {
+    stop("File not found: ", file_path)
+  }
+  LDAPdata <- read_csv(file_path, show_col_types = FALSE)
+  authors_names <- LDAPdata$cn
+  
+  dept_results <- list() 
+  
+  for (i in 1: length(authors_names) ) {
+    # Access the current row
+    author_name <- authors_names[i]
+    print (paste(author_name, affiliation_name))
+    
+    author_result_affiliation <- search_author(author_name, affiliation_name )
+    author_stats              <- calculate_works_count(author_name, affiliation_name, 2022)
+    
+    # Check if any of the results are NULL or have zero rows; handle accordingly
+    if (is.null(author_result_affiliation) || nrow(author_result_affiliation) == 0) {
+      author_result_affiliation <- NA  # or some other placeholder value
+    }
+    if (is.null(author_stats) || length(author_stats) == 0) {
+      author_stats <- NA  # or some other placeholder value
+    }
+    # Append the results to the list
+    dept_results[[i]] <- data.frame(author_name = author_name, 
+                                    author_result_affiliation = author_result_affiliation, 
+                                    author_stats = author_stats)
+  }
+  return (dept_results)
+}
+
+dept_code <- readline(prompt = "Please enter the department code: ")
+affiliation_name <- readline(prompt = "Please enter the affiliation: ")
+
+dept0713_results <- list()
+dept0788_results <- list()
+
+dept0788_results <- get_dept_author_data("dept0788", "University")
+dept0713_results <- get_dept_author_data("dept0713", "University")
+
+
 #############################################################
 # check to see if openAlexR has the latest entities in OpenAlex (OpenAlex updated its data model(Entities) in June 2023)
 # Before April 2023: they are [1] "works"        "authors"      "venues"       "institutions" "concepts"    
@@ -144,11 +264,11 @@ oa_entities()
 ### NOTE: May 2023, Not all the works are there, NEED TO discuss with OpenAlex. Most likely the disambigation alg not working well. https://docs.openalex.org/api-entities/authors
 ### NOTE: Aug 2023, OpenAlex has a new author data with a new disambiguation model. It is getting better but there are still some bugs/errors.
 ### Example: Aug 2023, there are 80 works associated with "0000-0001-9518-2684". About 40 works are NOT authored by me. (My works are all written in English. For some reason, these works are NOT pulled from ORCID)
-
+### NOTE: Jan 2024, ORCID 0000-0001-9518-2684 returns "No records found!"
 works_from_orcids <- oa_fetch(
   entity = "works",
-  author.orcid = c("0000-0001-9518-2684"),  
-  # author.orcid = c("0000-0001-6187-6610", "0000-0002-8517-9411"),
+  #author.orcid = c("0000-0001-9518-2684"),  
+   author.orcid = c("0000-0001-6187-6610", "0000-0002-8517-9411"),
   verbose = TRUE  
 ) 
 
@@ -158,9 +278,10 @@ works_from_orcids <- oa_fetch(
 #### Aug 11, 2023: Bekir affiliation shows "University of Arizona", which is correct now. 
 author_from_names <- oa_fetch(entity = "author", search = "Bekir Tanriover" )
 
-### July 2023, "Karen Padilla" affiliated with "University of Arizona"
-### Aug 11, 2023: "Karen Padilla" affiliated with "University of Arizona"
-author_from_names <- oa_fetch(entity = "author", search = "Karen Padilla" )
+### 2024-01-25: Tejo K Vemulapalli no 
+### [1] "Tejo K Vemulapalli University" Error in is.factor(x) : object 'affiliation_display_name' not found In addition: Warning messages:
+###  1: In oa_request(oa_query(filter = filter_i, multiple_id = multiple_id,                       No records found!
+author_from_names <- oa_fetch(entity = "author", search = "Tejo K Vemulapalli" )
 
 ### Aug 11, 2023: Results contain wrong info (Haitong Tai: https://openalex.org/A5060511275 ) affiliation not updated yet (probably based on last publication's affiliation)
 author_from_names <- oa_fetch(entity = "author", search = "Haw-chih Tai")
@@ -170,18 +291,10 @@ author_from_names <- oa_fetch(entity = "author", search = "Haw-chih Tai")
 author_from_names <- oa_fetch(entity = "author", search = "Yan Han")
 author_from_names <- search_author("Yan Han", "University of Arizona")
 
-#### This upgrade found Hong Cui's ID and correct affiliation. 
+#### This upgrade found and contains Hong Cui's ID and correct affiliation. but needs further filtering via affiliation
 author_from_names <- oa_fetch(entity = "author", search = "Hong Cui")
 
 
-### LDAP search
-#LDAP query against ldap.arizona.edu (public, no account required), e.g.
-# Via linux terminal: ldapsearch -H ldap://ldap.arizona.edu -D "" -b "o=University of Arizona,c=US" -w -x 'departmentNumber=1705' givenName sn
-
-# To find Dept HR code: log into apps.iam.arizona.edu to search person >> OrgSearch (partent org, child orgs) 
-# Example: https://apps.iam.arizona.edu/orgs/ua_orgs/view/1705
-
-# College of Medicine Department of: code : 0713
 
 # R does not have LDAP packages??
 # clean all objects from the environment to start
@@ -288,23 +401,23 @@ if (!is.null(author_from_names)) {
     } else {
       print("This is NOT a dataframe. Data wrong")
     }
-
 }
 
   total_cited_sum_2022 <- 0
   total_works_sum_2022 <- 0
 }
 
-
 ########################## TESTING PEOPLE ####################
 ### Format: Name: Year: Works/Cited
+
+
 
 ############# College of Medicine Tucson Test Date:  2023-05-14: If test in a different date, result may vary
 #### U of Arizona College of Medicine Faculty and Staff Directory https://medicine.arizona.edu/directory/faculty-staff
 #### Phillip Kuo: 2022: 30 and 133: 26 IDs
 ####            : 2023-07: after authorID updates: 17 and 330
-author_name <- "Phillip Kuo"
-affiliation_name <- "University of Arizona"
+author_name <- "Phillip H. Kuo"
+affiliation_name <- "University"
 author_result_fuzzy       <- oa_fetch(entity = "author", search = author_name)
 author_result_affiliation <- search_author(author_name, affiliation_name )
 author_stats              <- calculate_works_count(author_name, affiliation_name, 2022)
@@ -316,6 +429,7 @@ author_name <- "Bekir Tanriover"
 author_result_fuzzy       <- oa_fetch(entity = "author", search = author_name)
 author_result_affiliation <- search_author(author_name, affiliation_name )
 author_stats              <- calculate_works_count(author_name, affiliation_name, 2022)
+
 
 
 author_stats <- calculate_works_count(test_data_COM_authors[2], test_data_affiliation[1], test_data_year[1])
