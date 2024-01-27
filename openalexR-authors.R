@@ -244,10 +244,13 @@ affiliation_name <- readline(prompt = "Please enter the affiliation: ")
 
 dept0713_results <- list()
 dept0788_results <- list()
+dept07xx_results <- list()
 
-dept0788_results <- get_dept_author_data("dept0788", "University")
 dept0713_results <- get_dept_author_data("dept0713", "University")
+dept0788_results <- get_dept_author_data("dept0788", "University")
+dept07xx_results <- get_dept_author_data("dept07xx", "University")
 
+# To display the list certain fields. to output 
 
 #############################################################
 # check to see if openAlexR has the latest entities in OpenAlex (OpenAlex updated its data model(Entities) in June 2023)
