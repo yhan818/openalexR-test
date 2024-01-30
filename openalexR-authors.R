@@ -15,6 +15,7 @@ install.packages("dplyr")
 install.packages("ggplot2")
 install.packages("knitr")
 install.packages("testthat")
+install.packages("readxl")
 
 # common libraries
 library(openalexR)
@@ -249,6 +250,35 @@ dept07xx_results <- list()
 dept0713_results <- get_dept_author_data("dept0713", "University")
 dept0788_results <- get_dept_author_data("dept0788", "University")
 dept07xx_results <- get_dept_author_data("dept07xx", "University")
+
+
+### Banner faculty. No LDAP match??
+library(readxl)
+
+file_path <- "Funk_faculty_list.xlsx"
+# read the "Banner" sheet
+data_sheet_by_name <- read_excel(file_path, sheet="Banner")
+head(data_sheet_by_name)
+
+# Banner has no LDAP, so making a new dept with Banner's authors by combing the sheet's LAST NAME and FIRST NAME
+data_sheet_by_name$cn <-paste(data_sheet_by_name$`FIRST NAME`, data_sheet_by_name$`LAST NAME`, sep = " ")
+new_csv <-data.frame(cn = data_sheet_by_name$cn)
+head(new_csv)
+
+write.csv(new_csv, "dept_banner_common.csv", row.names = FALSE)
+
+# run the Banner as a UA's dept
+dept_banner <- list()
+# Use "Arizona" to see how many authors have  no affiliation of "Arizona"
+dept_banner <- get_dept_author_data("dept_banner", "Arizona")
+### results:
+#[1] "Anthony Witten Arizona"
+# Column 'affiliation_display_name' not found in the data.
+
+dept_banner <- list()
+# Use "University" to see how many authors have  no affiliation of "University"
+dept_banner <- get_dept_author_data("dept_banner", "University")
+
 
 # To display the list certain fields. to output 
 
