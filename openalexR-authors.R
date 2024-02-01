@@ -16,6 +16,7 @@ install.packages("ggplot2")
 install.packages("knitr")
 install.packages("testthat")
 install.packages("readxl")
+install.packages("openxlsx")
 
 # common libraries
 library(openalexR)
@@ -23,6 +24,7 @@ library(dplyr)
 library(ggplot2)
 library(knitr)
 library(testthat)
+library(openxlsx)
 
 options (openalexR.mailto="yhan@arizona.edu")
 getwd()
@@ -119,8 +121,94 @@ author_from_names <- oa_fetch(entity = "author", search = "Lise Alschuler")
 
 ### Affiliations data is accurate
 
+################################################################
+##### Function: Get works from author id and year #########
+get_works_from_authorid_by_year <- function(author_id, publication_year) {
+  author_works <- oa_fetch(
+    entity = "works",
+    author.id = author_id, 
+    publication_year = publication_year,
+    verbose = TRUE
+  )
+  return(author_works)
+}
 
+##### Function: Get works from author ORCID and year
+get_works_from_orcid_by_year <- function(orcid, publication_year) {
+  author_works <- oa_fetch(
+    entity = "works",
+    author.orcid = orcid, 
+    publication_year = publication_year,
+    verbose = TRUE
+  )
+  return(author_works)
+}
 
+##### Function: Get works from multiple author ORCIDs and year
+get_works_from_orcids_by_year <- function(orcids, publication_year) {
+  author_works <- oa_fetch(
+    entity = "works",
+    author.orcid = orcid, # author.orcid = c("0000-0001-6187-6610", "0000-0002-8517-9411"),
+    publication_year = publication_year,
+    verbose = TRUE
+  )
+  return(author_works)
+}
+
+# Bekir Tanriover: https://openalex.org/authors/a5016874418 
+author_id <- "a5016874418"
+publication_year <- "2022"
+author_works <- get_works_from_authorid_by_year(author_id, publication_year)
+print(author_works)
+class(author_works)
+str(author_works)
+
+#author_works_df <- as.data.frame(author_works)
+#str(author_works[[3]])
+
+#author_works_df[is.na(author_works_df)] <- "" 
+
+# remove or modfiy complex columns
+#author_works_df$concepts <- NULL
+#author_works_df$counts_by_year <- NULL
+#author_works_df$author <- NULL
+#author_works_df$
+
+# simplified df because this author_works are very complex (dataframe of data.frame)
+# It is a small db, cannot be represented by a single sheet of XLSX
+s_df <- data.frame(
+  id               = author_works[["id"]],
+  title            = author_works[["display_name"]],
+  
+  #author = author_works[["author"]] # author is a list of data.frame. need to flatten it. 
+  abstract         = author_works[["ab"]],
+  publication_date = author_works[["publication_date"]],
+  publication_year = author_works[["publication_year"]], 
+  source           = author_works[["so"]],
+  source_id        = author_works[["so_id"]],
+  publisher        = author_works[["host_organization"]],
+  ISSN             = author_works[["issn_l"]],
+  type             = author_works[["type"]],
+  doi              = author_works[["doi"]],
+  URL              = author_works[["url"]],
+  full_text        = author_works[["pdf_url"]],
+  license          = author_works[["license"]],
+  volume           = author_works[["volume"]], 
+  issue            = author_works[["issue"]],
+  open_access      = author_works[["is_oa"]],
+  oa_status        = author_works[["oa_status"]],
+  oa_URL           = author_works[["oa_url"]],
+  grant            = author_works[["grants"]],
+  cited_count      = author_works[["cited_by_count"]],
+  is_retracted     = author_works[["is_retracted"]]
+  # certain fields are dataframe and are not exported. If useful, it can be flattened to output.
+  # concepts: keywords, ranked by scores
+  # counts_by_year: citation counted by year
+)
+# Test the above function
+print(s_df)
+write.csv(s_df, "s1.csv", row.names = FALSE)
+write.xlsx(s_df, file = "s1.xlsx")
 
 
 #####################################################
@@ -251,6 +339,31 @@ dept0713_results <- get_dept_author_data("dept0713", "University")
 dept0788_results <- get_dept_author_data("dept0788", "University")
 dept07xx_results <- get_dept_author_data("dept07xx", "University")
 
+class(dept07xx_results)
+
+dept_data <- dept07xx_results
+first_df <- dept_data[[1]]
+
+firt_row<-first_df$author_name
+second_row <- first_df$author_result_affiliation.id
+
+#### Now getting every author's works by each dept ###
+### Parameter: dept_author_data: list 
+
+get_dept_author_works_by_year <- function(dept_author_data, year) {
+  for (i in 1: length(dept_author_data)) {
+    current_df <- dept_author_data[[i]]
+    current_author_name <- current_df$author_name
+    current_author_id <- current_df$author_result_affiliation.id
+    print(current_author_name)
+    get_works_from_authorid_by_year(current_author_id, 2022)
+    
+  }
+  
+}
+
+get_dept_author_works_by_year(dept07xx_results, 2022)
+
 
 ### Banner faculty. No LDAP match??
 library(readxl)
@@ -278,6 +391,24 @@ dept_banner <- get_dept_author_data("dept_banner", "Arizona")
 dept_banner <- list()
 # Use "University" to see how many authors have  no affiliation of "University"
 dept_banner <- get_dept_author_data("dept_banner", "University")
+
+#### OpenAlex records:
+
+### 2024-01-30: 
+# 1. Hong Lee https://deptmedicine.arizona.edu/profile/hong-seok-lee-md-mph
+# publications: https://www.ncbi.nlm.nih.gov/myncbi/101LmwjcFptkp/bibliography/public/ 
+# His works list has "Lee H", "Lee HS", "Seok Lee H", publishing works from 2008 - latest 2020
+# Also his affiliation with NLM is "Department of Cardiovascular Diseases, Mayo Clinic, Scottsdale, AZ, USA."! 
+
+# (note: NLM author search link is not correct with over 70,000 results. Many authors have names such as "Lee H", "Lee HH", "Lee HK")
+
+# openAlex records: searching "Hong S. Lee" returns 12 works from 1990 - 2022. None is from him. 
+# Note: Same name, different person
+
+# 2. Amanpreet S. Bains, https://deptmedicine.arizona.edu/profile/amanpreet-s-bains-md
+# MD, Assistant Professor, Medicine, Medical Director, Clinical Decision Unit, Division of Inpatient Medicine
+# Degrees: MD: University of the West Indies Faculty of Medical Sciences, 2002. Residency: Wilson Memorial Medical Center Internal Medicine
+# openAlex records: https://openalex.org/authors/A5005342862 or https://openalex.org/authors/a5076616077 (not the same person)
 
 
 # To display the list certain fields. to output 
