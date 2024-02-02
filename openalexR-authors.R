@@ -16,6 +16,7 @@ install.packages("ggplot2")
 install.packages("knitr")
 install.packages("testthat")
 install.packages("readxl")
+install.packages("openxlsx")
 
 # common libraries
 library(openalexR)
@@ -23,6 +24,7 @@ library(dplyr)
 library(ggplot2)
 library(knitr)
 library(testthat)
+library(openxlsx)
 
 options (openalexR.mailto="yhan@arizona.edu")
 getwd()
@@ -100,27 +102,6 @@ search_author2 <- function(author_name, affiliation_name){
   }
   return (filtered_authors)
 }
-
-
-### 2024-01-24: These have  ('affiliation_display_name' not found). 
-author_name <- "Vivian Kominos"
-affiliation_name <- "University"
-author_result_affiliation <- search_author(author_name, affiliation_name )
-
-author_name <- "Tejo K Vemulapalli"
-author_result_affiliation <- search_author(author_name, affiliation_name )
-
-### These have no affiliation with "University". https://openalex.org/authors/a5019422724
-
-author_name <- "Lise Alschuler"  
-author_result_affiliation <- search_author(author_name,"University") 
-author_from_names <- oa_fetch(entity = "author", search = author_name)
-author_from_names <- oa_fetch(entity = "author", search = "Lise Alschuler") 
-
-### Affiliations data is accurate
-
-
-
 
 
 #####################################################
@@ -201,6 +182,242 @@ calculate_works_count <- function(author_name, affiliation_name, year) {
 }
 
 
+
+### 2024-01-24: These have  ('affiliation_display_name' not found). 
+author_name <- "Vivian Kominos"
+affiliation_name <- "University"
+author_result_affiliation <- search_author(author_name, affiliation_name )
+
+author_name <- "Tejo K Vemulapalli"
+author_result_affiliation <- search_author(author_name, affiliation_name )
+
+### These have no affiliation with "University". https://openalex.org/authors/a5019422724
+
+author_name <- "Lise Alschuler"  
+author_result_affiliation <- search_author(author_name,"University") 
+author_from_names <- oa_fetch(entity = "author", search = author_name)
+author_from_names <- oa_fetch(entity = "author", search = "Lise Alschuler") 
+
+### Affiliations data is accurate
+
+################################################################
+##### Function: Get works from author id and year #########
+get_works_from_authorid_by_year <- function(author_id, publication_year) {
+  # Check if author_id is NULL
+  if (is.null(author_id)) {
+    message("author_id not found for this author.")
+    return (NULL)
+  }
+  # Attempt to fetch author works and handle potential errors
+  author_works <- tryCatch({
+    oa_fetch(
+      entity = "works",
+      author.id = author_id, 
+      publication_year = publication_year,
+      verbose = TRUE
+    )
+  }, error = function(e) {
+    message("An error occurred: ", e$message)
+    return(NULL)
+  })
+  return(author_works)
+}
+
+
+##### Function: Get works from author ORCID and year
+get_works_from_orcid_by_year <- function(orcid, publication_year) {
+  if (is.null(orcid)) {
+    stop("ORCID cannot be NULL.")
+  }
+  
+  author_works <- tryCatch({
+    oa_fetch(
+    entity = "works",
+    author.orcid = orcid, 
+    publication_year = publication_year,
+    verbose = TRUE
+  )
+  }, error = function(e) {
+    message ("An error occured: ", e$message)
+    return (NULL)
+  })
+  return(author_works)
+}
+
+##### Function: Get works from multiple author ORCIDs and year
+get_works_from_orcids_by_year <- function(orcids, publication_year) {
+  author_works <- oa_fetch(
+    entity = "works",
+    author.orcid = orcid, # author.orcid = c("0000-0001-6187-6610", "0000-0002-8517-9411"),
+    publication_year = publication_year,
+    verbose = TRUE
+  )
+  return(author_works)
+}
+
+### Function: output author's works by its oa author_id and year. 
+### It is necessary to do so, because this author_works are very complex (a df of dfs)
+# It is a small db, cannot be represented by a single sheet of XLSX
+
+author_works$author <- ""
+author_works$counts_by_year <- ""
+author_works$concepts <-""
+
+
+output_works_by_authorid_by_year <- function(author_name, author_id, year) {
+  if (is.null(author_id)) {
+    stop("author_id cannot be NULL.")
+  }
+  
+  author_works <- get_works_from_authorid_by_year(author_id, year)
+  if (is.null(author_works) || length(author_works) == 0) {
+    message("No works found for the provided author ID and year.")
+    return(NULL)
+  }
+
+  author_works <-select(author_works -c(author, counts_by_year, concepts))
+  # Generate the filename
+  filename <- paste0(gsub("[[:punct:]]", "", author_name), "_", year, ".xlsx")
+  
+  # Write the combined dataframe to an Excel file
+  write.xlsx(combined_df, file = filename)
+  message("File '", filename, "' has been created.")
+}
+
+
+
+output_works_by_authorid_by_year4 <- function(author_name, author_id, year) {
+  if (is.null(author_id)) {
+    stop("author_id cannot be NULL.")
+  }
+  
+  author_works <- get_works_from_authorid_by_year(author_id, year)
+  if (is.null(author_works) || length(author_works) == 0) {
+    message("No works found for the provided author ID and year.")
+    return(NULL)
+  }
+  
+  # Define a function to safely extract data or return NA if NULL
+  safe_extract <- function(data, field) {
+    if (is.null(data[[field]])) NA else data[[field]]
+  }
+  
+  # Prepare the records dataframe from author_works
+  records <- lapply(author_works, function(work) {
+    data.frame(
+      
+      id               = safe_extract(work, "id"),
+      #title            = safe_extract(work, "display_name"),
+      #abstract         = safe_extract(work, "ab"),
+      #publication_date = safe_extract(work, "publication_date"),
+      #publication_year = safe_extract(work, "publication_year"),
+      # Include other fields as necessary
+      #stringsAsFactors = FALSE
+    )
+  })
+  
+  # Combine all records into a single dataframe
+  combined_df <- do.call(rbind, records)
+  
+  # Generate the filename
+  filename <- paste0(gsub("[[:punct:]]", "", author_name), "_", year, ".xlsx")
+  
+  # Write the combined dataframe to an Excel file
+  write.xlsx(combined_df, file = filename)
+  message("File '", filename, "' has been created.")
+}
+
+
+################################################33
+
+output_works_by_authorid_by_year2 <- function(author_name, author_id, year) {
+  if (is.null(author_id)) {
+    stop("author_id cannot be NULL.")
+  }
+  
+  author_works <- get_works_from_authorid_by_year(author_id, year)
+  # After fetching author_works
+  if (is.null(author_works) || length(author_works) == 0) {
+    message("No works found for the provided author ID and year.")
+    return(NULL)
+  } else {
+    print("author_works exists and has data.")
+    print(head(author_works))  # Adjust according to data structure (e.g., use str() for complex structures)
+  }
+  
+  # Inside lapply, after creating each record's dataframe
+  records <- lapply(author_works, function(work) {
+    rec_df <- data.frame(
+      # Data extraction logic
+    )
+    print("Individual record data frame:")
+    print(rec_df)
+    return(rec_df)
+  })
+  
+  # Before writing to Excel
+  print("Final combined data frame:")
+  print(s_df)
+  
+  # Generate filename and write to Excel
+  filename <- paste0(gsub("[[:punct:]]", "", author_name), "_", year, ".xlsx")
+  if (nrow(s_df) > 0) {
+    write.xlsx(s_df, file = filename)
+    message("File '", filename, "' has been created with ", nrow(s_df), " records.")
+  } else {
+    message("Data frame is empty. No Excel file created.")
+  }
+  
+}
+
+output_works_by_authorid_by_year3 <- function(author_name, author_id, year) {
+  if (is.null(author_id)) {
+    stop("author_id cannot be NULL.")
+  }
+  
+  author_works <- get_works_from_authorid_by_year(author_id, year)
+  if (is.null(author_works)) {
+    message("No works found for the provided author ID and year.")
+    return (NULL)
+  }
+  
+  # Define a function to safely extract data or return NA if NULL
+  safe_extract <- function(data, field) {
+    if (is.null(data[[field]])) NA else data[[field]]
+  }
+  
+  s_df <- data.frame(
+    id               = safe_extract(author_works, "id"),
+    title            = safe_extract(author_works, "display_name"),
+    abstract         = safe_extract(author_works, "ab"),
+    publication_date = safe_extract(author_works, "publication_date"),
+    publication_year = safe_extract(author_works, "publication_year"), 
+    source           = safe_extract(author_works, "so"),
+    source_id        = safe_extract(author_works, "so_id"),
+    publisher        = safe_extract(author_works, "host_organization"),
+    ISSN             = safe_extract(author_works, "issn_l"),
+    type             = safe_extract(author_works, "type"),
+    doi              = safe_extract(author_works, "doi"),
+    URL              = safe_extract(author_works, "url"),
+    full_text        = safe_extract(author_works, "pdf_url"),
+    license          = safe_extract(author_works, "license"),
+    volume           = safe_extract(author_works, "volume"), 
+    issue            = safe_extract(author_works, "issue"),
+    open_access      = safe_extract(author_works, "is_oa"),
+    oa_status        = safe_extract(author_works, "oa_status"),
+    oa_URL           = safe_extract(author_works, "oa_url"),
+    grant            = safe_extract(author_works, "grants"),
+    cited_count      = safe_extract(author_works, "cited_by_count"),
+    is_retracted     = safe_extract(author_works, "is_retracted")
+  )
+  
+  filename <- paste0(gsub("[[:punct:]]", "", author_name), "_", year, ".xlsx")
+  write.xlsx(s_df, file = filename)
+  message("File '", filename, "' has been created.")
+}
+################################################33
+
+
 #### Dept of Medicine (HR code: 0713 and 0788) Test date: 2024-01-24 
 
 # First get a list of all the authors in this dept. The list is saved in a CSV with col 1 "surname" and 2 "first_name"
@@ -239,6 +456,7 @@ get_dept_author_data <- function(dept_code, affiliation_name) {
   }
   return (dept_results)
 }
+#######################################333
 
 dept_code <- readline(prompt = "Please enter the department code: ")
 affiliation_name <- readline(prompt = "Please enter the affiliation: ")
@@ -250,6 +468,51 @@ dept07xx_results <- list()
 dept0713_results <- get_dept_author_data("dept0713", "University")
 dept0788_results <- get_dept_author_data("dept0788", "University")
 dept07xx_results <- get_dept_author_data("dept07xx", "University")
+
+class(dept07xx_results)
+
+dept_data <- dept07xx_results
+first_df <- dept_data[[1]]
+
+firt_row<-first_df$author_name
+second_row <- first_df$author_result_affiliation.id
+
+##############################################################################
+## Testing cases
+# Bekir Tanriover: https://openalex.org/authors/a5016874418 
+author_id <- "a5016874418"
+publication_year <- "2022"
+author_works <- get_works_from_authorid_by_year(author_id, publication_year)
+
+output_works_by_authorid_by_year("Keith A Joiner", "a5082148123", 2022)
+output_works_by_authorid_by_year2("Keith A Joiner", "a5082148123", 2022)
+output_works_by_authorid_by_year3("Keith A Joiner", "a5082148123", 2022)
+
+output_works_by_authorid_by_year("Sara Centuori", "a5080182165", 2022)
+
+
+############################################################################
+
+#### Now getting every author's works by each dept ###
+### Parameter: dept_author_data: list 
+get_dept_author_works_by_year <- function(dept_author_data, year) {
+  year = 2022
+  for (i in 1: length(dept_author_data)) {
+    current_df <- dept_author_data[[i]]
+    author_name <- current_df$author_name
+    author_id <- current_df$author_result_affiliation.id
+    print(author_name)
+    get_works_from_authorid_by_year(author_id, year)
+    # if author_id is NOT NULL, get the works from this author and output
+    if (!is.null(author_id)) {
+      output_works_by_authorid_by_year(author_name, author_id, year)
+    }
+    
+  }
+  
+}
+
+get_dept_author_works_by_year(dept07xx_results, 2022)
 
 
 ### Banner faculty. No LDAP match??
@@ -278,6 +541,24 @@ dept_banner <- get_dept_author_data("dept_banner", "Arizona")
 dept_banner <- list()
 # Use "University" to see how many authors have  no affiliation of "University"
 dept_banner <- get_dept_author_data("dept_banner", "University")
+
+#### OpenAlex records:
+
+### 2024-01-30: 
+# 1. Hong Lee https://deptmedicine.arizona.edu/profile/hong-seok-lee-md-mph
+# publications: https://www.ncbi.nlm.nih.gov/myncbi/101LmwjcFptkp/bibliography/public/ 
+# His works list has "Lee H", "Lee HS", "Seok Lee H", publishing works from 2008 - latest 2020
+# Also his affiliation with NLM is "Department of Cardiovascular Diseases, Mayo Clinic, Scottsdale, AZ, USA."! 
+
+# (note: NLM author search link is not correct with over 70,000 results. Many authors have names such as "Lee H", "Lee HH", "Lee HK")
+
+# openAlex records: searching "Hong S. Lee" returns 12 works from 1990 - 2022. None is from him. 
+# Note: Same name, different person
+
+# 2. Amanpreet S. Bains, https://deptmedicine.arizona.edu/profile/amanpreet-s-bains-md
+# MD, Assistant Professor, Medicine, Medical Director, Clinical Decision Unit, Division of Inpatient Medicine
+# Degrees: MD: University of the West Indies Faculty of Medical Sciences, 2002. Residency: Wilson Memorial Medical Center Internal Medicine
+# openAlex records: https://openalex.org/authors/A5005342862 or https://openalex.org/authors/a5076616077 (not the same person)
 
 
 # To display the list certain fields. to output 
