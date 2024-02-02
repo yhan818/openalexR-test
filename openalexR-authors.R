@@ -12,6 +12,7 @@ remotes::install_github("ropensci/openalexR", force=TRUE)
 
 #install.packages("openalexR") #install.packages("openalexR")  ### use the latest development version due to issue with the production version openalexR 1.10. Waiting for 1.2.0
 install.packages("dplyr")
+install.packages("tidyr")
 install.packages("ggplot2")
 install.packages("knitr")
 install.packages("testthat")
@@ -21,6 +22,7 @@ install.packages("openxlsx")
 # common libraries
 library(openalexR)
 library(dplyr)
+library(tidyr)
 library(ggplot2)
 library(knitr)
 library(testthat)
@@ -224,6 +226,11 @@ get_works_from_authorid_by_year <- function(author_id, publication_year) {
 }
 
 
+# Example of replacing NA values in a specific column
+author_works <- author_works %>%
+  mutate(across(everything(), ~replace_na(., "N/A")))
+
+
 ##### Function: Get works from author ORCID and year
 get_works_from_orcid_by_year <- function(orcid, publication_year) {
   if (is.null(orcid)) {
@@ -259,36 +266,12 @@ get_works_from_orcids_by_year <- function(orcids, publication_year) {
 ### It is necessary to do so, because this author_works are very complex (a df of dfs)
 # It is a small db, cannot be represented by a single sheet of XLSX
 
-author_works$author <- ""
-author_works$counts_by_year <- ""
-author_works$concepts <-""
-
-
 output_works_by_authorid_by_year <- function(author_name, author_id, year) {
   if (is.null(author_id)) {
     stop("author_id cannot be NULL.")
   }
-  
-  author_works <- get_works_from_authorid_by_year(author_id, year)
-  if (is.null(author_works) || length(author_works) == 0) {
-    message("No works found for the provided author ID and year.")
-    return(NULL)
-  }
-
-  author_works <-select(author_works -c(author, counts_by_year, concepts))
-  # Generate the filename
-  filename <- paste0(gsub("[[:punct:]]", "", author_name), "_", year, ".xlsx")
-  
-  # Write the combined dataframe to an Excel file
-  write.xlsx(combined_df, file = filename)
-  message("File '", filename, "' has been created.")
-}
-
-
-
-output_works_by_authorid_by_year4 <- function(author_name, author_id, year) {
-  if (is.null(author_id)) {
-    stop("author_id cannot be NULL.")
+  if (!requireNamespace("dplyr", quietly = TRUE)) {
+    stop("dplyr package is not installed. Please install it using install.packages('dplyr').")
   }
   
   author_works <- get_works_from_authorid_by_year(author_id, year)
@@ -297,125 +280,36 @@ output_works_by_authorid_by_year4 <- function(author_name, author_id, year) {
     return(NULL)
   }
   
-  # Define a function to safely extract data or return NA if NULL
-  safe_extract <- function(data, field) {
-    if (is.null(data[[field]])) NA else data[[field]]
-  }
+  # Very important: Need to handle NA value in OpenAlex data. Otherwise, it will crash writexlsx()!!!
+  # The best way so far is to "as.character" and then replace NUL. 
+  author_works <- author_works %>%
+  #  mutate(across(where(is.character), ~replace_na(., "N/A")),
+  #         across(where(is.numeric), ~replace_na(., "N/A")) )
+    mutate(across(everything(), as.character)) %>%
+    mutate(across(everything(), ~replace_na(., "N/A")))
   
-  # Prepare the records dataframe from author_works
-  records <- lapply(author_works, function(work) {
-    data.frame(
-      
-      id               = safe_extract(work, "id"),
-      #title            = safe_extract(work, "display_name"),
-      #abstract         = safe_extract(work, "ab"),
-      #publication_date = safe_extract(work, "publication_date"),
-      #publication_year = safe_extract(work, "publication_year"),
-      # Include other fields as necessary
-      #stringsAsFactors = FALSE
-    )
-  })
+  # Exclude certain columns.
+  author_works <-select(author_works, -c(counts_by_year, concepts))
   
-  # Combine all records into a single dataframe
-  combined_df <- do.call(rbind, records)
-  
-  # Generate the filename
+    
+  print(author_works)
+  # write.csv
   filename <- paste0(gsub("[[:punct:]]", "", author_name), "_", year, ".xlsx")
-  
-  # Write the combined dataframe to an Excel file
-  write.xlsx(combined_df, file = filename)
+  #write.csv(author_works, file=filename, row.names = FALSE)
+  write.xlsx(author_works, file = filename)
   message("File '", filename, "' has been created.")
 }
 
 
-################################################33
+author_works <- get_works_from_authorid_by_year("a5082148123", 2022)
+output_works_by_authorid_by_year("Keith A Joiner", "a5082148123", 2022)
 
-output_works_by_authorid_by_year2 <- function(author_name, author_id, year) {
-  if (is.null(author_id)) {
-    stop("author_id cannot be NULL.")
-  }
-  
-  author_works <- get_works_from_authorid_by_year(author_id, year)
-  # After fetching author_works
-  if (is.null(author_works) || length(author_works) == 0) {
-    message("No works found for the provided author ID and year.")
-    return(NULL)
-  } else {
-    print("author_works exists and has data.")
-    print(head(author_works))  # Adjust according to data structure (e.g., use str() for complex structures)
-  }
-  
-  # Inside lapply, after creating each record's dataframe
-  records <- lapply(author_works, function(work) {
-    rec_df <- data.frame(
-      # Data extraction logic
-    )
-    print("Individual record data frame:")
-    print(rec_df)
-    return(rec_df)
-  })
-  
-  # Before writing to Excel
-  print("Final combined data frame:")
-  print(s_df)
-  
-  # Generate filename and write to Excel
-  filename <- paste0(gsub("[[:punct:]]", "", author_name), "_", year, ".xlsx")
-  if (nrow(s_df) > 0) {
-    write.xlsx(s_df, file = filename)
-    message("File '", filename, "' has been created with ", nrow(s_df), " records.")
-  } else {
-    message("Data frame is empty. No Excel file created.")
-  }
-  
-}
+# Error in x[is.na(x)] <- na.string : replacement has length zero. Why? 
+author_works <- get_works_from_authorid_by_year("a5080182165", 2022)
+output_works_by_authorid_by_year("Sara Centuori", "a5080182165", 2022)
 
-output_works_by_authorid_by_year3 <- function(author_name, author_id, year) {
-  if (is.null(author_id)) {
-    stop("author_id cannot be NULL.")
-  }
-  
-  author_works <- get_works_from_authorid_by_year(author_id, year)
-  if (is.null(author_works)) {
-    message("No works found for the provided author ID and year.")
-    return (NULL)
-  }
-  
-  # Define a function to safely extract data or return NA if NULL
-  safe_extract <- function(data, field) {
-    if (is.null(data[[field]])) NA else data[[field]]
-  }
-  
-  s_df <- data.frame(
-    id               = safe_extract(author_works, "id"),
-    title            = safe_extract(author_works, "display_name"),
-    abstract         = safe_extract(author_works, "ab"),
-    publication_date = safe_extract(author_works, "publication_date"),
-    publication_year = safe_extract(author_works, "publication_year"), 
-    source           = safe_extract(author_works, "so"),
-    source_id        = safe_extract(author_works, "so_id"),
-    publisher        = safe_extract(author_works, "host_organization"),
-    ISSN             = safe_extract(author_works, "issn_l"),
-    type             = safe_extract(author_works, "type"),
-    doi              = safe_extract(author_works, "doi"),
-    URL              = safe_extract(author_works, "url"),
-    full_text        = safe_extract(author_works, "pdf_url"),
-    license          = safe_extract(author_works, "license"),
-    volume           = safe_extract(author_works, "volume"), 
-    issue            = safe_extract(author_works, "issue"),
-    open_access      = safe_extract(author_works, "is_oa"),
-    oa_status        = safe_extract(author_works, "oa_status"),
-    oa_URL           = safe_extract(author_works, "oa_url"),
-    grant            = safe_extract(author_works, "grants"),
-    cited_count      = safe_extract(author_works, "cited_by_count"),
-    is_retracted     = safe_extract(author_works, "is_retracted")
-  )
-  
-  filename <- paste0(gsub("[[:punct:]]", "", author_name), "_", year, ".xlsx")
-  write.xlsx(s_df, file = filename)
-  message("File '", filename, "' has been created.")
-}
-################################################33
+
+################################################
 
 
 #### Dept of Medicine (HR code: 0713 and 0788) Test date: 2024-01-24 
