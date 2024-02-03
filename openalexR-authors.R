@@ -1,7 +1,7 @@
 ############# Author's search ##########
 ######## Author: Yan Han
 ######## Date: May 9, 2023
-######## Updated: Jan, 2024
+######## Updated: Feb 3, 2024
 ##### Search authors' publication using openAlex data ####
 # OpenAlex R Documentation: https://github.com/ropensci/openalexR
 # OpenAlex Beta explorer: https://explore.openalex.org/ (the explorer seems not to display all the possible researchers. In ohter words, You shall use API
@@ -12,19 +12,22 @@ remotes::install_github("ropensci/openalexR", force=TRUE)
 
 #install.packages("openalexR") #install.packages("openalexR")  ### use the latest development version due to issue with the production version openalexR 1.10. Waiting for 1.2.0
 install.packages("dplyr")
+install.packages("tidyr")
 install.packages("ggplot2")
 install.packages("knitr")
 install.packages("testthat")
+install.packages("readr")
 install.packages("readxl")
 install.packages("openxlsx")
 
-# common libraries
 library(openalexR)
 library(dplyr)
+library(tidyr)
 library(ggplot2)
 library(knitr)
 library(testthat)
 library(openxlsx)
+library(readr)
 
 options (openalexR.mailto="yhan@arizona.edu")
 getwd()
@@ -51,58 +54,99 @@ setwd("/home/yhan/Documents/UA-datasets/openalexR-test")
 
 #####################################################
 # Function: Find author via his/her affiliation 
+# Two fields for filtering: affiliation_display_name first, and then affiliations_other
+# Note: "affiliations_other" can be a string or a vector of strings. So both cases shall be taken care of.
 #####################################################
 search_author <- function(author_name, affiliation_name) {
-  # Initialize filtered_authors as NULL
-  filtered_authors <- NULL
+  UArizona <- c("https://openalex.org/I138006243", "https://ror.org/03m2x1q45", "University of Arizona", "I138006243")
   
-  # Fetch data from openAlexR API
   author_from_names <- oa_fetch(entity = "author", search = author_name)
-  
-  # Check if data is retrieved and non-empty
+
+  # Check if any authors were retrieved
   if (!is.null(author_from_names) && nrow(author_from_names) > 0) {
-    # Check if 'affiliation_display_name' column exists
-    if ("affiliation_display_name" %in% names(author_from_names)) {
-      # Filter using 'affiliation_display_name' column
-      matches <- sapply(author_from_names$affiliation_display_name, function(affiliation_display) {
-        !is.na(affiliation_display) && grepl(affiliation_name, affiliation_display, ignore.case = TRUE)
-      })
+    matches <- rep(FALSE, nrow(author_from_names))
+    
+    for (i in seq_len(nrow(author_from_names))) {
+      display_name_match <- FALSE
+      affiliations_other_match <- FALSE
       
-      filtered_authors <- author_from_names[matches, ]
       
-      if (nrow(filtered_authors) == 0) {
-        message("No authors found matching the given affiliation.")
-      } else {
-        print(filtered_authors)
+      #if ("affiliation_display_name" %in% names(author_from_names) && !is.na(author_from_names$affiliation_display_name[i])) {
+      #  display_name_match <- any(sapply(UArizona, function(pattern) grepl(pattern, author_from_names$affiliation_display_name[i], ignore.case = TRUE)))
+      #}
+      # Check primary affiliation only if the field exists
+      if ("affiliation_display_name" %in% names(author_from_names)) {
+        display_name_match <- !is.na(author_from_names$affiliation_display_name[i]) && 
+          any(sapply(UArizona, function(pattern) 
+            grepl(pattern, author_from_names$affiliation_display_name[i], ignore.case = TRUE)))
       }
+      
+      # Check affiliations_other
+      if ("affiliations_other" %in% names(author_from_names)) {
+        affiliations <- author_from_names$affiliations_other[[i]]
+        if (length(affiliations) > 0) {
+          affiliations_other_match <- any(UArizona %in% affiliations)
+        }
+      }
+      
+      matches[i] <- display_name_match | affiliations_other_match
+    }
+    
+    filtered_authors <- author_from_names[matches, ]
+    
+    if (nrow(filtered_authors) == 0) {
+      message("No authors found matching the given affiliation.")
     } else {
-      message("Column 'affiliation_display_name' not found in the data.")
-      return(author_from_names)
+      return(filtered_authors)
     }
   } else {
-    message("No data retrieved from API.")
+    message("No data retrieved from OpenAlex's API.")
+    return(NULL)
   }
+}
+
+
+######### old
+search_author3 <- function(author_name, affiliation_name) {
+  UArizona <- c("https://openalex.org/I138006243", "https://ror.org/03m2x1q45", "University of Arizona", "I138006243")
   
-  return(filtered_authors)
-}
-
-
-search_author2 <- function(author_name, affiliation_name){
-  # getting data from openAlexR API
-  filtered_authors <- NULL
-  author_from_names <- oa_fetch(entity = "author", search = author_name )
-  if (is.null(author_from_names)) {
-    filtered_authors <- NULL
+  author_from_names <- oa_fetch(entity = "author", search = author_name)
+  
+  if (!is.null(author_from_names) && nrow(author_from_names) > 0) {
+    matches <- rep(FALSE, nrow(author_from_names))
+    
+    for (i in seq_len(nrow(author_from_names))) {
+      display_name_match <- FALSE
+      affiliations_other_match <- FALSE
+      
+      # Check affiliation_display_name if it exists
+      if ("affiliation_display_name" %in% names(author_from_names) && !is.na(author_from_names$affiliation_display_name[i])) {
+        display_name_match <- any(sapply(UArizona, function(pattern) grepl(pattern, author_from_names$affiliation_display_name[i], ignore.case = TRUE)))
+      }
+      
+      # Check affiliations_other
+      if ("affiliations_other" %in% names(author_from_names)) {
+        affiliations <- author_from_names$affiliations_other[[i]]
+        if (length(affiliations) > 0) {
+          affiliations_other_match <- any(UArizona %in% affiliations)
+        }
+      }
+      
+      matches[i] <- display_name_match | affiliations_other_match
+    }
+    
+    filtered_authors <- author_from_names[matches, ]
+    
+    if (nrow(filtered_authors) == 0) {
+      message("No authors found matching the given affiliation.")
+    } else {
+      return(filtered_authors)
+    }
+  } else {
+    message("No data retrieved from OpenAlex's API.")
+    return(NULL)
   }
-  else {
-    # Filter out using "affiliation_display_name" column.
-    # other filtering fields can be "affiliation_id", "affiliation_ror"
-    filtered_authors <- subset(author_from_names, grepl(affiliation_name, affiliation_display_name, ignore.case=TRUE))
-    print(filtered_authors)
-  }
-  return (filtered_authors)
 }
-
 
 #####################################################
 # Function: Calculate works count
@@ -181,27 +225,8 @@ calculate_works_count <- function(author_name, affiliation_name, year) {
   }
 }
 
-
-
-### 2024-01-24: These have  ('affiliation_display_name' not found). 
-author_name <- "Vivian Kominos"
-affiliation_name <- "University"
-author_result_affiliation <- search_author(author_name, affiliation_name )
-
-author_name <- "Tejo K Vemulapalli"
-author_result_affiliation <- search_author(author_name, affiliation_name )
-
-### These have no affiliation with "University". https://openalex.org/authors/a5019422724
-
-author_name <- "Lise Alschuler"  
-author_result_affiliation <- search_author(author_name,"University") 
-author_from_names <- oa_fetch(entity = "author", search = author_name)
-author_from_names <- oa_fetch(entity = "author", search = "Lise Alschuler") 
-
-### Affiliations data is accurate
-
 ################################################################
-##### Function: Get works from author id and year #########
+##### Function: Get works from OA's author id and publication year #########
 get_works_from_authorid_by_year <- function(author_id, publication_year) {
   # Check if author_id is NULL
   if (is.null(author_id)) {
@@ -223,7 +248,6 @@ get_works_from_authorid_by_year <- function(author_id, publication_year) {
   return(author_works)
 }
 
-
 ##### Function: Get works from author ORCID and year
 get_works_from_orcid_by_year <- function(orcid, publication_year) {
   if (is.null(orcid)) {
@@ -244,203 +268,36 @@ get_works_from_orcid_by_year <- function(orcid, publication_year) {
   return(author_works)
 }
 
-##### Function: Get works from multiple author ORCIDs and year
-get_works_from_orcids_by_year <- function(orcids, publication_year) {
-  author_works <- oa_fetch(
-    entity = "works",
-    author.orcid = orcid, # author.orcid = c("0000-0001-6187-6610", "0000-0002-8517-9411"),
-    publication_year = publication_year,
-    verbose = TRUE
-  )
-  return(author_works)
-}
-
-### Function: output author's works by its oa author_id and year. 
-### It is necessary to do so, because this author_works are very complex (a df of dfs)
-# It is a small db, cannot be represented by a single sheet of XLSX
-
-author_works$author <- ""
-author_works$counts_by_year <- ""
-author_works$concepts <-""
-
-
-output_works_by_authorid_by_year <- function(author_name, author_id, year) {
-  if (is.null(author_id)) {
-    stop("author_id cannot be NULL.")
-  }
-  
-  author_works <- get_works_from_authorid_by_year(author_id, year)
-  if (is.null(author_works) || length(author_works) == 0) {
-    message("No works found for the provided author ID and year.")
-    return(NULL)
-  }
-
-  author_works <-select(author_works -c(author, counts_by_year, concepts))
-  # Generate the filename
-  filename <- paste0(gsub("[[:punct:]]", "", author_name), "_", year, ".xlsx")
-  
-  # Write the combined dataframe to an Excel file
-  write.xlsx(combined_df, file = filename)
-  message("File '", filename, "' has been created.")
-}
-
-
-
-output_works_by_authorid_by_year4 <- function(author_name, author_id, year) {
-  if (is.null(author_id)) {
-    stop("author_id cannot be NULL.")
-  }
-  
-  author_works <- get_works_from_authorid_by_year(author_id, year)
-  if (is.null(author_works) || length(author_works) == 0) {
-    message("No works found for the provided author ID and year.")
-    return(NULL)
-  }
-  
-  # Define a function to safely extract data or return NA if NULL
-  safe_extract <- function(data, field) {
-    if (is.null(data[[field]])) NA else data[[field]]
-  }
-  
-  # Prepare the records dataframe from author_works
-  records <- lapply(author_works, function(work) {
-    data.frame(
-      
-      id               = safe_extract(work, "id"),
-      #title            = safe_extract(work, "display_name"),
-      #abstract         = safe_extract(work, "ab"),
-      #publication_date = safe_extract(work, "publication_date"),
-      #publication_year = safe_extract(work, "publication_year"),
-      # Include other fields as necessary
-      #stringsAsFactors = FALSE
-    )
-  })
-  
-  # Combine all records into a single dataframe
-  combined_df <- do.call(rbind, records)
-  
-  # Generate the filename
-  filename <- paste0(gsub("[[:punct:]]", "", author_name), "_", year, ".xlsx")
-  
-  # Write the combined dataframe to an Excel file
-  write.xlsx(combined_df, file = filename)
-  message("File '", filename, "' has been created.")
-}
-
-
-################################################33
-
-output_works_by_authorid_by_year2 <- function(author_name, author_id, year) {
-  if (is.null(author_id)) {
-    stop("author_id cannot be NULL.")
-  }
-  
-  author_works <- get_works_from_authorid_by_year(author_id, year)
-  # After fetching author_works
-  if (is.null(author_works) || length(author_works) == 0) {
-    message("No works found for the provided author ID and year.")
-    return(NULL)
-  } else {
-    print("author_works exists and has data.")
-    print(head(author_works))  # Adjust according to data structure (e.g., use str() for complex structures)
-  }
-  
-  # Inside lapply, after creating each record's dataframe
-  records <- lapply(author_works, function(work) {
-    rec_df <- data.frame(
-      # Data extraction logic
-    )
-    print("Individual record data frame:")
-    print(rec_df)
-    return(rec_df)
-  })
-  
-  # Before writing to Excel
-  print("Final combined data frame:")
-  print(s_df)
-  
-  # Generate filename and write to Excel
-  filename <- paste0(gsub("[[:punct:]]", "", author_name), "_", year, ".xlsx")
-  if (nrow(s_df) > 0) {
-    write.xlsx(s_df, file = filename)
-    message("File '", filename, "' has been created with ", nrow(s_df), " records.")
-  } else {
-    message("Data frame is empty. No Excel file created.")
-  }
-  
-}
-
-output_works_by_authorid_by_year3 <- function(author_name, author_id, year) {
-  if (is.null(author_id)) {
-    stop("author_id cannot be NULL.")
-  }
-  
-  author_works <- get_works_from_authorid_by_year(author_id, year)
-  if (is.null(author_works)) {
-    message("No works found for the provided author ID and year.")
-    return (NULL)
-  }
-  
-  # Define a function to safely extract data or return NA if NULL
-  safe_extract <- function(data, field) {
-    if (is.null(data[[field]])) NA else data[[field]]
-  }
-  
-  s_df <- data.frame(
-    id               = safe_extract(author_works, "id"),
-    title            = safe_extract(author_works, "display_name"),
-    abstract         = safe_extract(author_works, "ab"),
-    publication_date = safe_extract(author_works, "publication_date"),
-    publication_year = safe_extract(author_works, "publication_year"), 
-    source           = safe_extract(author_works, "so"),
-    source_id        = safe_extract(author_works, "so_id"),
-    publisher        = safe_extract(author_works, "host_organization"),
-    ISSN             = safe_extract(author_works, "issn_l"),
-    type             = safe_extract(author_works, "type"),
-    doi              = safe_extract(author_works, "doi"),
-    URL              = safe_extract(author_works, "url"),
-    full_text        = safe_extract(author_works, "pdf_url"),
-    license          = safe_extract(author_works, "license"),
-    volume           = safe_extract(author_works, "volume"), 
-    issue            = safe_extract(author_works, "issue"),
-    open_access      = safe_extract(author_works, "is_oa"),
-    oa_status        = safe_extract(author_works, "oa_status"),
-    oa_URL           = safe_extract(author_works, "oa_url"),
-    grant            = safe_extract(author_works, "grants"),
-    cited_count      = safe_extract(author_works, "cited_by_count"),
-    is_retracted     = safe_extract(author_works, "is_retracted")
-  )
-  
-  filename <- paste0(gsub("[[:punct:]]", "", author_name), "_", year, ".xlsx")
-  write.xlsx(s_df, file = filename)
-  message("File '", filename, "' has been created.")
-}
-################################################33
-
-
-#### Dept of Medicine (HR code: 0713 and 0788) Test date: 2024-01-24 
-
-# First get a list of all the authors in this dept. The list is saved in a CSV with col 1 "surname" and 2 "first_name"
-library(readr)
-
 ################### Function ######################
-get_dept_author_data <- function(dept_code, affiliation_name) {
+get_dept_authors_names <- function(dept_code, affiliation_name) {
   file_path <- sprintf("%s_common.csv", dept_code)
   if (!file.exists(file_path)) {
     stop("File not found: ", file_path)
   }
+  
   LDAPdata <- read_csv(file_path, show_col_types = FALSE)
+  
+  if (nrow(LDAPdata) == 0) {
+    message("The CSV file is empty: ", file_path)
+    return(list())  # Return an empty list
+  }
+  
+  
   authors_names <- LDAPdata$cn
   
-  dept_results <- list() 
+  dept_authors_names <- list() 
   
-  for (i in 1: length(authors_names) ) {
+  for (i in 1:length(authors_names) ) {
     # Access the current row
     author_name <- authors_names[i]
     print (paste(author_name, affiliation_name))
     
-    author_result_affiliation <- search_author(author_name, affiliation_name )
-    author_stats              <- calculate_works_count(author_name, affiliation_name, 2022)
+    tryCatch({
+      author_result_affiliation <- search_author(author_name, affiliation_name )
+      author_stats              <- calculate_works_count(author_name, affiliation_name, 2022)
+    }, error = function(e) {
+      message("Error processing author ", author_name, ": ", e$message)
+    })
     
     # Check if any of the results are NULL or have zero rows; handle accordingly
     if (is.null(author_result_affiliation) || nrow(author_result_affiliation) == 0) {
@@ -450,70 +307,237 @@ get_dept_author_data <- function(dept_code, affiliation_name) {
       author_stats <- NA  # or some other placeholder value
     }
     # Append the results to the list
-    dept_results[[i]] <- data.frame(author_name = author_name, 
-                                    author_result_affiliation = author_result_affiliation, 
-                                    author_stats = author_stats)
+    dept_authors_names[[i]] <- data.frame(author_name = author_name, 
+                                        author_result_affiliation = author_result_affiliation, 
+                                        author_stats = author_stats)
   }
-  return (dept_results)
+  return (dept_authors_names)
 }
-#######################################333
 
-dept_code <- readline(prompt = "Please enter the department code: ")
-affiliation_name <- readline(prompt = "Please enter the affiliation: ")
+###################################################################################
+### Function: output author's works by its oa author_id and year. 
+### It is necessary to do so, because this author_works df are very complex (a df of dfs)
+### It is a small db, cannot be represented by a single sheet of XLSX
+output_works_by_authorid_by_year <- function(author_name, author_id, year, output_path) {
+  if (!requireNamespace("dplyr", quietly = TRUE)) {
+    stop("dplyr package is not installed. Please install it using install.packages('dplyr').")
+  }
+  if (!requireNamespace("writexl", quietly = TRUE)) {
+    stop("writexl package is not installed. Please install it using install.packages('writexl').")
+  }
+  
+  if (is.null(author_id)) {
+    stop("author_id cannot be NULL.")
+  }
+  if (!requireNamespace("dplyr", quietly = TRUE)) {
+    stop("dplyr package is not installed. Please install it using install.packages('dplyr').")
+  }
+  
+  author_works <- get_works_from_authorid_by_year(author_id, year)
+  if (is.null(author_works) || length(author_works) == 0) {
+    message("No works found for the provided author ID and year.")
+    return(NULL)
+  }
+  
+  #!!!!! Very important: Need to handle NA value in OpenAlex data. Otherwise, it will crash other functions such as writexlsx()!!!
+  # The best way so far is to "as.character" and then replace NUL. 
+  author_works <- author_works %>%
+  #  mutate(across(where(is.character), ~replace_na(., "N/A")),
+  #         across(where(is.numeric), ~replace_na(., "N/A")) )
+    mutate(across(everything(), as.character)) %>%
+    mutate(across(everything(), ~replace_na(., "N/A")))
+  
+  # Exclude certain columns.
+  author_works <-select(author_works, -c(counts_by_year, concepts))
+  print(author_works)
 
-dept0713_results <- list()
-dept0788_results <- list()
-dept07xx_results <- list()
-
-dept0713_results <- get_dept_author_data("dept0713", "University")
-dept0788_results <- get_dept_author_data("dept0788", "University")
-dept07xx_results <- get_dept_author_data("dept07xx", "University")
-
-class(dept07xx_results)
-
-dept_data <- dept07xx_results
-first_df <- dept_data[[1]]
-
-firt_row<-first_df$author_name
-second_row <- first_df$author_result_affiliation.id
-
-##############################################################################
-## Testing cases
-# Bekir Tanriover: https://openalex.org/authors/a5016874418 
-author_id <- "a5016874418"
-publication_year <- "2022"
-author_works <- get_works_from_authorid_by_year(author_id, publication_year)
-
-output_works_by_authorid_by_year("Keith A Joiner", "a5082148123", 2022)
-output_works_by_authorid_by_year2("Keith A Joiner", "a5082148123", 2022)
-output_works_by_authorid_by_year3("Keith A Joiner", "a5082148123", 2022)
-
-output_works_by_authorid_by_year("Sara Centuori", "a5080182165", 2022)
-
+  #full_output_path <- file.path(getwd(), output_path)
+  
+  # Create the output directory if it doesn't exist
+  if (!dir.exists(output_path)) {
+    dir.create(output_path, recursive = TRUE)
+    print(paste("Directory created at:", output_path))  # Confirm directory creation
+  }
+  print(paste("Current working directory:", getwd()))  # Confirm current directory
+  
+  # Generating the filename
+  filename <- paste0(gsub("[[:punct:]]", "", author_name), "_", year, ".xlsx")
+  full_path <- file.path(output_path, filename)
+  
+  # Write to Excel file
+  if (!requireNamespace("writexl", quietly = TRUE)) {
+    stop("writexl package is not installed. Please install it using install.packages('writexl').")
+  }
+  
+  writexl::write_xlsx(author_works, path = full_path)
+  message("File '", full_path, "' has been created.")
+  #write.csv(author_works, file=filename, row.names = FALSE)
+}
 
 ############################################################################
-
 #### Now getting every author's works by each dept ###
-### Parameter: dept_author_data: list 
-get_dept_author_works_by_year <- function(dept_author_data, year) {
-  year = 2022
-  for (i in 1: length(dept_author_data)) {
-    current_df <- dept_author_data[[i]]
+### Function: Parameter: dept_author_data: list 
+output_dept_author_works_by_year <- function(dept_name, dept_authors_names, year) {
+  # Check if dept_name is provided and valid
+  if (is.null(dept_name) || !nzchar(dept_name)) {
+    stop("Department name ('dept_name') must be provided and cannot be empty.")
+  }
+  
+  # Check if dept_authors_names is empty
+  if (length(dept_authors_names) == 0) {
+    message("No authors found for department: ", dept_name)
+    return()  # Exit the function early
+  }
+  
+  output_path <- file.path(getwd(), "output", dept_name) # Example path construction
+  for (i in 1: length(dept_authors_names)) {
+    current_df <- dept_authors_names[[i]]
     author_name <- current_df$author_name
     author_id <- current_df$author_result_affiliation.id
     print(author_name)
     get_works_from_authorid_by_year(author_id, year)
     # if author_id is NOT NULL, get the works from this author and output
-    if (!is.null(author_id)) {
-      output_works_by_authorid_by_year(author_name, author_id, year)
+    if (!is.null(author_id) && nzchar(author_id)) {
+      output_works_by_authorid_by_year(author_name, author_id, year, output_path)
+    } else {
+      message("Skipping due to NULL author_id for ", author_name)
     }
-    
   }
   
 }
 
-get_dept_author_works_by_year(dept07xx_results, 2022)
 
+
+#######################################
+
+#dept_code <- readline(prompt = "Please enter the department code: ")
+#affiliation_name <- readline(prompt = "Please enter the affiliation: ")
+
+#### Dept of Medicine (HR code: 0713 and 0788) Test date: 2024-01-24 
+##### Test cases: data is not uniformed.  
+author_works <- get_works_from_authorid_by_year("a5082148123", 2022)
+output_works_by_authorid_by_year("Keith A Joiner", "a5082148123", 2022, "./output/test")
+
+# Error in x[is.na(x)] <- na.string : replacement has length zero. Why? 
+author_works <- get_works_from_authorid_by_year("a5080182165", 2022)
+output_works_by_authorid_by_year("Sara Centuori", "a5080182165", 2022, "./output/test")
+
+# Bekir Tanriover: https://openalex.org/authors/a5016874418 
+author_name <- "Bekir Tanriover"
+author_id <- "a5016874418"
+publication_year <- "2022"
+author_works <- get_works_from_authorid_by_year(author_id, publication_year)
+UAresult1 <- search_author(author_name, affiliation_name)
+
+output_works_by_authorid_by_year(author_name, author_id, publication_year, "./output/test")
+
+# H.-H Sherry Chow
+author_name <-"H. H. Sherry Chow"
+author_id <- "a5018050941"
+author_works <- get_works_from_authorid_by_year(author_id, publication_year)
+output_works_by_authorid_by_year(author_name, author_id, publication_year, "./output/test")
+
+# author_name <- "H. Sherry Chow"
+#authod_id <- 
+#author_works <- get_works_from_authorid_by_year(author_id, publication_year)
+#output_works_by_authorid_by_year(author_name, author_id, publication_year)
+
+### 2024-01-25: Affiliation issues: 
+### [1] "Tejo K Vemulapalli University" Error in is.factor(x) : object 'affiliation_display_name' not found In addition: Warning messages:
+###  1: In oa_request(oa_query(filter = filter_i, multiple_id = multiple_id,                       No records found!
+### 2024-01-26: opened an issue with openAlexR https://github.com/ropensci/openalexR/issues/196 and can now find from "affiliations_other"
+
+author_name <- "Tejo K Vemulapalli"
+affiliation_name <- "University of Arizona"
+author_from_names <- oa_fetch(entity = "author", search = author_name)
+UAresult1 <- search_author(author_name, affiliation_name)
+
+author_name <- "Vivian Kominos"
+affiliation_name <- "University"
+author_from_names <- oa_fetch(entity = "author", search = author_name)
+UAresult1 <- search_author(author_name, affiliation_name)
+
+### These have no affiliation with "University". https://openalex.org/authors/a5019422724
+author_name <- "Lise Alschuler"  
+affiliation_name <- "University of Arizona"
+author_from_names <- oa_fetch(entity = "author", search = author_name)
+author_from_names$affiliations_other
+UAresult1 <- search_author(author_name, affiliation_name)
+
+# step2: get dept author name and filtering 
+# step 3: get authors works based on the names and affiliation
+affiliation_name <- "Unversity of Arizona"
+year <- 2022
+
+dept_name <- "dept0701"
+dept_authors_names <- list()
+dept_authors_names <- get_dept_authors_names(dept_name, affiliation_name)
+output_dept_author_works_by_year(dept_name, dept_authors_names, year)
+
+### dept0712 has no people.
+dept_name <- "dept0712"
+dept_authors_names <- list()
+dept_authors_names <- get_dept_authors_names(dept_name, affiliation_name)
+output_dept_author_works_by_year(dept_name, dept_authors_names, year)
+
+### Need to check " "Tejo K Vemulapalli"
+dept_name <- "dept0713"
+dept_authors_names <- list()
+dept_authors_names <- get_dept_authors_names(dept_name, affiliation_name)
+output_dept_author_works_by_year(dept_name, dept_authors_names, year)
+
+### dept0721 also have H.H. Chow?? 
+dept_name <- "dept0721"
+dept_authors_names <- list()
+dept_authors_names <- get_dept_authors_names(dept_name, affiliation_name)
+output_dept_author_works_by_year(dept_name, dept_authors_names, year)
+
+dept_name <- "dept0747"
+dept_authors_names <- list()
+dept_authors_names <- get_dept_authors_names(dept_name, affiliation_name)
+output_dept_author_works_by_year(dept_name, dept_authors_names, year)
+
+# dept0782 no data 
+dept_name <- "dept0782"
+dept_authors_names <- list()
+dept_authors_names <- get_dept_authors_names(dept_name, affiliation_name)
+output_dept_author_works_by_year(dept_name, dept_authors_names, year)
+
+dept_name <- "dept0788"
+dept_authors_names <- list()
+dept_authors_names <- get_dept_authors_names(dept_name, affiliation_name)
+output_dept_author_works_by_year(dept_name, dept_authors_names, year)
+
+dept_name <- "dept0795" # no people
+dept_authors_names <- list()
+dept_authors_names <- get_dept_authors_names(dept_name, affiliation_name)
+output_dept_author_works_by_year(dept_name, dept_authors_names, year)
+
+
+### 
+dept_name <- "dept_banner" # 
+affiliation_name <- "Banner"
+dept_authors_names <- list()
+dept_authors_names <- get_dept_authors_names(dept_name, affiliation_name)
+output_dept_author_works_by_year(dept_name, dept_authors_names, year)
+
+
+#dept07xx_names <- list()
+#dept07xx_names <- get_dept_authors_names("dept07xx", "University of Arizona")
+#output_dept_author_works_by_year("dept07xx", dept07xx_names, 2022)
+
+
+#get_dept_author_works_by_year(dept07xx_names, 2022)
+
+#### Test data 
+class(dept07xx_results)
+
+dept_data <- dept07xx_results
+first_df <- dept_data[[1]]
+firt_row<-first_df$author_name
+second_row <- first_df$author_result_affiliation.id
+
+##############################################################################
 
 ### Banner faculty. No LDAP match??
 library(readxl)
@@ -592,10 +616,6 @@ works_from_orcids <- oa_fetch(
 #### Aug 11, 2023: Bekir affiliation shows "University of Arizona", which is correct now. 
 author_from_names <- oa_fetch(entity = "author", search = "Bekir Tanriover" )
 
-### 2024-01-25: Tejo K Vemulapalli no 
-### [1] "Tejo K Vemulapalli University" Error in is.factor(x) : object 'affiliation_display_name' not found In addition: Warning messages:
-###  1: In oa_request(oa_query(filter = filter_i, multiple_id = multiple_id,                       No records found!
-author_from_names <- oa_fetch(entity = "author", search = "Tejo K Vemulapalli" )
 
 ### Aug 11, 2023: Results contain wrong info (Haitong Tai: https://openalex.org/A5060511275 ) affiliation not updated yet (probably based on last publication's affiliation)
 author_from_names <- oa_fetch(entity = "author", search = "Haw-chih Tai")
