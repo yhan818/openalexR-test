@@ -33,7 +33,7 @@ options (openalexR.mailto="yhan@arizona.edu")
 getwd()
 setwd("/home/yhan/Documents/UA-datasets/openalexR-test")
 
-######### Step1 :  Get unit/dept/college authors ######################
+######### Step 1 :  Get unit/dept/college authors ######################
 ######### LDAP search
 #LDAP query against ldap.arizona.edu (public, no account required), e.g.
 # Via linux terminal: ldapsearch -H ldap://ldap.arizona.edu -D "" -b "o=University of Arizona,c=US" -w -x 'departmentNumber=1705' givenName sn
@@ -56,9 +56,10 @@ setwd("/home/yhan/Documents/UA-datasets/openalexR-test")
 # Function: Find author via his/her affiliation 
 # Two fields for filtering: affiliation_display_name first, and then affiliations_other
 # Note: "affiliations_other" can be a string or a vector of strings. So both cases shall be taken care of.
+# Note: Some Banner authors have affiliation of "University of Arizona" or alike. 
 #####################################################
 search_author <- function(author_name, affiliation_name) {
-  UArizona <- c("https://openalex.org/I138006243", "https://ror.org/03m2x1q45", "University of Arizona", "I138006243")
+  UArizona <- c("https://openalex.org/I138006243", "https://ror.org/03m2x1q45", "University of Arizona", "I138006243", "Banner")
   
   author_from_names <- oa_fetch(entity = "author", search = author_name)
 
@@ -81,7 +82,7 @@ search_author <- function(author_name, affiliation_name) {
             grepl(pattern, author_from_names$affiliation_display_name[i], ignore.case = TRUE)))
       }
       
-      # Check affiliations_other
+      # Check affiliations_other with contains UArizona strings
       if ("affiliations_other" %in% names(author_from_names)) {
         affiliations <- author_from_names$affiliations_other[[i]]
         if (length(affiliations) > 0) {
@@ -329,9 +330,6 @@ output_works_by_authorid_by_year <- function(author_name, author_id, year, outpu
   if (is.null(author_id)) {
     stop("author_id cannot be NULL.")
   }
-  if (!requireNamespace("dplyr", quietly = TRUE)) {
-    stop("dplyr package is not installed. Please install it using install.packages('dplyr').")
-  }
   
   author_works <- get_works_from_authorid_by_year(author_id, year)
   if (is.null(author_works) || length(author_works) == 0) {
@@ -360,14 +358,12 @@ output_works_by_authorid_by_year <- function(author_name, author_id, year, outpu
   }
   print(paste("Current working directory:", getwd()))  # Confirm current directory
   
+  author_works <- author_works %>%
+    mutate(across(where(is.character), ~ifelse(nchar(.) > 32767, substr(., 1, 32767), .)))
+  
   # Generating the filename
   filename <- paste0(gsub("[[:punct:]]", "", author_name), "_", year, ".xlsx")
   full_path <- file.path(output_path, filename)
-  
-  # Write to Excel file
-  if (!requireNamespace("writexl", quietly = TRUE)) {
-    stop("writexl package is not installed. Please install it using install.packages('writexl').")
-  }
   
   writexl::write_xlsx(author_works, path = full_path)
   message("File '", full_path, "' has been created.")
@@ -464,6 +460,14 @@ author_from_names <- oa_fetch(entity = "author", search = author_name)
 author_from_names$affiliations_other
 UAresult1 <- search_author(author_name, affiliation_name)
 
+#### Banner: 
+##### Aaron Scott: 2022: 21 articles?? 
+#### I am very positive: This is wrong: alternative name Jesse Aaron. Jesse Aaron is not associated with University of Arizona. see https://www.biorxiv.org/content/10.1101/2022.07.07.499185v2
+### see https://www.molbiolcell.org/doi/10.1091/mbc.E21-10-0506
+### However, oa records says that Aaron Scott is with University of Arizona' 'Imaging Center'
+
+
+
 # step2: get dept author name and filtering 
 # step 3: get authors works based on the names and affiliation
 affiliation_name <- "Unversity of Arizona"
@@ -514,9 +518,14 @@ dept_authors_names <- get_dept_authors_names(dept_name, affiliation_name)
 output_dept_author_works_by_year(dept_name, dept_authors_names, year)
 
 
+### Banner- University Medical Center Tucson  ID: i4210124665
+### Banner Health ID: i2802412784
+### Some of Banner authors have affiliation of "University of Arizona", "University of Arizona Cancer Center". 
+### so 
+### Affiliations: Using UArizona vector of string (not containing "Banner": found 83 authors' works. There are 148
 ### 
-dept_name <- "dept_banner" # 
-affiliation_name <- "Banner"
+dept_name <- "dept_banner" 
+affiliation_name <- "Banner" 
 dept_authors_names <- list()
 dept_authors_names <- get_dept_authors_names(dept_name, affiliation_name)
 output_dept_author_works_by_year(dept_name, dept_authors_names, year)
