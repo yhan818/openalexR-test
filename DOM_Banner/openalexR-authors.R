@@ -59,8 +59,13 @@ setwd("/home/yhan/Documents/UA-datasets/openalexR-test/DOM_Banner")
 # Note: Some Banner authors have affiliation of "University of Arizona" or alike. 
 #####################################################
 search_author <- function(author_name, affiliation_name) {
-  UArizona <- c("https://openalex.org/I138006243", "https://ror.org/03m2x1q45", "University of Arizona", "I138006243", "Banner")
   
+  ### Better matching with a vector of strings for UArizona. 
+  # 1st line: UArizona ID, ROR, title and so on on the first line
+  # 2nd line: Banner (increasing recall),  "I2802412784": Banner Health ID, "I4210124665": Banner - University Medical Center Tucson
+  # For Banner, with the 2nd line, the matching authors increased from 81 to 83 for year 2022. 
+  UArizona <- c("https://openalex.org/I138006243", "https://ror.org/03m2x1q45", "University of Arizona", "I138006243", 
+              "Banner", "I2802412784", "I4210124665")
   
   base_dir <- file.path("./", "output")
   if (!dir.exists(base_dir)) {
@@ -589,54 +594,72 @@ UAresult1 <- search_author(author_name, affiliation_name)
 
 # step2: get dept author name and filtering 
 # step 3: get authors works based on the names and affiliation
+
+#### Note: Publication date may vary on: Received date, accepted date, published date, 
+### sometimes a publication date in 2022, but listed as published in 2023.
+### Note: OpenAlex data (author at least) is way better than ASM (check Debra Stern) or 
 affiliation_name <- "Unversity of Arizona"
 year <- 2022
 
+### dept0701: 1 match (all matched)
+### 2022: 1 author: Keith A Joiner
+### 2023: 1 author found: Keith A Joiner
 dept_code <- "dept0701"
 dept_authors_names <- list()
 dept_authors_names <- get_dept_authors_names(dept_code, affiliation_name)
 output_dept_author_works_by_year(dept_code, dept_authors_names, 2022)
 output_dept_author_works_by_year(dept_name, dept_authors_names, 2023)
 
-### dept0712 has no people.
+### dept0712: 1 match (All matched: Lisa O'Neill)
 dept_name <- "dept0712"
 dept_authors_names <- list()
 getwd()
 dept_authors_names <- get_dept_authors_names(dept_name, affiliation_name)
 output_dept_author_works_by_year(dept_name, dept_authors_names, 2022)
 output_dept_author_works_by_year(dept_name, dept_authors_names, 2023)
-### Need to check " "Tejo K Vemulapalli"
-# 40 authors works found. 8 no (warning messages)
+
+
+### dept0713: 49 matches with Funk's list
+### 2022: 41 authors works found (7 not found) 
+### 2023: 43 authors found (5 not found)
 dept_name <- "dept0713"
 dept_authors_names <- list()
 dept_authors_names <- get_dept_authors_names(dept_name, affiliation_name)
 output_dept_author_works_by_year(dept_name, dept_authors_names, 2022)
 output_dept_author_works_by_year(dept_name, dept_authors_names, 2023)
 
+### dept0721: 1 matches (HH Sherry chow). 
+### 2022: 2 authors found (HH Sherry Chow and Rebecca Crocker)
+###       Rebecca Crocker: verified (Center for Health Disparities Research (CHDR), University of Arizona Health Sciences, Tucson, AZ, USA)
+### 2023: 2 authors found (All)
+###       Rebecca Crocker: verified (Cancer Center, College of Medicine, University of Arizona, Tucson, AZ 85724, USA)
+### Funk's list: Crocker, Robert (LDAP: Rebecca Crocker)
+### Funk's list: Centuori, Sara (LDAP: None )
 dept_name <- "dept0721"
 dept_authors_names <- list()
 dept_authors_names <- get_dept_authors_names(dept_name, affiliation_name)
 output_dept_author_works_by_year(dept_name, dept_authors_names, 2022)
 output_dept_author_works_by_year(dept_name, dept_authors_names, 2023)
 
-
+### dept0723: 1 matches (Guerra, Stefano) 
+### 2022 & 2023: 2 authors found (Stefano Guerra, and LDAD name: Debra Stern (Not in Funk's list)
+### 2022 & 2023: Debra Stern: verified: Asthma and Airway Disease Research Center, The University of Arizona, Tucson, Arizona, USA
 dept_name <- "dept0723"
 dept_authors_names <- list()
 dept_authors_names <- get_dept_authors_names(dept_name, affiliation_name)
 output_dept_author_works_by_year(dept_name, dept_authors_names, 2022)
 output_dept_author_works_by_year(dept_name, dept_authors_names, 2023)
 
-
-# dept0747 no data
-# Guadalupe Carr": author_id not found for this author.
-# [1] "Kevin F Moynahan": No works found for the provided author ID and year.
+### dept0747: 1 matches (All matched)
+# Guadalupe Carr": author_id not found for this author. check error log
+# 2023: Kevin Moyanahan verified
 dept_name <- "dept0747"
 dept_authors_names <- list()
 dept_authors_names <- get_dept_authors_names(dept_name, affiliation_name)
 output_dept_author_works_by_year(dept_name, dept_authors_names, 2022)
 output_dept_author_works_by_year(dept_name, dept_authors_names, 2023)
 
-# dept0782 no data 
+### dept0782: 0 matches (Funk's list: Fantry, George)
 # The CSV file is empty: dept0782_common.csv                                                                                                                                                                              
 dept_name <- "dept0782"
 dept_authors_names <- list()
@@ -644,26 +667,27 @@ dept_authors_names <- get_dept_authors_names(dept_name, affiliation_name)
 output_dept_author_works_by_year(dept_name, dept_authors_names, 2022)
 output_dept_author_works_by_year(dept_name, dept_authors_names, 2023)
 
+### dept0788: 7 matches (All matched)
 dept_name <- "dept0788"
 dept_authors_names <- list()
 dept_authors_names <- get_dept_authors_names(dept_name, affiliation_name)
 output_dept_author_works_by_year(dept_name, dept_authors_names, 2022)
 output_dept_author_works_by_year(dept_name, dept_authors_names, 2023)
 
-# dept0795: The CSV file is empty: dept0795_common.csv                                                                                                                                                                              
+### dept0795: 0 match (Funk's list: John Galgiani)
+# The CSV file is empty: dept0795_common.csv                                                                                                                                                                              
 dept_name <- "dept0795" 
 dept_authors_names <- list()
 dept_authors_names <- get_dept_authors_names(dept_name, affiliation_name)
 output_dept_author_works_by_year(dept_name, dept_authors_names, 2022)
 output_dept_author_works_by_year(dept_name, dept_authors_names, 2023)
 
-
 ### Banner- University Medical Center Tucson  ID: i4210124665
-### Banner Health ID: i2802412784
+### Banner Health ID: i2802412784. Using a vector of string increased recall.
 ### Some of Banner authors have affiliation of "University of Arizona", "University of Arizona Cancer Center". 
-### so 
 ### Affiliations: Using UArizona vector of string (not containing "Banner": found 83 authors' works. There are 148
 ### 
+### 2022: Avin Aggarwal verified 
 dept_name <- "dept_banner" 
 affiliation_name <- "Banner" 
 dept_authors_names <- list()
