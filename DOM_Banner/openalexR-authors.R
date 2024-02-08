@@ -109,14 +109,7 @@ search_author <- function(author_name, affiliation_name) {
          # any(sapply(UArizona, function(pattern) 
           #  grepl(pattern, author_from_names$affiliation_display_name[i], ignore.case = TRUE)))
       }
-        
-      # Check affiliations_other with contains UArizona strings
-    #  if ("affiliations_other" %in% names(author_from_names)) {
-     #   affiliations <- author_from_names$affiliations_other[[i]]
-    #    if (!is.null(affiliations) && length(affiliations) > 0) {
-    #      affiliations_other_match <- any(UArizona %in% affiliations)
-    #    }
-    #  }
+    
         if ("affiliations_other" %in% names(author_from_names) && 
             !is.null(author_from_names$affiliations_other[[i]]) && 
             length(author_from_names$affiliations_other[[i]]) > 0) {
@@ -143,6 +136,7 @@ search_author <- function(author_name, affiliation_name) {
   }
 }
 
+# 2024-02-07: "Vivian Kominos" has no affiliation info at all
 author_name <- "Vivian Kominos"
 affiliation_name <- "University"
 author_from_names <- oa_fetch(entity = "author", search = author_name)
@@ -227,7 +221,7 @@ calculate_works_count <- function(author_name, affiliation_name, year) {
 
 ################################################################
 ##### Function: Get works from OA's author id and publication year #########
-get_works_from_authorid_by_year <- function(author_id, year) {
+get_works_from_authorid_by_year <- function(dept_code, author_id, year) {
   
   base_dir <- file.path("./", "output", dept_code)
   if (!dir.exists(base_dir)) {
@@ -328,7 +322,7 @@ get_dept_authors_names <- function(dept_code, affiliation_name) {
   
   file_path <- sprintf("%s_common.csv", dept_code)
   #file_path <- file.path(base_dir, sprintf("%s_common.csv", dept_code))
-  log_file_path <- file.path(base_dir, paste0(dept_code, ".error.log"))
+  log_file_path <- file.path(base_dir, paste0(dept_code, ".log"))
   
   
   if (!file.exists(file_path)) {
@@ -350,19 +344,34 @@ get_dept_authors_names <- function(dept_code, affiliation_name) {
   
   for (i in 1:length(authors_names) ) {
     # Access the current row
+    author_result_affiliation <- NULL 
+    
     author_name <- authors_names[i]
     print (paste(author_name, affiliation_name))
   
     tryCatch({
       author_result_affiliation <- search_author(author_name, affiliation_name)
+      log_time <- paste(format(Sys.time(), "%Y-%m-%d %H:%M:%S"), "Author result affiliation:", sep=" ")
+  
       #author_status <- NULL
       #author_stats <- calculate_works_count(author_name, affiliation_name, 2022)
+      print(author_result_affiliation)
+      if (!is.null(author_result_affiliation)) {
+        # Temporarily capture output of dput to a variable
+        dput_str <- capture.output(dput(author_result_affiliation))
+        cat(log_time, file=file(log_file_path, "a"), sep="\n")
+        cat(dput_str, file=file(log_file_path, "a"), sep = "\n")
+      } else {
+        cat(log_time, file=file(log_file_path, "a"), sep="\n")
+        cat("No affiliation found", file = log_file_path, append = TRUE)
+      }
+      
     }, warning = function(w) {
-      wrn_msg <- paste(Sys.time(), dept_code, author_name, ": get_dept_authors_names() Warning: ", w$message, "\n")
+      wrn_msg <- paste(log_time, dept_code, author_name, ": get_dept_authors_names() Warning: ", w$message, "\n")
       cat(wrn_msg, file = log_file_path, append =TRUE)
       message(wrn_msg)
     }, error = function(e) {
-      err_msg <- paste(Sys.time(), dept_code, author_name, ": get_dept_authors_names() Error:   ", e$message, "\n")
+      err_msg <- paste(log_time, dept_code, author_name, ": get_dept_authors_names() Error:   ", e$message, "\n")
       cat(err_msg, file = log_file_path, append = TRUE)
       message(err_msg)
     })
@@ -382,12 +391,18 @@ get_dept_authors_names <- function(dept_code, affiliation_name) {
   return (dept_authors_names)
 }
 
+# Minimal test case
+log_file_path <- "test_log.txt"
+test_content <- "This is a test."
+writeLines(test_content, log_file_path, append = TRUE)
+
+
 ###################################################################################
 ### Function: output author's works by its oa author_id and year. 
 ### It is necessary to do so, because this author_works df are very complex (a df of dfs)
 ### It is a small db, cannot be represented by a single sheet of XLSX
-output_works_by_authorid_by_year <- function(author_name, author_id, year, base_dir = ".") {
-    
+
+output_works_by_authorid_by_year <- function(dept_code, author_name, author_id, year, base_dir = ".") {
   if (!requireNamespace("dplyr", quietly = TRUE)) {
     stop("dplyr package is not installed. Please install it using install.packages('dplyr').")
   }
@@ -399,6 +414,7 @@ output_works_by_authorid_by_year <- function(author_name, author_id, year, base_
     stop("author_id cannot be NULL.")
   }
   
+  base_dir <- file.path("./", "output", dept_code)
   if (!dir.exists(base_dir)) {
     dir.create(base_dir, recursive = TRUE)
     print(paste("Directory created at:", base_dir))
@@ -407,7 +423,7 @@ output_works_by_authorid_by_year <- function(author_name, author_id, year, base_
   
   log_file <- file.path(base_dir, paste0(author_name, "_", year, ".log")) # Define log file path
   
-  author_works <- get_works_from_authorid_by_year(author_id, year)
+  author_works <- get_works_from_authorid_by_year(dept_code, author_id, year)
   if (is.null(author_works) || length(author_works) == 0) {
     err_msg <- paste0(Sys.time(), " output_works_by_authorid_by_year() ", author_name,  " ", author_id,  " ", year, " NO works found!")
     cat(err_msg, file = log_file, append = TRUE)
@@ -424,9 +440,15 @@ output_works_by_authorid_by_year <- function(author_name, author_id, year, base_
   
   # Exclude certain columns.
   author_works <-select(author_works, -c(counts_by_year, concepts))
+  # Exclude suggested columns. 
+  author_works <- select(author_works, -c (ab, so_id, issn_l, pdf_url, first_page, last_page, volume, issue, 
+                                           is_oa, oa_anywhere, oa_url, any_repository_has_fulltext, grants, cited_by_api_url, 
+                                           referenced_works, related_works, is_paratext, is_retracted) )
+  # column "author" and "ids" need further processing
+  # write a separated function for author
+  # write a separated function for ids
+  
   print(author_works)
-
-  #full_output_path <- file.path(getwd(), output_path)
   
   author_works <- author_works %>%
     mutate(across(where(is.character), ~ifelse(nchar(.) > 32767, substr(., 1, 32767), .)))
@@ -448,11 +470,6 @@ output_dept_author_works_by_year <- function(dept_code, dept_authors_names, year
   if (is.null(dept_code) || !nzchar(dept_code)) {
     stop("Department code ('dept_code') must be provided and cannot be empty.")
   }
-  # output_path <- file.path("./", "output", dept_code)
-  # Ensure the output directory exists
-  #if (!dir.exists(output_path)) {
-  #  dir.create(output_path, recursive = TRUE)
-  #}
   
   base_dir <- file.path("./", "output", dept_code)
   if (!dir.exists(base_dir)) {
@@ -463,8 +480,11 @@ output_dept_author_works_by_year <- function(dept_code, dept_authors_names, year
   log_file <- file.path(base_dir, paste0(dept_code, "_", year, ".log")) # Define log file path
   
   if (length(dept_authors_names) == 0) {
-    message(dept_code, " in ", year, ": No authors found for department.")
-    write(paste(Sys.time(), dept_authors_names, " No authors found for department"), file = log_file, append = TRUE)
+    msg <- paste0(Sys.time(), dept_code, ": ", dept_authors_names, " in ", year, ": No authors found for this department.")
+    write(msg, file = log_file, append = TRUE)
+    message(msg)
+    #message(dept_code, " in ", year, ": No authors found for department.")
+    #write(paste(Sys.time(), dept_authors_names, " No authors found for department"), file = log_file, append = TRUE)
     return()  # Exit the function early
   }
   
@@ -472,53 +492,29 @@ output_dept_author_works_by_year <- function(dept_code, dept_authors_names, year
     current_df <- dept_authors_names[[i]]
     author_name <- current_df$author_name
     author_id <- current_df$author_result_affiliation.id
-    print(author_name)
+    print(paste(author_name, author_id))
     
     tryCatch({
       if (!is.null(author_id) && nzchar(author_id)) {
-        get_works_from_authorid_by_year(author_id, year)
-        output_works_by_authorid_by_year(author_name, author_id, year, base_dir)
+        get_works_from_authorid_by_year(dept_code, author_id, year)
+        output_works_by_authorid_by_year(dept_code, author_name, author_id, year, base_dir)
       } else {
-        message(author_name, "skipping due to NULL author_id")
-        write(paste(Sys.time(), author_name, ": Skipping due to NULL author_id"), file = log_file, append = TRUE)
+        msg <- paste(Sys.time(), author_name, ": Skipping due to NULL author_id\n")
+        message(msg)
+        write(msg, file = log_file, append = TRUE)
       }
     },  warning = function(w) {
-      write(paste(Sys.time(), author_name, " year ", year, " : Warning: ", w$message), file = log_file, append = TRUE)
+      wrn_msg <- paste(Sys.time(), author_name, " year ", year, " : Warning: ", w$message)
+      write(paste(wrn_msg, file = log_file, append = TRUE))
+      message(wrn_msg)      
     }, error = function(e) {
-      write(paste(Sys.time(), author_name, "year ", year, " : Error: ", e$message), file = log_file, append = TRUE)
-      message(author_name, ": Error: ", e$message)
+      err_msg <- paste(Sys.time(), author_name, "year ", year, " : Error: ", e$message)
+      write(err_msg, file = log_file, append = TRUE)
+      message(err_msg)
     })
     }
 }
 
-###################### To be deleted
-output_dept_author_works_by_year2 <- function(dept_name, dept_authors_names, year) {
-  # Check if dept_name is provided and valid
-  if (is.null(dept_name) || !nzchar(dept_name)) {
-    stop("Department name ('dept_name') must be provided and cannot be empty.")
-  }
-  
-  # Check if dept_authors_names is empty
-  if (length(dept_authors_names) == 0) {
-    message("No authors found for department: ", dept_name)
-    return()  # Exit the function early
-  }
-  
-  output_path <- file.path(getwd(), "output", dept_name) # Example path construction
-  for (i in 1: length(dept_authors_names)) {
-    current_df <- dept_authors_names[[i]]
-    author_name <- current_df$author_name
-    author_id <- current_df$author_result_affiliation.id
-    print(author_name)
-    get_works_from_authorid_by_year(author_id, year)
-    # if author_id is NOT NULL, get the works from this author and output
-    if (!is.null(author_id) && nzchar(author_id)) {
-      output_works_by_authorid_by_year(author_name, author_id, year, output_path)
-    } else {
-      message("Skipping due to NULL author_id for ", author_name)
-    }
-  }
-}
 
 
 
@@ -529,49 +525,47 @@ output_dept_author_works_by_year2 <- function(dept_name, dept_authors_names, yea
 
 #### Dept of Medicine (HR code: 0713 and 0788) Test date: 2024-01-24 
 ##### Test cases: data is not uniformed.  
-author_works <- get_works_from_authorid_by_year("a5082148123", 2022)
+author_works <- get_works_from_authorid_by_year("test", "a5082148123", 2022)
 getwd()
-output_works_by_authorid_by_year("Keith A Joiner", "a5082148123", 2022)
-#output_works_by_authorid_by_year("Keith A Joiner", "a5082148123", 2022, "./output/test")
+output_works_by_authorid_by_year("test", "Keith A Joiner", "a5082148123", 2022)
 
 # Error in x[is.na(x)] <- na.string : replacement has length zero. Why? 
-author_works <- get_works_from_authorid_by_year("a5080182165", 2022)
-output_works_by_authorid_by_year("Sara Centuori", "a5080182165", 2022)
+author_works <- get_works_from_authorid_by_year("test", "a5080182165", 2022)
+output_works_by_authorid_by_year("test", "Sara Centuori", "a5080182165", 2022)
 
 # Bekir Tanriover: https://openalex.org/authors/a5016874418 
 author_name <- "Bekir Tanriover"
 author_id <- "a5016874418"
 publication_year <- "2023"
-author_works <- get_works_from_authorid_by_year(author_id, publication_year)
+dept_code <-"test"
+author_works <- get_works_from_authorid_by_year(dept_code, author_id, publication_year)
 UAresult1 <- search_author(author_name, affiliation_name)
 
-output_works_by_authorid_by_year(author_name, author_id, publication_year) 
+output_works_by_authorid_by_year(dept_code, author_name, author_id, publication_year) 
 
 # H.-H Sherry Chow
 author_name <-"H. H. Sherry Chow"
 author_id <- "a5018050941"
-author_works <- get_works_from_authorid_by_year(author_id, publication_year)
-output_works_by_authorid_by_year(author_name, author_id, publication_year) 
-
-# author_name <- "H. Sherry Chow"
-#authod_id <- 
-#author_works <- get_works_from_authorid_by_year(author_id, publication_year)
-#output_works_by_authorid_by_year(author_name, author_id, publication_year)
+dept_code <- "test"
+author_works <- get_works_from_authorid_by_year(dept_code, author_id, publication_year)
+output_works_by_authorid_by_year(dept_code, author_name, author_id, publication_year) 
 
 ### 2024-01-25: Affiliation issues: 
 ### [1] "Tejo K Vemulapalli University" Error in is.factor(x) : object 'affiliation_display_name' not found In addition: Warning messages:
 ###  1: In oa_request(oa_query(filter = filter_i, multiple_id = multiple_id,        No records found!
 ### 2024-01-26: opened an issue with openAlexR https://github.com/ropensci/openalexR/issues/196 and can now find from "affiliations_other"
 
-# No works found 
+# No works found for year 2023
+# No work found for year 2022
 author_name <- "Tejo K Vemulapalli"
-author_id <-"a5023323706"
+author_id <-"a5023323706" 
 affiliation_name <- "University of Arizona"
 author_from_names <- oa_fetch(entity = "author", search = author_name)
 UAresult1 <- search_author(author_name, affiliation_name)
-output_works_by_authorid_by_year(author_name, author_id, publication_year)
+output_works_by_authorid_by_year(dept_code, author_name, author_id, 2022)
+output_works_by_authorid_by_year(dept_code, author_name, author_id, publication_year)
 
-
+# NULL 
 author_name <- "Vivian Kominos"
 affiliation_name <- "University"
 author_from_names <- oa_fetch(entity = "author", search = author_name)
@@ -584,7 +578,6 @@ author_from_names <- oa_fetch(entity = "author", search = author_name)
 # 2 obs found. One has affiliations_other (UA ID: I138006243)  One does not have any affiliation info. 
 author_from_names$affiliations_other
 UAresult1 <- search_author(author_name, affiliation_name)
-
 
 #### Banner: 
 ##### Aaron Scott: 2022: 21 articles?? 
@@ -608,7 +601,7 @@ dept_code <- "dept0701"
 dept_authors_names <- list()
 dept_authors_names <- get_dept_authors_names(dept_code, affiliation_name)
 output_dept_author_works_by_year(dept_code, dept_authors_names, 2022)
-output_dept_author_works_by_year(dept_name, dept_authors_names, 2023)
+output_dept_author_works_by_year(dept_code, dept_authors_names, 2023)
 
 ### dept0712: 1 match (All matched: Lisa O'Neill)
 dept_name <- "dept0712"
@@ -619,8 +612,8 @@ output_dept_author_works_by_year(dept_name, dept_authors_names, 2022)
 output_dept_author_works_by_year(dept_name, dept_authors_names, 2023)
 
 
-### dept0713: 49 matches with Funk's list
-### 2022: 41 authors works found (7 not found) 
+### dept0713: 49 matches (all except 1 not matched with Funk's list)
+### 2022: 41 authors works found (8 not found) 
 ### 2023: 43 authors found (5 not found)
 dept_name <- "dept0713"
 dept_authors_names <- list()
@@ -628,7 +621,7 @@ dept_authors_names <- get_dept_authors_names(dept_name, affiliation_name)
 output_dept_author_works_by_year(dept_name, dept_authors_names, 2022)
 output_dept_author_works_by_year(dept_name, dept_authors_names, 2023)
 
-### dept0721: 1 matches (HH Sherry chow). 
+### dept0721: 1 match (HH Sherry Chow). 
 ### 2022: 2 authors found (HH Sherry Chow and Rebecca Crocker)
 ###       Rebecca Crocker: verified (Center for Health Disparities Research (CHDR), University of Arizona Health Sciences, Tucson, AZ, USA)
 ### 2023: 2 authors found (All)
@@ -641,8 +634,8 @@ dept_authors_names <- get_dept_authors_names(dept_name, affiliation_name)
 output_dept_author_works_by_year(dept_name, dept_authors_names, 2022)
 output_dept_author_works_by_year(dept_name, dept_authors_names, 2023)
 
-### dept0723: 1 matches (Guerra, Stefano) 
-### 2022 & 2023: 2 authors found (Stefano Guerra, and LDAD name: Debra Stern (Not in Funk's list)
+### dept0723: 1 matches (All matched. Guerra, Stefano) 
+### 2022 & 2023: 2 authors found (Stefano Guerra, and LDAP name: Debra Stern (Not in Funk's list)
 ### 2022 & 2023: Debra Stern: verified: Asthma and Airway Disease Research Center, The University of Arizona, Tucson, Arizona, USA
 dept_name <- "dept0723"
 dept_authors_names <- list()
@@ -675,6 +668,7 @@ output_dept_author_works_by_year(dept_name, dept_authors_names, 2022)
 output_dept_author_works_by_year(dept_name, dept_authors_names, 2023)
 
 ### dept0795: 0 match (Funk's list: John Galgiani)
+# John Galgiani is in dept0713
 # The CSV file is empty: dept0795_common.csv                                                                                                                                                                              
 dept_name <- "dept0795" 
 dept_authors_names <- list()
@@ -683,7 +677,7 @@ output_dept_author_works_by_year(dept_name, dept_authors_names, 2022)
 output_dept_author_works_by_year(dept_name, dept_authors_names, 2023)
 
 ### Banner- University Medical Center Tucson  ID: i4210124665
-### Banner Health ID: i2802412784. Using a vector of string increased recall.
+### Banner Health ID: i2802412784. Using a vector of strings increased recall.
 ### Some of Banner authors have affiliation of "University of Arizona", "University of Arizona Cancer Center". 
 ### Affiliations: Using UArizona vector of string (not containing "Banner": found 83 authors' works. There are 148
 ### 
