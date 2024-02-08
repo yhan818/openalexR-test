@@ -1,166 +1,100 @@
-2024-02-05 12:31:48 Kristopher Abbate  year  2023  : Warning:  No records found!
-2024-02-05 12:31:48 Gebran Abboud : Skipping due to NULL author_id
-2024-02-05 12:31:50 Depak Acharya : Skipping due to NULL author_id
-2024-02-05 12:31:54 Ahmad M A Al-Khashman : Skipping due to NULL author_id
-2024-02-05 12:31:56 Alvaro Altamirano Ufion : Skipping due to NULL author_id
-2024-02-05 12:32:00 Danielle Avila  year  2023  : Warning:  No records found!
-2024-02-05 12:32:01 Mimi Bach  year  2023  : Warning:  No records found!
-2024-02-05 12:32:01 Aurangzaib Baig : Skipping due to NULL author_id
-2024-02-05 12:32:01 Amanpreet Bains : Skipping due to NULL author_id
-2024-02-05 12:32:05 Babitha Bijin  year  2023  : Warning:  No records found!
-2024-02-05 12:32:06 Jawad Bilal  year  2023  : Warning:  No records found!
-2024-02-05 12:32:11 Fernando Blumenkron  year  2023  : Warning:  No records found!
-2024-02-05 12:32:11 Fernando Blumenkron  year  2023  : Warning:  No records found!
-2024-02-05 12:32:11 Joy Bulger Beck : Skipping due to NULL author_id
-2024-02-05 12:32:19 Satypriya Chaudhary : Skipping due to NULL author_id
-2024-02-05 12:32:20 Zachary Chun : Skipping due to NULL author_id
-2024-02-05 12:32:21 Ian Coe  year  2023  : Warning:  No records found!
-2024-02-05 12:32:24 Julia Cremer  year  2023  : Warning:  No records found!
-2024-02-05 12:32:25 Soham Dave : Skipping due to NULL author_id
-2024-02-05 12:32:25 Abhinav Dhakal : Skipping due to NULL author_id
-2024-02-05 12:32:26 John Dicken  year  2023  : Warning:  No records found!
-2024-02-05 12:32:29 Michael Durando  year  2023  : Warning:  No records found!
-2024-02-05 12:32:29 Sima Ehsani Chimeh  year  2023  : Warning:  No records found!
-2024-02-05 12:32:29 Tammer Yehia Elaini : Skipping due to NULL author_id
-2024-02-05 12:32:32 Lori Fantry  year  2023  : Warning:  No records found!
-2024-02-05 12:32:34 Darius Filsoof : Skipping due to NULL author_id
-2024-02-05 12:32:34 Kendal Flo Flegenheimer : Skipping due to NULL author_id
-2024-02-05 12:32:34 Gerald Goldberg  year  2023  : Warning:  No records found!
-2024-02-05 12:32:37 Elvira Gonzalez negrete : Skipping due to NULL author_id
-2024-02-05 12:32:39 Oleh Haluszka  year  2023  : Warning:  No records found!
-2024-02-05 12:32:41 Jared Head : Skipping due to NULL author_id
-2024-02-05 12:32:42 Monica Hinestroza-Jordan : Skipping due to NULL author_id
-2024-02-05 12:32:43 Craig Hoover  year  2023  : Warning:  No records found!
-2024-02-05 12:32:44 Audriana Nicole Hurbon : Skipping due to NULL author_id
-2024-02-05 12:32:49 Khalid Ibrahim : Skipping due to NULL author_id
-2024-02-05 12:32:57 Christopher Brian Johnson : Skipping due to NULL author_id
-2024-02-05 12:33:00 Saher Khalid : Skipping due to NULL author_id
-2024-02-05 12:33:00 Nabin Khatiwada : Skipping due to NULL author_id
-2024-02-05 12:33:01 Robert Kim : Skipping due to NULL author_id
-2024-02-05 12:33:01 Ravi Kiran Vuthoori : Skipping due to NULL author_id
-2024-02-05 12:33:01 Amy Klein : Skipping due to NULL author_id
-2024-02-05 12:33:02 Steven R. Knoper  year  2023  : Warning:  No records found!
-2024-02-05 12:33:04 Ravi Krishnadasan  year  2023  : Warning:  No records found!
-2024-02-05 12:33:09 Gurusaravanan Kutti Sridharan  year  2023  : Warning:  No records found!
-2024-02-05 12:33:09 Gurusaravanan Kutti Sridharan  year  2023  : Warning:  No records found!
-2024-02-05 12:33:12 Dylan Lee : Skipping due to NULL author_id
-2024-02-05 12:33:14 Haripriya Maddur : Skipping due to NULL author_id
-2024-02-05 12:33:17 Saif Arsan Mashaqi : Skipping due to NULL author_id
-2024-02-05 12:33:17 Josh Melson : Skipping due to NULL author_id
-2024-02-05 12:33:17 Dalia M. Mikhael  year  2023  : Warning:  No records found!
-2024-02-05 12:33:17 David Carpenter Miller : Skipping due to NULL author_id
-2024-02-05 12:33:17 Artur Mirzabekian : Skipping due to NULL author_id
-2024-02-05 12:33:18 Francisco  E. Mora  year  2023  : Warning:  No records found!
-2024-02-05 12:33:19 Alex Mulmi : Skipping due to NULL author_id
-2024-02-05 12:33:23 Rahmi Naseef : Skipping due to NULL author_id
-2024-02-05 12:33:24 Bhupinder Natt  year  2023  : Warning:  No records found!
-2024-02-05 12:33:26 Nora Odisho Domit : Skipping due to NULL author_id
-2024-02-05 12:33:26 Christine Oropez : Skipping due to NULL author_id
-2024-02-05 12:33:27 Karen Parker : Skipping due to NULL author_id
-2024-02-05 12:33:34 JR Exequiel Pineda : Skipping due to NULL author_id
-2024-02-05 12:33:34 Jenny Plitt : Skipping due to NULL author_id
-2024-02-05 12:33:34 Bupesh Pokhrel : Skipping due to NULL author_id
-2024-02-05 12:33:36 Nanda Pullela  year  2023  : Warning:  No records found!
-2024-02-05 12:33:38 Ali Raoof : Skipping due to NULL author_id
-2024-02-05 12:33:41 Casey Rendon  year  2023  : Warning:  No records found!
-2024-02-05 12:33:41 Dave Reyes : Skipping due to NULL author_id
-2024-02-05 12:33:47 Serena Scott  year  2023  : Warning:  No records found!
-2024-02-05 12:33:47 Serena Scott  year  2023  : Warning:  No records found!
-2024-02-05 12:33:52 Muha Jawad Sethi : Skipping due to NULL author_id
-2024-02-05 12:33:55 Tasneem Shah  year  2023  : Warning:  No records found!
-2024-02-05 12:33:55 Nasreen Shaikh : Skipping due to NULL author_id
-2024-02-05 12:33:55 Madhan Shanmusgasundaram : Skipping due to NULL author_id
-2024-02-05 12:33:58 Aimee Shock : Skipping due to NULL author_id
-2024-02-05 12:34:00 Ivan Sierra : Skipping due to NULL author_id
-2024-02-05 12:34:07 Mei So  year  2023  : Warning:  No records found!
-2024-02-05 12:34:11 Akash Taggarse : Skipping due to NULL author_id
-2024-02-05 12:34:18 Golnez Vahdani : Skipping due to NULL author_id
-2024-02-05 12:34:18 Monica Vandivort  year  2023  : Warning:  No records found!
-2024-02-05 12:34:22 Duane Whitaker  year  2023  : Warning:  No records found!
-2024-02-05 12:34:22 Gerald Wolff : Skipping due to NULL author_id
-2024-02-05 12:34:24 James Yanes  year  2023  : Warning:  No records found!
-2024-02-05 12:34:24 Tiffany Ynosensio : Skipping due to NULL author_id
-2024-02-05 12:46:50 Kristopher Abbate  year  2023  : Warning:  No records found!
-2024-02-05 12:46:50 Gebran Abboud : Skipping due to NULL author_id
-2024-02-05 12:46:51 Depak Acharya : Skipping due to NULL author_id
-2024-02-05 12:46:55 Ahmad M A Al-Khashman : Skipping due to NULL author_id
-2024-02-05 12:46:56 Alvaro Altamirano Ufion : Skipping due to NULL author_id
-2024-02-05 12:46:59 Danielle Avila  year  2023  : Warning:  No records found!
-2024-02-05 12:46:59 Mimi Bach  year  2023  : Warning:  No records found!
-2024-02-05 12:46:59 Aurangzaib Baig : Skipping due to NULL author_id
-2024-02-05 12:46:59 Amanpreet Bains : Skipping due to NULL author_id
-2024-02-05 12:47:02 Babitha Bijin  year  2023  : Warning:  No records found!
-2024-02-05 12:47:02 Jawad Bilal  year  2023  : Warning:  No records found!
-2024-02-05 12:47:06 Fernando Blumenkron  year  2023  : Warning:  No records found!
-2024-02-05 12:47:06 Fernando Blumenkron  year  2023  : Warning:  No records found!
-2024-02-05 12:47:06 Joy Bulger Beck : Skipping due to NULL author_id
-2024-02-05 12:47:13 Vijay Chandiramani  year  2023  : Warning:  the condition has length > 1 and only the first element will be used
-2024-02-05 12:47:13 Vijay Chandiramani  year  2023  : Warning:  the condition has length > 1 and only the first element will be used
-2024-02-05 12:47:16 Satypriya Chaudhary : Skipping due to NULL author_id
-2024-02-05 12:47:17 Zachary Chun : Skipping due to NULL author_id
-2024-02-05 12:47:18 Ian Coe  year  2023  : Warning:  No records found!
-2024-02-05 12:47:20 Julia Cremer  year  2023  : Warning:  No records found!
-2024-02-05 12:47:21 Soham Dave : Skipping due to NULL author_id
-2024-02-05 12:47:21 Abhinav Dhakal : Skipping due to NULL author_id
-2024-02-05 12:47:21 John Dicken  year  2023  : Warning:  No records found!
-2024-02-05 12:47:23 Michael Durando  year  2023  : Warning:  No records found!
-2024-02-05 12:47:23 Sima Ehsani Chimeh  year  2023  : Warning:  No records found!
-2024-02-05 12:47:23 Tammer Yehia Elaini : Skipping due to NULL author_id
-2024-02-05 12:47:25 Lori Fantry  year  2023  : Warning:  No records found!
-2024-02-05 12:47:26 Darius Filsoof : Skipping due to NULL author_id
-2024-02-05 12:47:26 Kendal Flo Flegenheimer : Skipping due to NULL author_id
-2024-02-05 12:47:27 Gerald Goldberg  year  2023  : Warning:  No records found!
-2024-02-05 12:47:28 Elvira Gonzalez negrete : Skipping due to NULL author_id
-2024-02-05 12:47:30 Oleh Haluszka  year  2023  : Warning:  No records found!
-2024-02-05 12:47:31 Jared Head : Skipping due to NULL author_id
-2024-02-05 12:47:31 Monica Hinestroza-Jordan : Skipping due to NULL author_id
-2024-02-05 12:47:32 Craig Hoover  year  2023  : Warning:  No records found!
-2024-02-05 12:47:33 Audriana Nicole Hurbon : Skipping due to NULL author_id
-2024-02-05 12:47:36 Khalid Ibrahim : Skipping due to NULL author_id
-2024-02-05 12:47:43 Christopher Brian Johnson : Skipping due to NULL author_id
-2024-02-05 12:47:45 Saher Khalid : Skipping due to NULL author_id
-2024-02-05 12:47:45 Nabin Khatiwada : Skipping due to NULL author_id
-2024-02-05 12:47:46 Robert Kim : Skipping due to NULL author_id
-2024-02-05 12:47:46 Ravi Kiran Vuthoori : Skipping due to NULL author_id
-2024-02-05 12:47:46 Amy Klein : Skipping due to NULL author_id
-2024-02-05 12:47:47 Steven R. Knoper  year  2023  : Warning:  No records found!
-2024-02-05 12:47:48 Ravi Krishnadasan  year  2023  : Warning:  No records found!
-2024-02-05 12:47:50 Gurusaravanan Kutti Sridharan  year  2023  : Warning:  No records found!
-2024-02-05 12:47:50 Gurusaravanan Kutti Sridharan  year  2023  : Warning:  No records found!
-2024-02-05 12:47:53 Dylan Lee : Skipping due to NULL author_id
-2024-02-05 12:47:54 Haripriya Maddur : Skipping due to NULL author_id
-2024-02-05 12:47:56 Saif Arsan Mashaqi : Skipping due to NULL author_id
-2024-02-05 12:47:56 Josh Melson : Skipping due to NULL author_id
-2024-02-05 12:47:56 Dalia M. Mikhael  year  2023  : Warning:  No records found!
-2024-02-05 12:47:56 David Carpenter Miller : Skipping due to NULL author_id
-2024-02-05 12:47:56 Artur Mirzabekian : Skipping due to NULL author_id
-2024-02-05 12:47:57 Francisco  E. Mora  year  2023  : Warning:  No records found!
-2024-02-05 12:47:57 Alex Mulmi : Skipping due to NULL author_id
-2024-02-05 12:47:59 Rahmi Naseef : Skipping due to NULL author_id
-2024-02-05 12:48:00 Bhupinder Natt  year  2023  : Warning:  No records found!
-2024-02-05 12:48:01 Nora Odisho Domit : Skipping due to NULL author_id
-2024-02-05 12:48:01 Christine Oropez : Skipping due to NULL author_id
-2024-02-05 12:48:02 Karen Parker : Skipping due to NULL author_id
-2024-02-05 12:48:07 JR Exequiel Pineda : Skipping due to NULL author_id
-2024-02-05 12:48:07 Jenny Plitt : Skipping due to NULL author_id
-2024-02-05 12:48:07 Bupesh Pokhrel : Skipping due to NULL author_id
-2024-02-05 12:48:09 Nanda Pullela  year  2023  : Warning:  No records found!
-2024-02-05 12:48:10 Ali Raoof : Skipping due to NULL author_id
-2024-02-05 12:48:12 Casey Rendon  year  2023  : Warning:  No records found!
-2024-02-05 12:48:12 Dave Reyes : Skipping due to NULL author_id
-2024-02-05 12:48:16 Serena Scott  year  2023  : Warning:  No records found!
-2024-02-05 12:48:16 Serena Scott  year  2023  : Warning:  No records found!
-2024-02-05 12:48:20 Muha Jawad Sethi : Skipping due to NULL author_id
-2024-02-05 12:48:21 Tasneem Shah  year  2023  : Warning:  No records found!
-2024-02-05 12:48:21 Nasreen Shaikh : Skipping due to NULL author_id
-2024-02-05 12:48:21 Madhan Shanmusgasundaram : Skipping due to NULL author_id
-2024-02-05 12:48:23 Aimee Shock : Skipping due to NULL author_id
-2024-02-05 12:48:24 Ivan Sierra : Skipping due to NULL author_id
-2024-02-05 12:48:29 Mei So  year  2023  : Warning:  No records found!
-2024-02-05 12:48:31 Akash Taggarse : Skipping due to NULL author_id
-2024-02-05 12:48:36 Golnez Vahdani : Skipping due to NULL author_id
-2024-02-05 12:48:37 Monica Vandivort  year  2023  : Warning:  No records found!
-2024-02-05 12:48:39 Duane Whitaker  year  2023  : Warning:  No records found!
-2024-02-05 12:48:39 Gerald Wolff : Skipping due to NULL author_id
-2024-02-05 12:48:40 James Yanes  year  2023  : Warning:  No records found!
-2024-02-05 12:48:40 Tiffany Ynosensio : Skipping due to NULL author_id
+2024-02-07 22:17:18 Gebran Abboud : Skipping due to NULL author_id
+
+2024-02-07 22:17:19 Depak Acharya : Skipping due to NULL author_id
+
+2024-02-07 22:17:22 Ahmad M A Al-Khashman : Skipping due to NULL author_id
+
+2024-02-07 22:17:24 Alvaro Altamirano Ufion : Skipping due to NULL author_id
+
+2024-02-07 22:17:29 Aurangzaib Baig : Skipping due to NULL author_id
+
+2024-02-07 22:17:29 Amanpreet Bains : Skipping due to NULL author_id
+
+2024-02-07 22:17:38 Joy Bulger Beck : Skipping due to NULL author_id
+
+2024-02-07 22:17:44 Satypriya Chaudhary : Skipping due to NULL author_id
+
+2024-02-07 22:17:46 Zachary Chun : Skipping due to NULL author_id
+
+2024-02-07 22:17:51 Soham Dave : Skipping due to NULL author_id
+
+2024-02-07 22:17:51 Abhinav Dhakal : Skipping due to NULL author_id
+
+2024-02-07 22:17:54 Tammer Yehia Elaini : Skipping due to NULL author_id
+
+2024-02-07 22:17:58 Darius Filsoof : Skipping due to NULL author_id
+
+2024-02-07 22:17:58 Kendal Flo Flegenheimer : Skipping due to NULL author_id
+
+2024-02-07 22:18:01 Elvira Gonzalez negrete : Skipping due to NULL author_id
+
+2024-02-07 22:18:05 Jared Head : Skipping due to NULL author_id
+
+2024-02-07 22:18:06 Monica Hinestroza-Jordan : Skipping due to NULL author_id
+
+2024-02-07 22:18:08 Audriana Nicole Hurbon : Skipping due to NULL author_id
+
+2024-02-07 22:18:12 Khalid Ibrahim : Skipping due to NULL author_id
+
+2024-02-07 22:18:21 Christopher Brian Johnson : Skipping due to NULL author_id
+
+2024-02-07 22:18:24 Saher Khalid : Skipping due to NULL author_id
+
+2024-02-07 22:18:24 Nabin Khatiwada : Skipping due to NULL author_id
+
+2024-02-07 22:18:25 Robert Kim : Skipping due to NULL author_id
+
+2024-02-07 22:18:25 Ravi Kiran Vuthoori : Skipping due to NULL author_id
+
+2024-02-07 22:18:25 Amy Klein : Skipping due to NULL author_id
+
+2024-02-07 22:18:34 Dylan Lee : Skipping due to NULL author_id
+
+2024-02-07 22:18:36 Haripriya Maddur : Skipping due to NULL author_id
+
+2024-02-07 22:18:39 Saif Arsan Mashaqi : Skipping due to NULL author_id
+
+2024-02-07 22:18:39 Josh Melson : Skipping due to NULL author_id
+
+2024-02-07 22:18:39 David Carpenter Miller : Skipping due to NULL author_id
+
+2024-02-07 22:18:39 Artur Mirzabekian : Skipping due to NULL author_id
+
+2024-02-07 22:18:41 Alex Mulmi : Skipping due to NULL author_id
+
+2024-02-07 22:18:44 Rahmi Naseef : Skipping due to NULL author_id
+
+2024-02-07 22:18:46 Nora Odisho Domit : Skipping due to NULL author_id
+
+2024-02-07 22:18:46 Christine Oropez : Skipping due to NULL author_id
+
+2024-02-07 22:18:47 Karen Parker : Skipping due to NULL author_id
+
+2024-02-07 22:18:54 JR Exequiel Pineda : Skipping due to NULL author_id
+
+2024-02-07 22:18:54 Jenny Plitt : Skipping due to NULL author_id
+
+2024-02-07 22:18:54 Bupesh Pokhrel : Skipping due to NULL author_id
+
+2024-02-07 22:18:57 Ali Raoof : Skipping due to NULL author_id
+
+2024-02-07 22:18:59 Dave Reyes : Skipping due to NULL author_id
+
+2024-02-07 22:19:09 Muha Jawad Sethi : Skipping due to NULL author_id
+
+2024-02-07 22:19:11 Nasreen Shaikh : Skipping due to NULL author_id
+
+2024-02-07 22:19:11 Madhan Shanmusgasundaram : Skipping due to NULL author_id
+
+2024-02-07 22:19:13 Aimee Shock : Skipping due to NULL author_id
+
+2024-02-07 22:19:15 Ivan Sierra : Skipping due to NULL author_id
+
+2024-02-07 22:19:23 Akash Taggarse : Skipping due to NULL author_id
+
+2024-02-07 22:19:29 Golnez Vahdani : Skipping due to NULL author_id
+
+2024-02-07 22:19:33 Gerald Wolff : Skipping due to NULL author_id
+
+2024-02-07 22:19:34 Tiffany Ynosensio : Skipping due to NULL author_id
+
