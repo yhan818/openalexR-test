@@ -1,4 +1,4 @@
-2024-02-07 22:41:32 Author result affiliation:
+2024-02-11 07:43:03 Author result affiliation:
 structure(list(id = c("https://openalex.org/A5005154233", "https://openalex.org/A5018050941", 
 "https://openalex.org/A5022251680"), display_name = c("H‐H. Sherry Chow", 
 "H.‐H. Sherry Chow", "Sherry Chow"), display_name_alternatives = list(
@@ -9,8 +9,8 @@ structure(list(id = c("https://openalex.org/A5005154233", "https://openalex.org/
     "Hsiao‐Hui Chow", "Hsiao‐Hui Sherry Chow", "H. H. Chow", 
     "H. H.S. Chow", "Hsiao Hui S. Chow", "Hsiao‐Hui ‐H Chow", 
     "Hsiao Hui Sherry Chow"), c("Sherry Chow", "Sherry H.‐H. Chow", 
-    "Sherry H.H. Chow", "S. Chow")), relevance_score = c(11602.22, 
-9002.766, 1930.6475), ids = list(c(openalex = "https://openalex.org/A5005154233", 
+    "Sherry H.H. Chow", "S. Chow")), relevance_score = c(11589.399, 
+8994.95, 1923.4246), ids = list(c(openalex = "https://openalex.org/A5005154233", 
 orcid = "https://orcid.org/0000-0002-9638-711X"), c(openalex = "https://openalex.org/A5018050941"), 
     c(openalex = "https://openalex.org/A5022251680")), orcid = c("https://orcid.org/0000-0002-9638-711X", 
 NA, NA), works_count = c(75L, 93L, 15L), cited_by_count = c(2492L, 
@@ -19,7 +19,7 @@ NA, NA), works_count = c(75L, 93L, 15L), cited_by_count = c(2492L,
     4L, 6L), cited_by_count = c(18L, 220L, 269L, 231L, 206L, 
     176L, 219L, 191L, 165L, 206L, 172L, 208L, 153L)), class = "data.frame", row.names = c(NA, 
 -13L)), structure(list(year = 2024:2012, works_count = c(1L, 
-21L, 6L, 4L, 2L, 2L, 1L, 1L, 2L, 2L, 2L, 0L, 4L), cited_by_count = c(13L, 
+21L, 6L, 4L, 2L, 2L, 1L, 1L, 2L, 2L, 2L, 0L, 4L), cited_by_count = c(17L, 
 148L, 142L, 134L, 122L, 97L, 103L, 80L, 82L, 74L, 71L, 76L, 75L
 )), class = "data.frame", row.names = c(NA, -13L)), structure(list(
     year = 2024:2012, works_count = c(0L, 0L, 1L, 1L, 0L, 0L, 
@@ -48,7 +48,7 @@ NA, NA), works_count = c(75L, 93L, 15L), cited_by_count = c(2492L,
 "https://openalex.org/C142724271", "https://openalex.org/C98274493", 
 "https://openalex.org/C121608353", "https://openalex.org/C178790620", 
 "https://openalex.org/C60644358", "https://openalex.org/C31903555", 
-"https://openalex.org/C141071460", "https://openalex.org/C143998085", 
+"https://openalex.org/C143998085", "https://openalex.org/C141071460", 
 "https://openalex.org/C204787440", "https://openalex.org/C530470458", 
 "https://openalex.org/C15744967", "https://openalex.org/C118552586", 
 "https://openalex.org/C121332964"), wikidata = c("https://www.wikidata.org/wiki/Q11190", 
@@ -58,18 +58,18 @@ NA, NA), works_count = c(75L, 93L, 15L), cited_by_count = c(2492L,
 "https://www.wikidata.org/wiki/Q7208", "https://www.wikidata.org/wiki/Q128406", 
 "https://www.wikidata.org/wiki/Q12078", "https://www.wikidata.org/wiki/Q11351", 
 "https://www.wikidata.org/wiki/Q128570", "https://www.wikidata.org/wiki/Q1637030", 
-"https://www.wikidata.org/wiki/Q40821", "https://www.wikidata.org/wiki/Q162555", 
+"https://www.wikidata.org/wiki/Q162555", "https://www.wikidata.org/wiki/Q40821", 
 "https://www.wikidata.org/wiki/Q188504", "https://www.wikidata.org/wiki/Q128581", 
 "https://www.wikidata.org/wiki/Q9418", "https://www.wikidata.org/wiki/Q7867", 
 "https://www.wikidata.org/wiki/Q413"), display_name = c("Medicine", 
 "Biology", "Internal medicine", "Chemistry", "Biochemistry", 
 "Genetics", "Endocrinology", "Pathology", "Pharmacology", "Cancer", 
-"Organic chemistry", "Bioinformatics", "Food science", "Surgery", 
-"Oncology", "Alternative medicine", "Breast cancer", "Psychology", 
+"Organic chemistry", "Bioinformatics", "Food science", "Oncology", 
+"Surgery", "Alternative medicine", "Breast cancer", "Psychology", 
 "Psychiatry", "Physics"), level = c(0L, 0L, 1L, 0L, 1L, 1L, 1L, 
 1L, 1L, 2L, 1L, 1L, 1L, 1L, 1L, 2L, 3L, 0L, 1L, 0L), score = c(101.3, 
-101.3, 101.3, 86.7, 77.3, 70.7, 68, 56, 52, 50.7, 44, 36, 30.7, 
-26.7, 26.7, 26.7, 22.7, 21.3, 21.3, 21.3)), class = "data.frame", row.names = c(NA, 
+101.3, 101.3, 86.7, 77.3, 70.7, 68, 54.7, 52, 50.7, 44, 34.7, 
+30.7, 26.7, 25.3, 25.3, 22.7, 21.3, 21.3, 21.3)), class = "data.frame", row.names = c(NA, 
 -20L)), structure(list(id = c("https://openalex.org/C71924100", 
 "https://openalex.org/C86803240", "https://openalex.org/C126322002", 
 "https://openalex.org/C54355233", "https://openalex.org/C185592680", 
@@ -139,17 +139,17 @@ NA, NA), works_count = c(75L, 93L, 15L), cited_by_count = c(2492L,
 "https://api.openalex.org/works?filter=author.id:A5022251680"
 )), row.names = c(NA, -3L), class = c("tbl_df", "tbl", "data.frame"
 ))
-2024-02-07 22:41:33 Author result affiliation:
+2024-02-11 07:43:03 Author result affiliation:
 structure(list(id = "https://openalex.org/A5051128417", display_name = "Rebecca M. Crocker", 
     display_name_alternatives = list(c("Rebecca M. Crocker", 
-    "Rebecca Crocker")), relevance_score = 1907.4438, ids = list(
+    "Rebecca Crocker")), relevance_score = 1896.6554, ids = list(
         c(openalex = "https://openalex.org/A5051128417", orcid = "https://orcid.org/0000-0002-5281-2831"
         )), orcid = "https://orcid.org/0000-0002-5281-2831", 
     works_count = 22L, cited_by_count = 107L, counts_by_year = list(
         structure(list(year = c(2024L, 2023L, 2022L, 2021L, 2020L, 
         2019L, 2018L, 2017L, 2016L, 2015L, 2014L, 2012L), works_count = c(1L, 
-        3L, 6L, 7L, 2L, 0L, 0L, 1L, 1L, 1L, 1L, 1L), cited_by_count = c(7L, 
-        50L, 34L, 7L, 2L, 2L, 2L, 4L, 2L, 0L, 0L, 0L)), class = "data.frame", row.names = c(NA, 
+        3L, 6L, 7L, 2L, 0L, 0L, 1L, 1L, 1L, 1L, 1L), cited_by_count = c(9L, 
+        50L, 33L, 7L, 2L, 2L, 2L, 4L, 2L, 0L, 0L, 0L)), class = "data.frame", row.names = c(NA, 
         -12L))), affiliation_display_name = "University of Arizona", 
     affiliation_id = "https://openalex.org/I138006243", affiliation_ror = "https://ror.org/03m2x1q45", 
     affiliation_country_code = "US", affiliation_type = "education", 
