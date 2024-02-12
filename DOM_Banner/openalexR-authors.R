@@ -219,23 +219,40 @@ calculate_works_count <- function(author_name, affiliation_name, year) {
   }
 }
 
+
+
+##### Function: Get works from author ORCID and year
+get_works_from_orcid_by_year <- function(orcid, publication_year) {
+  if (is.null(orcid)) {
+    stop("ORCID cannot be NULL.")
+  }
+  
+  author_works <- tryCatch({
+    oa_fetch(
+      entity = "works",
+      author.orcid = orcid, 
+      publication_year = publication_year,
+      verbose = TRUE
+    )
+  }, error = function(e) {
+    message ("An error occured: ", e$message)
+    return (NULL)
+  })
+  return(author_works)
+}
+
 ################################################################
 ##### Function: Get works from OA's author id and publication year #########
 get_works_from_authorid_by_year <- function(dept_code, author_id, year) {
   
   base_dir <- file.path("./", "output", dept_code)
-  if (!dir.exists(base_dir)) {
-    dir.create(base_dir, recursive = TRUE)
-  }
+  if (!dir.exists(base_dir)) { dir.create(base_dir, recursive = TRUE) }
   log_file <- file.path(base_dir, paste0(author_id, "_", year, ".log"))
   
-  # Check if author_id is NULL
-  if (is.null(author_id)) {
+  if (is.null(author_id)) {  # Check if author_id is NULL
     err_msg <- paste0(Sys.time(), "get_works_from_authorid_by_year(), Error: ", author_id, "Not found for this author.")
     cat(err_msg, file = log_file, append = TRUE)
     message(err_msg)
-    #message(paste0(author_id, " author_id not found for this author."))
-    #write(paste(Sys.time(), author_id, " ", year, " No works found"), file = log_file, append = TRUE)
     return (NULL)
   }
 
@@ -251,83 +268,32 @@ get_works_from_authorid_by_year <- function(dept_code, author_id, year) {
     err_msg <- paste0(Sys.time(), "get_works_from_authorid_by_year(), Error: ", author_id, "in ", year, e$message)
     cat(err_msg, file = log_file, append = TRUE)
     message(err_msg)
-    #message(paste0(author_id, " An error occurred while fetching in ", year, e$message))
-    #write(paste(Sys.time(), author_id, " An error occurred while fetching in ", year, e$message), file = log_file, append = TRUE)
     return(NULL)
   })
   return(author_works)
 }
 
-##################################
-get_works_from_authorid_by_year4 <- function(author_id, publication_year) {
-  if (is.null(author_id)) {
-    message("Author ID cannot be NULL.")
-    return(NULL)
-  }
-  
-  log_file_path <- paste0("logs_for_", author_id, "_", publication_year, ".txt")
-  
-  author_works <- tryCatch({
-    withCallingHandlers({
-      oa_fetch(
-        entity = "works",
-        "author.id" = author_id,
-        publication_year = publication_year,
-        verbose = TRUE
-      )
-    }, warning = function(w) {
-      warning_message <- paste(Sys.time(), "Warning for author ID", author_id, 
-                               "in year", publication_year, ":", w$message, "\n")
-      writeLines(warning_message, con = log_file_path, append = TRUE)
-    })
-  }, error = function(e) {
-    error_message <- paste(Sys.time(), "Error occurred while fetching works for ", 
-                           author_id, " in ", publication_year, ": ", e$message, "\n")
-    writeLines(error_message, con = log_file_path, append = TRUE)
-    return(NULL)
-  })
-  
-  return(author_works)
-}
 
-
-##### Function: Get works from author ORCID and year
-get_works_from_orcid_by_year <- function(orcid, publication_year) {
-  if (is.null(orcid)) {
-    stop("ORCID cannot be NULL.")
-  }
-  
-  author_works <- tryCatch({
-    oa_fetch(
-    entity = "works",
-    author.orcid = orcid, 
-    publication_year = publication_year,
-    verbose = TRUE
-  )
-  }, error = function(e) {
-    message ("An error occured: ", e$message)
-    return (NULL)
-  })
-  return(author_works)
-}
+author_works <- oa_fetch(
+  entity = "works",
+  author.id = "a5016874418",
+  publication_year = 2023,
+  verbose = TRUE
+)
 
 ################### Function ######################
+### parameter: dept_code and affiliation
+### return: dept authors name after using search_author() 
 get_dept_authors_names <- function(dept_code, affiliation_name) {
   # Construct the base directory path based on dept_code
   base_dir <- file.path("./", "output", dept_code)
-
-  if (!dir.exists(base_dir)) {
-    dir.create(base_dir, recursive = TRUE)
-  }
+  if (!dir.exists(base_dir)) { dir.create(base_dir, recursive = TRUE)  }
   
   file_path <- sprintf("%s_common.csv", dept_code)
-  #file_path <- file.path(base_dir, sprintf("%s_common.csv", dept_code))
   log_file_path <- file.path(base_dir, paste0(dept_code, ".log"))
   
   
-  if (!file.exists(file_path)) {
-    stop("File not found: ", file_path)
-  }
+  if (!file.exists(file_path)) { stop("File not found: ", file_path) }
   
   LDAPdata <- read_csv(file_path, show_col_types = FALSE)
   
@@ -339,7 +305,6 @@ get_dept_authors_names <- function(dept_code, affiliation_name) {
   }
   
   authors_names <- LDAPdata$cn
-  
   dept_authors_names <- list() 
   
   for (i in 1:length(authors_names) ) {
@@ -391,25 +356,20 @@ get_dept_authors_names <- function(dept_code, affiliation_name) {
   return (dept_authors_names)
 }
 
-# Minimal test case
-log_file_path <- "test_log.txt"
-test_content <- "This is a test."
-writeLines(test_content, log_file_path, append = TRUE)
-
 
 ###################################################################################
 ### Function: output author's works by its oa author_id and year. 
 ### It is necessary to do so, because this author_works df are very complex (a df of dfs)
 ### It is a small db, cannot be represented by a single sheet of XLSX
+### return: after calling get_works_from_authorid_by_year(), return xlsx file containing the author's works
 
 output_works_by_authorid_by_year <- function(dept_code, author_name, author_id, year, base_dir = ".") {
-  if (!requireNamespace("dplyr", quietly = TRUE)) {
+  if (!requireNamespace("dplyr", quietly = TRUE)) { 
     stop("dplyr package is not installed. Please install it using install.packages('dplyr').")
   }
   if (!requireNamespace("writexl", quietly = TRUE)) {
     stop("writexl package is not installed. Please install it using install.packages('writexl').")
   }
-  
   if (is.null(author_id)) {
     stop("author_id cannot be NULL.")
   }
@@ -423,35 +383,61 @@ output_works_by_authorid_by_year <- function(dept_code, author_name, author_id, 
   
   log_file <- file.path(base_dir, paste0(author_name, "_", year, ".log")) # Define log file path
   
+  ######## calling get_works_from_authorid_by_year() #####################
   author_works <- get_works_from_authorid_by_year(dept_code, author_id, year)
   if (is.null(author_works) || length(author_works) == 0) {
     err_msg <- paste0(Sys.time(), " output_works_by_authorid_by_year() ", author_name,  " ", author_id,  " ", year, " NO works found!")
     cat(err_msg, file = log_file, append = TRUE)
-    #message(paste0(author_name,  " ", author_id,  " ", year, " NO works found!"))
-    #write(paste(Sys.time(), author_name, " ", author_id, " ", year, " No works found"), file = log_file, append = TRUE)
     return(NULL)
   }
   
+  # Processing column "author" to get au_display_name only. 
+  if(!is.null(author_works$author)) {
+    #authors_names <- sapply(author_works$author, get_au_display_names, USE.NAMES = FALSE)
+    author_works$authors_name <- lapply(author_works$author, get_au_display_name)
+  } else { 
+    # If author_works$author is NULL, handle accordingly
+    author_works$authors_name <- "NA"
+    message("author_works$author is NULL. 'authors_name' column set to NA.")
+  }
+  
+  ### Processing column "ids" to get PMID
+  if(!is.null(author_works$ids)) {
+    author_works$pmid <- lapply(author_works$ids, get_pmid)
+  } else { 
+    # If NULL, handle accordingly
+    author_works$pmid <- "NA"
+    message("author_works$PMID is NULL. 'PMID' column set to NA.")
+  }
+   
   #!!!!! Very important: Need to handle NA value in OpenAlex data. Otherwise, it will crash other functions such as writexlsx()!!!
   # The best way so far is to "as.character" and then replace NUL. 
   author_works <- author_works %>%
     mutate(across(everything(), as.character)) %>%
     mutate(across(everything(), ~replace_na(., "N/A")))
   
+  # Make the col "authors_name" as the first column
+  author_works <- author_works %>% select(authors_name, everything())
+  
+  
   # Exclude certain columns.
-  author_works <-select(author_works, -c(counts_by_year, concepts))
-  # Exclude suggested columns. 
-  author_works <- select(author_works, -c (ab, so_id, issn_l, pdf_url, first_page, last_page, volume, issue, 
-                                           is_oa, oa_anywhere, oa_url, any_repository_has_fulltext, grants, cited_by_api_url, 
-                                           referenced_works, related_works, is_paratext, is_retracted) )
-  # column "author" and "ids" need further processing
-  # write a separated function for author
-  # write a separated function for ids
+  # author_works <- select(author_works, -c (counts_by_year, concepts, ab, so_id, issn_l, pdf_url, first_page, last_page, volume, issue, 
+  #  is_oa, is_oa_anywhere, oa_url, any_repository_has_fulltext, grants, cited_by_api_url, referenced_works, related_works, is_paratext, is_retracted) )
   
-  print(author_works)
+  # Define the columns 
+  desired_columns <- c("authors_name", "id", "display_name", "publication_date", "so", 
+                       "host_organization", "url", "license", "version", "oa_status", "language", 
+                       "cited_by_count", "publication_year", "pmid", "doi", "type")
   
+  # Check which of the desired columns exist in 'author_works'
+  existing_columns <- desired_columns[desired_columns %in% names(author_works)]
+  author_works <- select(author_works, all_of(existing_columns))
+  
+  # limit each column to 32767 because writexl cannot handle more than 32767 chars
   author_works <- author_works %>%
     mutate(across(where(is.character), ~ifelse(nchar(.) > 32767, substr(., 1, 32767), .)))
+  
+  print(author_works)
   
   # Generating the filename
   filename <- paste0(gsub("[[:punct:]]", "", author_name), "_", year, ".xlsx")
@@ -459,13 +445,88 @@ output_works_by_authorid_by_year <- function(dept_code, author_name, author_id, 
   
   writexl::write_xlsx(author_works, path = full_path)
   message("File '", full_path, "' has been created.")
-  
 }
+
+
+#################### get author's display_name from "author" col #### 
+### Para: author_info : col "author" from openAlex's works
+### Return: author$au_display_name
+get_au_display_name <- function(author_info) {
+  # Check if author_info is a data frame and contains the 'au_display_name' column
+  if (is.data.frame(author_info) && "au_display_name" %in% names(author_info)) {
+    # Concatenate 'au_display_name' values into a single string
+    names_concatenated <- paste(author_info$au_display_name, collapse = ", ")
+    return(names_concatenated)
+  } else {
+    # Return NA if author_info is not a data frame or 'au_display_name' column is missing
+    return("aaaa")
+  }
+}
+
+################### get PMID from "ids" col #####
+### Para: col "ids" from openAlex's works
+### Return: pmid
+get_pmid <- function(ids) {
+  # Check if "pmid" key exists
+  if("pmid" %in% names(ids)) {
+    pmid_url <- ids["pmid"]
+    #numeric_pmid <- gsub("https://pubmed.ncbi.nlm.nih.gov/", "", named_urls["pmid"])
+    return(pmid_url)
+  } else {
+    # Return NA if there's no "pmid" key
+    return(NA)
+  }
+}
+
+# Since lapply returns a list and each element is just a single PMID, you might want to simplify this to a vector
+pmids_vector <- unlist(pmids)
+
+################# Test ##############################
+
+#### Dept of Medicine (HR code: 0713 and 0788) Test date: 2024-01-24 
+##### Test cases: data is not uniformed.  
+author_works <- get_works_from_authorid_by_year("test", "a5082148123", 2022)
+getwd()
+output_works_by_authorid_by_year("test", "Keith A Joiner", "a5082148123", 2022)
+
+# Apply the function to each element in the list (assuming multiple data frames could be in the list)
+#authors_names <- sapply(author_works$author, get_au_display_names, USE.NAMES = FALSE)
+author_works$authors_name <- lapply(author_works$author, get_au_display_name)
+
+# Apply the function to each element in the 'pmid' list
+author_works$pmid <- lapply(author_works$ids, get_pmid)
+
+str(pmid)
+class(pmid)
+
+# Error in x[is.na(x)] <- na.string : replacement has length zero. Why? 
+### Sara Centuori no affiliation. need to send to openAlex
+author_works <- get_works_from_authorid_by_year("test", "a5080182165", 2022)
+output_works_by_authorid_by_year("test", "Sara Centuori", "a5080182165", 2022)
+
+# Bekir Tanriover: https://openalex.org/authors/a5016874418 
+author_name <- "Bekir Tanriover"
+author_id <- "a5016874418"
+publication_year <- "2023"
+dept_code <-"test"
+author_works <- get_works_from_authorid_by_year(dept_code, author_id, publication_year)
+UAresult1 <- search_author(author_name, affiliation_name)
+output_works_by_authorid_by_year(dept_code, author_name, author_id, publication_year) 
+
+# H.-H Sherry Chow
+# issues: Two DOIs issued for figure s1, s2, and s3,  table s1, s2, s3 and s4 (v1 )
+author_name <-"H. H. Sherry Chow"
+author_id <- "a5018050941"
+dept_code <- "test"
+author_works <- get_works_from_authorid_by_year(dept_code, author_id, publication_year)
+output_works_by_authorid_by_year(dept_code, author_name, author_id, publication_year) 
+
 
 ############################################################################
 #### Now getting every author's works by each dept ###
 ### Function: Parameter: dept_author_data: list 
-######################################################################################333
+### return: calling get_works_from_authorid_by_year() and output_works_by_authorid_by_year() 
+######################################################################################
 output_dept_author_works_by_year <- function(dept_code, dept_authors_names, year) {
   if (is.null(dept_code) || !nzchar(dept_code)) {
     stop("Department code ('dept_code') must be provided and cannot be empty.")
@@ -483,8 +544,6 @@ output_dept_author_works_by_year <- function(dept_code, dept_authors_names, year
     msg <- paste0(Sys.time(), dept_code, ": ", dept_authors_names, " in ", year, ": No authors found for this department.")
     write(msg, file = log_file, append = TRUE)
     message(msg)
-    #message(dept_code, " in ", year, ": No authors found for department.")
-    #write(paste(Sys.time(), dept_authors_names, " No authors found for department"), file = log_file, append = TRUE)
     return()  # Exit the function early
   }
   
@@ -515,40 +574,10 @@ output_dept_author_works_by_year <- function(dept_code, dept_authors_names, year
     }
 }
 
-
-
-
 #######################################
 
 #dept_code <- readline(prompt = "Please enter the department code: ")
 #affiliation_name <- readline(prompt = "Please enter the affiliation: ")
-
-#### Dept of Medicine (HR code: 0713 and 0788) Test date: 2024-01-24 
-##### Test cases: data is not uniformed.  
-author_works <- get_works_from_authorid_by_year("test", "a5082148123", 2022)
-getwd()
-output_works_by_authorid_by_year("test", "Keith A Joiner", "a5082148123", 2022)
-
-# Error in x[is.na(x)] <- na.string : replacement has length zero. Why? 
-author_works <- get_works_from_authorid_by_year("test", "a5080182165", 2022)
-output_works_by_authorid_by_year("test", "Sara Centuori", "a5080182165", 2022)
-
-# Bekir Tanriover: https://openalex.org/authors/a5016874418 
-author_name <- "Bekir Tanriover"
-author_id <- "a5016874418"
-publication_year <- "2023"
-dept_code <-"test"
-author_works <- get_works_from_authorid_by_year(dept_code, author_id, publication_year)
-UAresult1 <- search_author(author_name, affiliation_name)
-
-output_works_by_authorid_by_year(dept_code, author_name, author_id, publication_year) 
-
-# H.-H Sherry Chow
-author_name <-"H. H. Sherry Chow"
-author_id <- "a5018050941"
-dept_code <- "test"
-author_works <- get_works_from_authorid_by_year(dept_code, author_id, publication_year)
-output_works_by_authorid_by_year(dept_code, author_name, author_id, publication_year) 
 
 ### 2024-01-25: Affiliation issues: 
 ### [1] "Tejo K Vemulapalli University" Error in is.factor(x) : object 'affiliation_display_name' not found In addition: Warning messages:
@@ -613,8 +642,11 @@ output_dept_author_works_by_year(dept_name, dept_authors_names, 2023)
 
 
 ### dept0713: 49 matches (all except 1 not matched with Funk's list)
-### 2022: 41 authors works found (8 not found) 
-### 2023: 43 authors found (5 not found)
+### 2022: 40 authors works found
+### 2023: 42 authors found
+### Rachana Shroff: 2023: 78 records: checked: ~70 DOIs issued for table, table s3. (Type as "article"). 
+# Similar cases like H.H. Sherry for American Association for Cancer Research (on figshare.com). The same publishing practice
+### 
 dept_name <- "dept0713"
 dept_authors_names <- list()
 dept_authors_names <- get_dept_authors_names(dept_name, affiliation_name)
@@ -681,7 +713,15 @@ output_dept_author_works_by_year(dept_name, dept_authors_names, 2023)
 ### Some of Banner authors have affiliation of "University of Arizona", "University of Arizona Cancer Center". 
 ### Affiliations: Using UArizona vector of string (not containing "Banner": found 83 authors' works. There are 148
 ### 
-### 2022: Avin Aggarwal verified 
+### 2022: Avin Aggarwal, Indu Partha, Saad Kubba, Olivia Hung (affiliation is Sarver Heart Center, UA, Banner?) Mathew Hutchinson (Mahesh Balakrishnan not in Funk's list) verified 
+### Not error: duplicated DOIs (Mathew Hutchinson 2023 works in both Pubmed and Wiley)
+### Error: 2022: Hong Seok Lee (same name): London: https://doi.org/10.1002/adma.202203310 https://doi.org/10.1002/adma.202270240
+### Error: 2023: Hong Seok Lee (same name): Korea: https://pubs.acs.org/doi/10.1021/acssensors.2c01086 https://pubmed.ncbi.nlm.nih.gov/36798505
+### Error: Jose Gonzalez: (reason?) 2023: https://doi.org/10.56470/978-9942-627-93-3 https://doi.org/10.1016/j.annonc.2023.10.013
+### Error: data error: Sarah Tariq not in the arXiv's article metadata(https://doi.org/10.48550/arxiv.2306.07713), 
+### 2023: Abd Assalam Qannus, Akshay Amaraneni, Ernest Vina, Indu Partha, Lauren Estep, Olivia Hung, Sarah Tariq, Venkata Rokkam verified
+### 
+
 dept_name <- "dept_banner" 
 affiliation_name <- "Banner" 
 dept_authors_names <- list()
