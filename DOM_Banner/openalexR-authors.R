@@ -51,97 +51,6 @@ setwd("/home/yhan/Documents/UA-datasets/openalexR-test/DOM_Banner")
 
 
 ########################## Functions ###########################33
-
-#####################################################
-# Function: Find author via his/her affiliation 
-# Two fields for filtering: affiliation_display_name first, and then affiliations_other
-# Note: "affiliations_other" can be a string or a vector of strings. So both cases shall be taken care of.
-# Note: Some Banner authors have affiliation of "University of Arizona" or alike. 
-#####################################################
-search_author <- function(author_name, affiliation_name) {
-  
-  ### Better matching with a vector of strings for UArizona. 
-  # 1st line: UArizona ID, ROR, title and so on on the first line
-  # 2nd line: Banner (increasing recall),  "I2802412784": Banner Health ID, "I4210124665": Banner - University Medical Center Tucson
-  # For Banner, with the 2nd line, the matching authors increased from 81 to 83 for year 2022. 
-  UArizona <- c("https://openalex.org/I138006243", "https://ror.org/03m2x1q45", "University of Arizona", "I138006243", 
-              "Banner", "I2802412784", "I4210124665")
-  
-  base_dir <- file.path("./", "output")
-  if (!dir.exists(base_dir)) {
-    dir.create(base_dir, recursive = TRUE)
-  }
-  log_file <- file.path(base_dir, paste0(author_name, ".log"))
-
-  #author_from_names <- oa_fetch(entity = "author", search = author_name)
-    
-  author_from_names <- tryCatch({
-    withCallingHandlers({
-      oa_fetch(entity = "author", search = author_name)
-    }, warning = function(w) {
-      # Handle and log the warning
-      wrn_msg <- paste0(Sys.time(), " search_author(), Warning: ", author_name, ": ", w$message, "\n")
-      cat(wrn_msg, file = log_file, append = TRUE)
-      invokeRestart("muffleWarning") # Prevent the warning from being printed to the console
-    })
-  }, error = function(e) {
-    # Handle and log the error
-    err_msg <- paste0(Sys.time(), " search_author(), Error: ", author_name, ": ", e$message, "\n")
-    cat(err_msg, file = log_file, append = TRUE)
-    message(err_msg) # Optionally display the error message in the console as well
-    return(NULL) # Return NULL to indicate the error condition
-  })
-  
-    # Check if any authors were retrieved
-    if (!is.null(author_from_names) && nrow(author_from_names) > 0) {
-      matches <- rep(FALSE, nrow(author_from_names))
-    
-      for (i in seq_len(nrow(author_from_names))) {
-        display_name_match <- FALSE
-        affiliations_other_match <- FALSE
-      
-      # Check primary affiliation only if the field exists
-      if (!is.na(author_from_names$affiliation_display_name[i]) &&
-          "affiliation_display_name" %in% names(author_from_names)) {
-        display_name_match <- any(sapply(UArizona, function(pattern) 
-          grepl(pattern, author_from_names$affiliation_display_name[i], ignore.case = TRUE)))
-        #display_name_match <- !is.na(author_from_names$affiliation_display_name[i]) && 
-         # any(sapply(UArizona, function(pattern) 
-          #  grepl(pattern, author_from_names$affiliation_display_name[i], ignore.case = TRUE)))
-      }
-    
-        if ("affiliations_other" %in% names(author_from_names) && 
-            !is.null(author_from_names$affiliations_other[[i]]) && 
-            length(author_from_names$affiliations_other[[i]]) > 0) {
-          affiliations_other_match <- any(sapply(author_from_names$affiliations_other[[i]], function(affiliation) {
-            any(sapply(UArizona, grepl, x = affiliation, ignore.case = TRUE))
-          }))
-        }
-      
-      matches[i] <- display_name_match | affiliations_other_match
-    }
-    
-    filtered_authors <- author_from_names[matches, ]
-    
-    if (nrow(filtered_authors) == 0) {
-      wrn_msg <- paste0(Sys.time(), " search_author() ", author_name, ": NOT found matching the given affiliation. \n")
-      cat (wrn_msg, file = log_file, append = TRUE)
-    } else {
-      return(filtered_authors)
-    }
-  } else {
-      wrn_msg <- paste0(Sys.time(), " search_author() ", author_name, ": NO data retrieved from OpenAlex's API. \n")
-      cat (wrn_msg, file = log_file, append = TRUE)
-      return(NULL)
-  }
-}
-
-# 2024-02-07: "Vivian Kominos" has no affiliation info at all
-author_name <- "Vivian Kominos"
-affiliation_name <- "University"
-author_from_names <- oa_fetch(entity = "author", search = author_name)
-UAresult1 <- search_author(author_name, affiliation_name)
-
 #####################################################
 # Function: Calculate works count
 #####################################################
@@ -219,7 +128,96 @@ calculate_works_count <- function(author_name, affiliation_name, year) {
   }
 }
 
+#####################################################
+# Function: Find author via his/her affiliation 
+# Two fields for filtering: affiliation_display_name first, and then affiliations_other
+# Note: "affiliations_other" can be a string or a vector of strings. So both cases shall be taken care of.
+# Note: Some Banner authors have affiliation of "University of Arizona" or alike. 
+#####################################################
+search_author <- function(author_name, affiliation_name) {
+  ### Better matching with a vector of strings for UArizona. 
+  # 1st line: UArizona ID, ROR, title and so on on the first line
+  # 2nd line: Banner (increasing recall),  "I2802412784": Banner Health ID, "I4210124665": Banner - University Medical Center Tucson
+  # For Banner, with the 2nd line, the matching authors increased from 81 to 83 for year 2022. 
+  UArizona <- c("https://openalex.org/I138006243", "https://ror.org/03m2x1q45", "University of Arizona", "I138006243", 
+              "Banner", "I2802412784", "I4210124665")
+  
+  base_dir <- file.path("./", "output")
+  if (!dir.exists(base_dir)) {
+    dir.create(base_dir, recursive = TRUE)
+  }
+  log_file <- file.path(base_dir, paste0(author_name, ".log"))
 
+  author_from_names <- tryCatch({
+    withCallingHandlers({
+      oa_fetch(entity = "author", search = author_name)
+    }, warning = function(w) {
+      # Handle and log the warning
+      wrn_msg <- paste0(Sys.time(), " search_author(), Warning: ", author_name, ": ", w$message, "\n")
+      cat(wrn_msg, file = log_file, append = TRUE)
+      invokeRestart("muffleWarning") # Prevent the warning from being printed to the console
+    })
+  }, error = function(e) {
+    # Handle and log the error
+    err_msg <- paste0(Sys.time(), " search_author(), Error: ", author_name, ": ", e$message, "\n")
+    cat(err_msg, file = log_file, append = TRUE)
+    message(err_msg) # Optionally display the error message in the console as well
+    return(NULL) # Return NULL to indicate the error condition
+  })
+  
+    # Check if any authors were retrieved
+    if (!is.null(author_from_names) && nrow(author_from_names) > 0) {
+      matches <- rep(FALSE, nrow(author_from_names))
+    
+      for (i in seq_len(nrow(author_from_names))) {
+        display_name_match <- FALSE
+        affiliations_other_match <- FALSE
+      
+      # Check primary affiliation only if the field exists
+      if (!is.na(author_from_names$affiliation_display_name[i]) &&
+          "affiliation_display_name" %in% names(author_from_names)) {
+        display_name_match <- any(sapply(UArizona, function(pattern) 
+          grepl(pattern, author_from_names$affiliation_display_name[i], ignore.case = TRUE)))
+      }
+    
+        if ("affiliations_other" %in% names(author_from_names) && 
+            !is.null(author_from_names$affiliations_other[[i]]) && 
+            length(author_from_names$affiliations_other[[i]]) > 0) {
+          affiliations_other_match <- any(sapply(author_from_names$affiliations_other[[i]], function(affiliation) {
+            any(sapply(UArizona, grepl, x = affiliation, ignore.case = TRUE))
+            
+          }))
+        }
+      
+      matches[i] <- display_name_match | affiliations_other_match
+    }
+    
+    filtered_authors <- author_from_names[matches, ]
+    
+    if (nrow(filtered_authors) == 0) {
+      wrn_msg <- paste0(Sys.time(), " search_author() ", author_name, ": NOT found matching the given affiliation. \n")
+      cat (wrn_msg, file = log_file, append = TRUE)
+    } else {
+      return(filtered_authors)
+    }
+  } else {
+      wrn_msg <- paste0(Sys.time(), " search_author() ", author_name, ": NO data retrieved from OpenAlex's API. \n")
+      cat (wrn_msg, file = log_file, append = TRUE)
+      return(NULL)
+  }
+}
+
+author_name <- "Jose Gonzalez"   # ? https://openalex.org/A5016903118
+
+affiliation_name <- "Banner"
+author_from_names_direct <- oa_fetch(entity = "author", search = author_name) #6429 matches. 
+author_from_names <- search_author(author_name, "Univesity of Arizona")
+
+# 2024-02-07: "Vivian Kominos" has no affiliation info at all
+author_name <- "Vivian Kominos"
+affiliation_name <- "University"
+author_from_names <- oa_fetch(entity = "author", search = author_name)
+UAresult1 <- search_author(author_name, affiliation_name)
 
 ##### Function: Get works from author ORCID and year
 get_works_from_orcid_by_year <- function(orcid, publication_year) {
@@ -356,7 +354,6 @@ get_dept_authors_names <- function(dept_code, affiliation_name) {
   return (dept_authors_names)
 }
 
-
 ###################################################################################
 ### Function: output author's works by its oa author_id and year. 
 ### It is necessary to do so, because this author_works df are very complex (a df of dfs)
@@ -383,22 +380,24 @@ output_works_by_authorid_by_year <- function(dept_code, author_name, author_id, 
   
   log_file <- file.path(base_dir, paste0(author_name, "_", year, ".log")) # Define log file path
   
-  ######## calling get_works_from_authorid_by_year() #####################
-  author_works <- get_works_from_authorid_by_year(dept_code, author_id, year)
+ ######## calling get_works_from_authorid_by_year() #####################
+ author_works <- get_works_from_authorid_by_year(dept_code, author_id, year)
   if (is.null(author_works) || length(author_works) == 0) {
     err_msg <- paste0(Sys.time(), " output_works_by_authorid_by_year() ", author_name,  " ", author_id,  " ", year, " NO works found!")
     cat(err_msg, file = log_file, append = TRUE)
     return(NULL)
   }
   
-  # Processing column "author" to get au_display_name only. 
+  # Processing column "author" to get au_display_name (then put it in a new col) and get affiliation (then put it into a new col)
   if(!is.null(author_works$author)) {
     #authors_names <- sapply(author_works$author, get_au_display_names, USE.NAMES = FALSE)
     author_works$authors_name <- lapply(author_works$author, get_au_display_name)
+    author_works$affiliation  <- lapply(author_works$author, get_au_affiliation_raw)
   } else { 
     # If author_works$author is NULL, handle accordingly
     author_works$authors_name <- "NA"
-    message("author_works$author is NULL. 'authors_name' column set to NA.")
+    author_works$authors_affiliation <- "NA"
+    message("author_works$author is NULL. 'authors_name' and 'authors_affiliation' column set to NA.")
   }
   
   ### Processing column "ids" to get PMID
@@ -425,7 +424,7 @@ output_works_by_authorid_by_year <- function(dept_code, author_name, author_id, 
   #  is_oa, is_oa_anywhere, oa_url, any_repository_has_fulltext, grants, cited_by_api_url, referenced_works, related_works, is_paratext, is_retracted) )
   
   # Define the columns 
-  desired_columns <- c("authors_name", "id", "display_name", "publication_date", "so", 
+  desired_columns <- c("authors_name", "authors_affiliation", "id", "display_name", "publication_date", "so", 
                        "host_organization", "url", "license", "version", "oa_status", "language", 
                        "cited_by_count", "publication_year", "pmid", "doi", "type")
   
@@ -447,7 +446,6 @@ output_works_by_authorid_by_year <- function(dept_code, author_name, author_id, 
   message("File '", full_path, "' has been created.")
 }
 
-
 #################### get author's display_name from "author" col #### 
 ### Para: author_info : col "author" from openAlex's works
 ### Return: author$au_display_name
@@ -460,6 +458,20 @@ get_au_display_name <- function(author_info) {
   } else {
     # Return NA if author_info is not a data frame or 'au_display_name' column is missing
     return("aaaa")
+  }
+}
+
+##################### get author's affiliation from "author" col ###
+### Para: author_info: col "author" from openAlex's works
+### Return: author$au_affiliation_raw
+get_au_affiliation_raw <- function(author_info) {
+  # Check if author_info is a data frame and contains the column
+  if (is.data.frame(author_info) && "au_affiliation_raw" %in% names(author_info)) {
+    names_concatenated <- paste(author_info$au_affiliation_raw, collapse = "; ")
+    return(names_concatenated)
+  } else {
+    # Return NA if author_info is not a data frame or 'c' column is missing
+    return("bbbbb")
   }
 }
 
@@ -492,7 +504,7 @@ output_works_by_authorid_by_year("test", "Keith A Joiner", "a5082148123", 2022)
 # Apply the function to each element in the list (assuming multiple data frames could be in the list)
 #authors_names <- sapply(author_works$author, get_au_display_names, USE.NAMES = FALSE)
 author_works$authors_name <- lapply(author_works$author, get_au_display_name)
-
+author_works$authors_affiliation <- lapply(author_works$author, get_au_affilation_raw)
 # Apply the function to each element in the 'pmid' list
 author_works$pmid <- lapply(author_works$ids, get_pmid)
 
