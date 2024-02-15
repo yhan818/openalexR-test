@@ -1,12 +1,12 @@
-2024-02-11 07:43:17 Author result affiliation:
-No affiliation found2024-02-11 07:43:17 Author result affiliation:
+2024-02-14 21:37:02 Author result affiliation:
+No affiliation found2024-02-14 21:37:03 Author result affiliation:
 structure(list(id = "https://openalex.org/A5031943208", display_name = "Kevin F. Moynahan", 
     display_name_alternatives = list(c("Kevin Francis Moynahan", 
-    "Kevin Moynahan", "Kevin F. Moynahan")), relevance_score = 3186.0222, 
+    "Kevin Moynahan", "Kevin F. Moynahan")), relevance_score = 3188.5046, 
     ids = list(c(openalex = "https://openalex.org/A5031943208")), 
-    orcid = NA, works_count = 15L, cited_by_count = 224L, counts_by_year = list(
+    orcid = NA, works_count = 15L, cited_by_count = 225L, counts_by_year = list(
         structure(list(year = 2024:2012, works_count = c(0L, 
-        1L, 0L, 0L, 1L, 3L, 1L, 0L, 2L, 0L, 2L, 0L, 1L), cited_by_count = c(32L, 
+        1L, 0L, 0L, 1L, 3L, 1L, 0L, 2L, 0L, 2L, 0L, 1L), cited_by_count = c(37L, 
         78L, 154L, 225L, 248L, 332L, 134L, 131L, 90L, 37L, 37L, 
         1L, 1L)), class = "data.frame", row.names = c(NA, -13L
         ))), affiliation_display_name = "University of Arizona", 

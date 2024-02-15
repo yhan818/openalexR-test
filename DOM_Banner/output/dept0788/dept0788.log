@@ -1,7 +1,7 @@
-2024-02-11 07:46:01 Author result affiliation:
+2024-02-14 21:37:16 Author result affiliation:
 structure(list(id = "https://openalex.org/A5019422724", display_name = "Lise Alschuler", 
     display_name_alternatives = list(c("Lise N. Alschuler", "Lise Alschuler", 
-    "L. Alschuler")), relevance_score = 1990.2379, ids = list(
+    "L. Alschuler")), relevance_score = 1999.1536, ids = list(
         c(openalex = "https://openalex.org/A5019422724")), orcid = NA_character_, 
     works_count = 24L, cited_by_count = 82L, counts_by_year = list(
         structure(list(year = c(2024L, 2023L, 2022L, 2021L, 2020L, 
@@ -33,10 +33,10 @@ structure(list(id = "https://openalex.org/A5019422724", display_name = "Lise Als
         33.3, 29.2, 25, 20.8)), class = "data.frame", row.names = c(NA, 
     -10L))), works_api_url = "https://api.openalex.org/works?filter=author.id:A5019422724"), row.names = c(NA, 
 -1L), class = c("tbl_df", "tbl", "data.frame"))
-2024-02-11 07:46:02 Author result affiliation:
+2024-02-14 21:37:17 Author result affiliation:
 structure(list(id = "https://openalex.org/A5084468343", display_name = "Ann Marie Chiasson", 
     display_name_alternatives = list(c("A Chiasson", "Ann Marie Chiasson", 
-    "Ann M. Chiasson")), relevance_score = 2205.7288, ids = list(
+    "Ann M. Chiasson")), relevance_score = 2208.5005, ids = list(
         c(openalex = "https://openalex.org/A5084468343", orcid = "https://orcid.org/0000-0002-8826-0370"
         )), orcid = "https://orcid.org/0000-0002-8826-0370", 
     works_count = 17L, cited_by_count = 107L, counts_by_year = list(
@@ -79,13 +79,13 @@ structure(list(id = "https://openalex.org/A5084468343", display_name = "Ann Mari
     23.5, 23.5, 23.5, 23.5, 23.5, 23.5, 23.5, 23.5)), class = "data.frame", row.names = c(NA, 
     -19L))), works_api_url = "https://api.openalex.org/works?filter=author.id:A5084468343"), row.names = c(NA, 
 -1L), class = c("tbl_df", "tbl", "data.frame"))
-2024-02-11 07:46:03 Author result affiliation:
+2024-02-14 21:37:18 Author result affiliation:
 structure(list(id = "https://openalex.org/A5033747542", display_name = "Robert Crocker", 
     display_name_alternatives = list(c("Robert L. Crocker", "R. Crocker", 
     "R. W. Crocker", "Robert Langdon Crocker", "R. L. Crocker", 
-    "Robert Crocker", "Robert W. Crocker")), relevance_score = 5925.283, 
+    "Robert Crocker", "Robert W. Crocker")), relevance_score = 5930.0703, 
     ids = list(c(openalex = "https://openalex.org/A5033747542")), 
-    orcid = NA, works_count = 163L, cited_by_count = 2164L, counts_by_year = list(
+    orcid = NA, works_count = 163L, cited_by_count = 2165L, counts_by_year = list(
         structure(list(year = 2024:2012, works_count = c(0L, 
         1L, 7L, 4L, 3L, 3L, 1L, 28L, 5L, 1L, 3L, 12L, 2L), cited_by_count = c(9L, 
         79L, 81L, 105L, 95L, 54L, 45L, 65L, 54L, 73L, 50L, 40L, 
@@ -118,14 +118,14 @@ structure(list(id = "https://openalex.org/A5033747542", display_name = "Robert C
     "Engineering", "Physics", "Botany", "Geology", "History", 
     "Organic chemistry", "Materials science", "Medicine", "Archaeology"
     ), level = c(0L, 1L, 0L, 0L, 0L, 0L, 0L, 1L, 0L, 0L, 1L, 
-    0L, 0L, 1L), score = c(61.3, 40.5, 37.4, 36.2, 35.6, 33.1, 
-    31.3, 28.8, 28.8, 26.4, 25.8, 25.2, 22.7, 22.7)), class = "data.frame", row.names = c(NA, 
+    0L, 0L, 1L), score = c(60.7, 40.5, 37.4, 36.2, 35.6, 33.1, 
+    31.3, 28.8, 28.2, 26.4, 25.8, 25.2, 22.7, 22.7)), class = "data.frame", row.names = c(NA, 
     -14L))), works_api_url = "https://api.openalex.org/works?filter=author.id:A5033747542"), row.names = c(NA, 
 -1L), class = c("tbl_df", "tbl", "data.frame"))
-2024-02-11 07:46:04 Author result affiliation:
+2024-02-14 21:37:19 Author result affiliation:
 structure(list(id = "https://openalex.org/A5007947694", display_name = "Randy Horwitz", 
     display_name_alternatives = list(c("R.J. Horwitz", "Randy J. Horwitz", 
-    "R. Horwitz", "Randy Horwitz")), relevance_score = 2988.163, 
+    "R. Horwitz", "Randy Horwitz")), relevance_score = 3000.9612, 
     ids = list(c(openalex = "https://openalex.org/A5007947694")), 
     orcid = NA, works_count = 43L, cited_by_count = 424L, counts_by_year = list(
         structure(list(year = 2024:2012, works_count = c(0L, 
@@ -169,15 +169,15 @@ structure(list(id = "https://openalex.org/A5007947694", display_name = "Randy Ho
         20.9)), class = "data.frame", row.names = c(NA, -18L))), 
     works_api_url = "https://api.openalex.org/works?filter=author.id:A5007947694"), row.names = c(NA, 
 -1L), class = c("tbl_df", "tbl", "data.frame"))
-2024-02-11 07:46:04 Author result affiliation:
+2024-02-14 21:37:20 Author result affiliation:
 structure(list(id = "https://openalex.org/A5057099910", display_name = "Victoria Maizes", 
     display_name_alternatives = list(c("Victoria H. Maizes", 
-    "V. Maizes", "Victoria Maizes")), relevance_score = 7087.9893, 
+    "V. Maizes", "Victoria Maizes")), relevance_score = 7061.5264, 
     ids = list(c(openalex = "https://openalex.org/A5057099910")), 
-    orcid = NA, works_count = 86L, cited_by_count = 1442L, counts_by_year = list(
+    orcid = NA, works_count = 86L, cited_by_count = 1444L, counts_by_year = list(
         structure(list(year = 2024:2012, works_count = c(0L, 
         0L, 3L, 5L, 5L, 2L, 6L, 3L, 2L, 10L, 5L, 5L, 6L), cited_by_count = c(13L, 
-        136L, 159L, 190L, 130L, 133L, 116L, 118L, 112L, 264L, 
+        137L, 159L, 190L, 130L, 133L, 116L, 118L, 112L, 264L, 
         158L, 110L, 133L)), class = "data.frame", row.names = c(NA, 
         -13L))), affiliation_display_name = "University of Arizona", 
     affiliation_id = "https://openalex.org/I138006243", affiliation_ror = "https://ror.org/03m2x1q45", 
@@ -213,15 +213,15 @@ structure(list(id = "https://openalex.org/A5057099910", display_name = "Victoria
     36, 36, 34.9, 34.9, 33.7, 30.2, 30.2, 29.1, 20.9)), class = "data.frame", row.names = c(NA, 
     -17L))), works_api_url = "https://api.openalex.org/works?filter=author.id:A5057099910"), row.names = c(NA, 
 -1L), class = c("tbl_df", "tbl", "data.frame"))
-2024-02-11 07:46:05 Author result affiliation:
+2024-02-14 21:37:20 Author result affiliation:
 structure(list(id = "https://openalex.org/A5078283465", display_name = "Esther M. Sternberg", 
     display_name_alternatives = list(c("E. M. Sternberg", "Esther Sternberg", 
-    "Esther M. Sternberg", "E. Sternberg")), relevance_score = 19908.629, 
+    "Esther M. Sternberg", "E. Sternberg")), relevance_score = 19886.082, 
     ids = list(c(openalex = "https://openalex.org/A5078283465", 
     orcid = "https://orcid.org/0000-0001-5867-3556")), orcid = "https://orcid.org/0000-0001-5867-3556", 
     works_count = 289L, cited_by_count = 12855L, counts_by_year = list(
         structure(list(year = 2024:2012, works_count = c(10L, 
-        3L, 2L, 3L, 1L, 5L, 6L, 3L, 4L, 5L, 4L, 5L, 4L), cited_by_count = c(109L, 
+        3L, 2L, 3L, 1L, 5L, 6L, 3L, 4L, 5L, 4L, 5L, 4L), cited_by_count = c(110L, 
         855L, 916L, 932L, 900L, 787L, 702L, 722L, 768L, 786L, 
         711L, 793L, 785L)), class = "data.frame", row.names = c(NA, 
         -13L))), affiliation_display_name = "University of Arizona", 
@@ -255,19 +255,19 @@ structure(list(id = "https://openalex.org/A5078283465", display_name = "Esther M
     "Neuroscience", "Receptor", "Pathology", "Immune system", 
     "Psychiatry", "Gene", "Computer science"), level = c(0L, 
     0L, 1L, 1L, 0L, 1L, 0L, 1L, 1L, 1L, 2L, 1L, 2L, 1L, 2L, 0L
-    ), score = c(91.7, 82.4, 70.6, 59.2, 58.8, 56.7, 53.3, 52.9, 
-    49.5, 35.3, 29.8, 28.7, 27.3, 26.3, 23.5, 21.8)), class = "data.frame", row.names = c(NA, 
+    ), score = c(91.3, 82.4, 70.6, 59.2, 58.8, 56.7, 53.3, 52.9, 
+    49.5, 35.3, 29.8, 28.7, 27.3, 26, 23.5, 21.8)), class = "data.frame", row.names = c(NA, 
     -16L))), works_api_url = "https://api.openalex.org/works?filter=author.id:A5078283465"), row.names = c(NA, 
 -1L), class = c("tbl_df", "tbl", "data.frame"))
-2024-02-11 07:46:06 Author result affiliation:
+2024-02-14 21:37:21 Author result affiliation:
 structure(list(id = c("https://openalex.org/A5002820631", "https://openalex.org/A5022146223"
 ), display_name = c("Andrew Weil", "Weil Andrew T"), display_name_alternatives = list(
     c("A. T. Weil", "Andrew T. Weil", "Andrew Weil", "A. Weil"
-    ), "Weil Andrew T"), relevance_score = c(6312.8843, 48.353783
+    ), "Weil Andrew T"), relevance_score = c(6343.624, 48.452698
 ), ids = list(c(openalex = "https://openalex.org/A5002820631", 
 orcid = "https://orcid.org/0000-0002-0377-7822"), c(openalex = "https://openalex.org/A5022146223")), 
     orcid = c("https://orcid.org/0000-0002-0377-7822", NA), works_count = c(163L, 
-    1L), cited_by_count = c(2410L, 0L), counts_by_year = list(
+    1L), cited_by_count = c(2411L, 0L), counts_by_year = list(
         structure(list(year = 2024:2012, works_count = c(0L, 
         0L, 3L, 4L, 4L, 3L, 6L, 3L, 0L, 3L, 3L, 0L, 5L), cited_by_count = c(7L, 
         100L, 118L, 156L, 107L, 97L, 73L, 71L, 83L, 155L, 122L, 
