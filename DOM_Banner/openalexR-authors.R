@@ -1,7 +1,7 @@
 ############# Author's search ##########
 ######## Author: Yan Han
 ######## Date: May 9, 2023
-######## Updated: Feb 3, 2024
+######## Updated: Feb 14, 2024
 ##### Search authors' publication using openAlex data ####
 # OpenAlex R Documentation: https://github.com/ropensci/openalexR
 # OpenAlex Beta explorer: https://explore.openalex.org/ (the explorer seems not to display all the possible researchers. In ohter words, You shall use API
@@ -207,11 +207,11 @@ search_author <- function(author_name, affiliation_name) {
   }
 }
 
-author_name <- "Jose Gonzalez"   # ? https://openalex.org/A5016903118
+#author_name <- "Jose Gonzalez"   # ? https://openalex.org/A5016903118
 
-affiliation_name <- "Banner"
-author_from_names_direct <- oa_fetch(entity = "author", search = author_name) #6429 matches. 
-author_from_names <- search_author(author_name, "Univesity of Arizona")
+#affiliation_name <- "Banner"
+#author_from_names_direct <- oa_fetch(entity = "author", search = author_name) #6429 matches. 
+#author_from_names <- search_author(author_name, "Univesity of Arizona")
 
 # 2024-02-07: "Vivian Kominos" has no affiliation info at all
 author_name <- "Vivian Kominos"
@@ -416,7 +416,7 @@ output_works_by_authorid_by_year <- function(dept_code, author_name, author_id, 
     mutate(across(everything(), ~replace_na(., "N/A")))
   
   # Make the col "authors_name" as the first column
-  author_works <- author_works %>% select(authors_name, everything())
+  author_works <- author_works %>% select(authors_name, affiliation, everything())
   
   
   # Exclude certain columns.
@@ -424,7 +424,7 @@ output_works_by_authorid_by_year <- function(dept_code, author_name, author_id, 
   #  is_oa, is_oa_anywhere, oa_url, any_repository_has_fulltext, grants, cited_by_api_url, referenced_works, related_works, is_paratext, is_retracted) )
   
   # Define the columns 
-  desired_columns <- c("authors_name", "authors_affiliation", "id", "display_name", "publication_date", "so", 
+  desired_columns <- c("authors_name", "affiliation", "id", "display_name", "publication_date", "so", 
                        "host_organization", "url", "license", "version", "oa_status", "language", 
                        "cited_by_count", "publication_year", "pmid", "doi", "type")
   
@@ -504,7 +504,7 @@ output_works_by_authorid_by_year("test", "Keith A Joiner", "a5082148123", 2022)
 # Apply the function to each element in the list (assuming multiple data frames could be in the list)
 #authors_names <- sapply(author_works$author, get_au_display_names, USE.NAMES = FALSE)
 author_works$authors_name <- lapply(author_works$author, get_au_display_name)
-author_works$authors_affiliation <- lapply(author_works$author, get_au_affilation_raw)
+author_works$authors_affiliation <- lapply(author_works$author, get_au_affiliation_raw)
 # Apply the function to each element in the 'pmid' list
 author_works$pmid <- lapply(author_works$ids, get_pmid)
 
@@ -612,6 +612,16 @@ affiliation_name <- "University"
 author_from_names <- oa_fetch(entity = "author", search = author_name)
 UAresult1 <- search_author(author_name, affiliation_name)
 
+### Error: 1 match. But I think the match was wrong. Geoffrey is with U.S. Renal care (did not find he is associated with UArizona or Banner) 
+### search_author() relies on openAlex data. 
+author_name <- "Geoffrey A. Block" # should be "Geoffrey D. Block" https://openalex.org/A5076006182  ?? 
+author_id <- "A5076006182"
+affiliation_name <- "University of Arizona or Banner"
+author_from_names <- oa_fetch(entity = "author", search = author_name)
+UAresult1 <- search_author(author_name, affiliation_name)
+output_works_by_authorid_by_year(dept_code, author_name, author_id, 2022)
+output_works_by_authorid_by_year(dept_code, author_name, author_id, 2023)
+
 ### These have no affiliation with "University". https://openalex.org/authors/a5019422724
 author_name <- "Lise Alschuler"  
 affiliation_name <- "University of Arizona"
@@ -652,13 +662,14 @@ dept_authors_names <- get_dept_authors_names(dept_name, affiliation_name)
 output_dept_author_works_by_year(dept_name, dept_authors_names, 2022)
 output_dept_author_works_by_year(dept_name, dept_authors_names, 2023)
 
-
+### 2024-02-14:
 ### dept0713: 49 matches (all except 1 not matched with Funk's list)
 ### 2022: 40 authors works found
 ### 2023: 42 authors found
 ### Rachana Shroff: 2023: 78 records: checked: ~70 DOIs issued for table, table s3. (Type as "article"). 
 # Similar cases like H.H. Sherry for American Association for Cancer Research (on figshare.com). The same publishing practice
-### 
+### Checked: Bekir Tariover, Bhaskar Banerjee, Janet Funk, Sairam Parthasarathy, Reubender Randhawa
+### Error: Bhaskar Banerjee https://arxiv.org/abs/2306.06717 (same name)
 dept_name <- "dept0713"
 dept_authors_names <- list()
 dept_authors_names <- get_dept_authors_names(dept_name, affiliation_name)
@@ -726,13 +737,18 @@ output_dept_author_works_by_year(dept_name, dept_authors_names, 2023)
 ### Affiliations: Using UArizona vector of string (not containing "Banner": found 83 authors' works. There are 148
 ### 
 ### 2022: Avin Aggarwal, Indu Partha, Saad Kubba, Olivia Hung (affiliation is Sarver Heart Center, UA, Banner?) Mathew Hutchinson (Mahesh Balakrishnan not in Funk's list) verified 
+### 2022: Hemanth K. Gavini,
 ### Not error: duplicated DOIs (Mathew Hutchinson 2023 works in both Pubmed and Wiley)
+### Error: 2022: Gefforey A. Block. >>> should be Gefforey D Block. 
 ### Error: 2022: Hong Seok Lee (same name): London: https://doi.org/10.1002/adma.202203310 https://doi.org/10.1002/adma.202270240
 ### Error: 2023: Hong Seok Lee (same name): Korea: https://pubs.acs.org/doi/10.1021/acssensors.2c01086 https://pubmed.ncbi.nlm.nih.gov/36798505
 ### Error: Jose Gonzalez: (reason?) 2023: https://doi.org/10.56470/978-9942-627-93-3 https://doi.org/10.1016/j.annonc.2023.10.013
 ### Error: data error: Sarah Tariq not in the arXiv's article metadata(https://doi.org/10.48550/arxiv.2306.07713), 
-### 2023: Abd Assalam Qannus, Akshay Amaraneni, Ernest Vina, Indu Partha, Lauren Estep, Olivia Hung, Sarah Tariq, Venkata Rokkam verified
 ### 
+### 2023: Verified:
+### Abd Assalam Qannus, Akshay Amaraneni, Ernest Vina, Indu Partha, Lauren Estep, Olivia Hung, Sarah Tariq, Venkata Rokkam, Sharad Khurana
+### 
+
 
 dept_name <- "dept_banner" 
 affiliation_name <- "Banner" 
