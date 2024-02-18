@@ -747,8 +747,9 @@ output_dept_author_works_by_year(dept_name, dept_authors_names, 2023)
 ### 
 ### 2023: Verified:
 ### Abd Assalam Qannus, Akshay Amaraneni, Ernest Vina, Indu Partha, Lauren Estep, Olivia Hung, Sarah Tariq, Venkata Rokkam, Sharad Khurana
-### 
-
+### 2024-02-17:
+### Error: https://openalex.org/W4214607846 (type: aritlce) "display_name" the same "so" = "image" and  https://openalex.org/W4221051350 (so = "treanscript" )
+### Error: https://openalex.org/W4206158552 and https://openalex.org/W4288786850 (display_name = "Contributors, type = book-chapter)
 
 dept_name <- "dept_banner" 
 affiliation_name <- "Banner" 
