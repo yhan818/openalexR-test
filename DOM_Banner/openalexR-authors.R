@@ -211,7 +211,7 @@ search_author <- function(author_name, affiliation_name) {
 
 #affiliation_name <- "Banner"
 #author_from_names_direct <- oa_fetch(entity = "author", search = author_name) #6429 matches. 
-#author_from_names <- search_author(author_name, "Univesity of Arizona")
+#author_from_names <- search_author(author_name, "University of Arizona")
 
 # 2024-02-07: "Vivian Kominos" has no affiliation info at all
 author_name <- "Vivian Kominos"
@@ -670,6 +670,8 @@ output_dept_author_works_by_year(dept_name, dept_authors_names, 2023)
 # Similar cases like H.H. Sherry for American Association for Cancer Research (on figshare.com). The same publishing practice
 ### Checked: Bekir Tariover, Bhaskar Banerjee, Janet Funk, Sairam Parthasarathy, Reubender Randhawa
 ### Error: Bhaskar Banerjee https://arxiv.org/abs/2306.06717 (same name)
+### 
+
 dept_name <- "dept0713"
 dept_authors_names <- list()
 dept_authors_names <- get_dept_authors_names(dept_name, affiliation_name)
@@ -834,7 +836,7 @@ works_from_orcids <- oa_fetch(
 
 
 ########################### Author matching criteria: 1) starting with ORCID; 2) using latest publication's affiliations 3) 
-#### July 2023:  Bekir affiliation shows "Columbia University", which is wrong. He (2009-2013) is at Columbia Univeristy, then he moved to UT Southwestern, and now he is at UA
+#### July 2023:  Bekir affiliation shows "Columbia University", which is wrong. He (2009-2013) is at Columbia University, then he moved to UT Southwestern, and now he is at UA
 #### Aug 11, 2023: Bekir affiliation shows "University of Arizona", which is correct now. 
 author_from_names <- oa_fetch(entity = "author", search = "Bekir Tanriover" )
 

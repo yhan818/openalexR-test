@@ -8,7 +8,7 @@ import pandas as pd
 
 # Define directory and output file
 directory = "./"
-output_file = "combined_data.xlsx"
+output_file = "all_works_in_one_sheet.xlsx"
 
 # Create an empty DataFrame
 combined_data = pd.DataFrame()

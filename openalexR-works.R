@@ -52,6 +52,14 @@ test_data_year <- c("2022", "2021", "2020", "2012")
 # Test works 
 works_from_dois <- oa_fetch(entity = "works", doi = c("https://doi.org/10.1093/ofid/ofac186", "https://doi.org/10.1007/s11192-013-1221-3"),  verbose = TRUE)
 
+### Testing three datasets citations recall and precision using one article (published in 2022)
+### OpenAlex: Precision 
+### OpenCitaitons: Precision 100%. Recall: 2/3 
+### Google scholar: Precision 100%. Recall 100%
+works_from_dois <- oa_fetch(entity = "works", doi = c("https://doi.org/10.6017/ital.v40i1.12553"),  verbose = TRUE)
+works_from_dois$cited_by_api_url
+works_from_dois$ids
+
 
 # To see is_oa field
 
