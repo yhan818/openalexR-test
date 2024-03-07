@@ -10,7 +10,7 @@ import zipfile
 
 # Specify the directory containing the Excel files and the output file name
 directory = './'
-output_file = 'combined_excel.xlsx'
+output_file = 'all_works_in_individual_sheet.xlsx'
 
 # Dictionary to hold filename and its corresponding sheet name (truncated if necessary)
 sheet_names = {}
