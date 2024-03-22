@@ -1,15 +1,15 @@
 
-***** 2024-03-19 12:55:06 
+***** 2024-03-21 19:20:48 
 Searched: Heather Froehlich : Author affiliation: University of Arizona
 NOT FOUND !!!
 
-***** 2024-03-19 12:55:06 
+***** 2024-03-21 19:20:49 
 Searched: Megan Senseney : Author affiliation: University of Arizona
 structure(list(id = "https://openalex.org/A5031860314", display_name = "Megan Senseney", 
     display_name_alternatives = list(c("Megan F. Senseney", "Megan Finn Senseney", 
     "Megan Senseney", "John Senseney", "Megan E. Finn", "Megan Elizabeth Finn", 
     "Megan Finn", "Megan F. Senseney", "Megan Finn Senseney")), 
-    relevance_score = 1991.3368, ids = list(c(openalex = "https://openalex.org/A5031860314", 
+    relevance_score = 1990.9401, ids = list(c(openalex = "https://openalex.org/A5031860314", 
     orcid = "https://orcid.org/0000-0003-0081-1666", scopus = "http://www.scopus.com/inward/authorDetails.url?authorID=55756514600&partnerID=MN8TOARS"
     )), orcid = "https://orcid.org/0000-0003-0081-1666", works_count = 43L, 
     cited_by_count = 94L, counts_by_year = list(structure(list(
@@ -57,11 +57,11 @@ structure(list(id = "https://openalex.org/A5031860314", display_name = "Megan Se
     -21L))), works_api_url = "https://api.openalex.org/works?filter=author.id:A5031860314"), row.names = c(NA, 
 -1L), class = c("tbl_df", "tbl", "data.frame"))
 
-***** 2024-03-19 12:55:07 
+***** 2024-03-21 19:20:49 
 Searched: Ellen Dubinsky : Author affiliation: University of Arizona
 structure(list(id = "https://openalex.org/A5002413850", display_name = "Ellen Dubinsky", 
     display_name_alternatives = list(c("Ellen K. Dubinsky", "Ellen Dubinsky", 
-    "E. K. Dubinsky", "Ellen K. Dubinsky")), relevance_score = 2155.5068, 
+    "E. K. Dubinsky", "Ellen K. Dubinsky")), relevance_score = 2121.1472, 
     ids = list(c(openalex = "https://openalex.org/A5002413850", 
     orcid = "https://orcid.org/0000-0002-2874-0284", scopus = "http://www.scopus.com/inward/authorDetails.url?authorID=35361684300&partnerID=MN8TOARS"
     )), orcid = "https://orcid.org/0000-0002-2874-0284", works_count = 139L, 
@@ -91,15 +91,15 @@ structure(list(id = "https://openalex.org/A5002413850", display_name = "Ellen Du
     -8L))), works_api_url = "https://api.openalex.org/works?filter=author.id:A5002413850"), row.names = c(NA, 
 -1L), class = c("tbl_df", "tbl", "data.frame"))
 
-***** 2024-03-19 12:55:08 
+***** 2024-03-21 19:20:50 
 Searched: Fernando Rios : Author affiliation: University of Arizona
 structure(list(id = c("https://openalex.org/A5027526343", "https://openalex.org/A5045598118"
 ), display_name = c("Fernando Rios", "Fernando Rios Avila"), 
     display_name_alternatives = list(c("F G Rios", "Jose Fernando Rios", 
     "F. Ríos", "J. Fernando Rios", "F. Rios", "Francisco Rios", 
     "Fernando Rios", "J. Fernando Rios"), c("F. Avila", "Fernando Avila", 
-    "Fernando Rios Avila", "Fernando Ávila")), relevance_score = c(2135.7244, 
-    1053.9653), ids = list(c(openalex = "https://openalex.org/A5027526343", 
+    "Fernando Rios Avila", "Fernando Ávila")), relevance_score = c(2125.9084, 
+    1047.7338), ids = list(c(openalex = "https://openalex.org/A5027526343", 
     orcid = "https://orcid.org/0000-0001-6262-3260", scopus = "http://www.scopus.com/inward/authorDetails.url?authorID=26221942800&partnerID=MN8TOARS"
     ), c(openalex = "https://openalex.org/A5045598118")), orcid = c("https://orcid.org/0000-0001-6262-3260", 
     NA), works_count = c(104L, 27L), cited_by_count = c(181L, 
@@ -167,16 +167,16 @@ structure(list(id = c("https://openalex.org/A5027526343", "https://openalex.org/
     )), row.names = c(NA, -2L), class = c("tbl_df", "tbl", "data.frame"
 ))
 
-***** 2024-03-19 12:55:08 
+***** 2024-03-21 19:20:50 
 Searched: Vicktoria Wilcox : Author affiliation: University of Arizona
 NOT FOUND !!!
 
-***** 2024-03-19 12:55:09 
+***** 2024-03-21 19:20:51 
 Searched: Anthony Sanchez : Author affiliation: University of Arizona
 structure(list(id = "https://openalex.org/A5032220440", display_name = "C. A. Sanchez", 
     display_name_alternatives = list(c("Charles A. Sanchez", 
     "Charles Sanchez", "C. A Sanchez", "Charles Anthony Sanchez", 
-    "Charles Sánchez", "C. A. Sanchez", "C Sánchez")), relevance_score = 3598.177, 
+    "Charles Sánchez", "C. A. Sanchez", "C Sánchez")), relevance_score = 3590.0789, 
     ids = list(c(openalex = "https://openalex.org/A5032220440")), 
     orcid = NA_character_, works_count = 161L, cited_by_count = 1950L, 
     counts_by_year = list(structure(list(year = 2024:2012, works_count = c(1L, 
@@ -232,11 +232,11 @@ structure(list(id = "https://openalex.org/A5032220440", display_name = "C. A. Sa
     works_api_url = "https://api.openalex.org/works?filter=author.id:A5032220440"), row.names = c(NA, 
 -1L), class = c("tbl_df", "tbl", "data.frame"))
 
-***** 2024-03-19 12:55:09 
+***** 2024-03-21 19:20:51 
 Searched: Kimberly Chapman : Author affiliation: University of Arizona
 structure(list(id = "https://openalex.org/A5078704068", display_name = "Kimberly Chapman", 
     display_name_alternatives = list(c("K. Chapman", "Kimberly B. Chapman", 
-    "Kimberly Chapman")), relevance_score = 1692.2589, ids = list(
+    "Kimberly Chapman")), relevance_score = 1687.3201, ids = list(
         c(openalex = "https://openalex.org/A5078704068")), orcid = NA_character_, 
     works_count = 22L, cited_by_count = 117L, counts_by_year = list(
         structure(list(year = 2024:2012, works_count = c(0L, 
@@ -275,12 +275,12 @@ structure(list(id = "https://openalex.org/A5078704068", display_name = "Kimberly
     works_api_url = "https://api.openalex.org/works?filter=author.id:A5078704068"), row.names = c(NA, 
 -1L), class = c("tbl_df", "tbl", "data.frame"))
 
-***** 2024-03-19 12:55:10 
+***** 2024-03-21 19:20:52 
 Searched: Jeffrey Oliver : Author affiliation: University of Arizona
 structure(list(id = "https://openalex.org/A5061875763", display_name = "Jeffrey C. Oliver", 
     display_name_alternatives = list(c("Jeffrey Catlin Oliver", 
     "Jack Oliver", "Jeffrey Oliver", "J. C. Oliver", "Jeffrey C. Oliver"
-    )), relevance_score = 5563.7725, ids = list(c(openalex = "https://openalex.org/A5061875763", 
+    )), relevance_score = 5552.763, ids = list(c(openalex = "https://openalex.org/A5061875763", 
     orcid = "https://orcid.org/0000-0003-2160-1086")), orcid = "https://orcid.org/0000-0003-2160-1086", 
     works_count = 61L, cited_by_count = 2039L, counts_by_year = list(
         structure(list(year = 2024:2012, works_count = c(0L, 
@@ -334,14 +334,14 @@ structure(list(id = "https://openalex.org/A5061875763", display_name = "Jeffrey 
     -25L))), works_api_url = "https://api.openalex.org/works?filter=author.id:A5061875763"), row.names = c(NA, 
 -1L), class = c("tbl_df", "tbl", "data.frame"))
 
-***** 2024-03-19 12:55:10 
+***** 2024-03-21 19:20:52 
 Searched: Jeffrey Oliver : Author affiliation: University of Arizona dept1705 Alana Varner : get_dept_authors_names() Warning:  Unknown or uninitialised column: `affiliation_display_name`. 
 
-***** 2024-03-19 12:55:11 
+***** 2024-03-21 19:20:53 
 Searched: Elizabeth Kline : Author affiliation: University of Arizona
 structure(list(id = "https://openalex.org/A5080033269", display_name = "Elizabeth Kline", 
     display_name_alternatives = list(c("E. K. Kline", "Elizabeth Kline", 
-    "E. Kline")), relevance_score = 3020.0098, ids = list(c(openalex = "https://openalex.org/A5080033269", 
+    "E. Kline")), relevance_score = 3009.397, ids = list(c(openalex = "https://openalex.org/A5080033269", 
     orcid = "https://orcid.org/0000-0001-6700-5445")), orcid = "https://orcid.org/0000-0001-6700-5445", 
     works_count = 27L, cited_by_count = 451L, counts_by_year = list(
         structure(list(year = 2023:2012, works_count = c(1L, 
@@ -381,7 +381,7 @@ structure(list(id = "https://openalex.org/A5080033269", display_name = "Elizabet
     -17L))), works_api_url = "https://api.openalex.org/works?filter=author.id:A5080033269"), row.names = c(NA, 
 -1L), class = c("tbl_df", "tbl", "data.frame"))
 
-***** 2024-03-19 12:55:14 
+***** 2024-03-21 19:20:56 
 Searched: Daniel Martin : Author affiliation: University of Arizona
 structure(list(id = c("https://openalex.org/A5078903553", "https://openalex.org/A5011535969", 
 "https://openalex.org/A5051794858"), display_name = c("Daniel M. Martin", 
@@ -392,8 +392,8 @@ structure(list(id = c("https://openalex.org/A5078903553", "https://openalex.org/
     "M. Daniel Dan Johnston", "M. Johnston", "M. D. Johnston", 
     "Martin D. Johnston"), c("Díez‐Martín José Luis", "D. Luis", 
     "Daniel De Luis", "D. De Luis", "D D J Luís", "Daniel Luís", 
-    "Daniel Luis")), relevance_score = c(2220.0063, 556.2609, 
-147.26964), ids = list(c(openalex = "https://openalex.org/A5078903553", 
+    "Daniel Luis")), relevance_score = c(2216.0483, 555.20264, 
+147.47505), ids = list(c(openalex = "https://openalex.org/A5078903553", 
 orcid = "https://orcid.org/0000-0001-7127-8761"), c(openalex = "https://openalex.org/A5011535969"), 
     c(openalex = "https://openalex.org/A5051794858")), orcid = c("https://orcid.org/0000-0001-7127-8761", 
 NA, NA), works_count = c(67L, 29L, 89L), cited_by_count = c(494L, 
@@ -405,7 +405,7 @@ NA, NA), works_count = c(67L, 29L, 89L), cited_by_count = c(494L,
 0L, 0L, 0L, 0L, 0L, 2L, 6L, 1L, 0L, 0L, 0L, 0L), cited_by_count = c(2L, 
 42L, 54L, 72L, 58L, 34L, 56L, 59L, 34L, 61L, 36L, 48L, 59L)), class = "data.frame", row.names = c(NA, 
 -13L)), structure(list(year = 2024:2012, works_count = c(3L, 
-7L, 4L, 17L, 5L, 6L, 5L, 0L, 2L, 3L, 3L, 1L, 8L), cited_by_count = c(17L, 
+7L, 4L, 17L, 5L, 6L, 5L, 0L, 2L, 3L, 3L, 1L, 8L), cited_by_count = c(18L, 
 71L, 78L, 42L, 26L, 13L, 10L, 14L, 12L, 31L, 18L, 18L, 26L)), class = "data.frame", row.names = c(NA, 
 -13L))), affiliation_display_name = c("Technical University of Darmstadt", 
 "Jet Propulsion Laboratory", "Hospital Clínico Universitario de Valladolid"
@@ -523,12 +523,12 @@ NA, NA), works_count = c(67L, 29L, 89L), cited_by_count = c(494L,
 )), row.names = c(NA, -3L), class = c("tbl_df", "tbl", "data.frame"
 ))
 
-***** 2024-03-19 12:55:19 
+***** 2024-03-21 19:21:01 
 Searched: Yan Han : Author affiliation: University of Arizona
 structure(list(id = "https://openalex.org/A5056855636", display_name = "Yan Han", 
     display_name_alternatives = list(c("Yan Han", "Y. Han", "Yan Long Han", 
     "Yan Hong Han", "Yu Han", "Han Y", "Yu Ting Han", "Han Yan"
-    )), relevance_score = 2232.43, ids = list(c(openalex = "https://openalex.org/A5056855636", 
+    )), relevance_score = 2219.9937, ids = list(c(openalex = "https://openalex.org/A5056855636", 
     orcid = "https://orcid.org/0000-0003-1293-8111")), orcid = "https://orcid.org/0000-0003-1293-8111", 
     works_count = 81L, cited_by_count = 397L, counts_by_year = list(
         structure(list(year = 2024:2012, works_count = c(0L, 
@@ -567,11 +567,11 @@ structure(list(id = "https://openalex.org/A5056855636", display_name = "Yan Han"
     -13L))), works_api_url = "https://api.openalex.org/works?filter=author.id:A5056855636"), row.names = c(NA, 
 -1L), class = c("tbl_df", "tbl", "data.frame"))
 
-***** 2024-03-19 12:55:20 
+***** 2024-03-21 19:21:01 
 Searched: Cheryl Casey : Author affiliation: University of Arizona
 structure(list(id = "https://openalex.org/A5091434366", display_name = "Cheryl Casey", 
     display_name_alternatives = list(c("Cheryl Anne Casey", "Cheryl Casey"
-    )), relevance_score = 2490.5718, ids = list(c(openalex = "https://openalex.org/A5091434366")), 
+    )), relevance_score = 2480.9185, ids = list(c(openalex = "https://openalex.org/A5091434366")), 
     orcid = NA_character_, works_count = 13L, cited_by_count = 260L, 
     counts_by_year = list(structure(list(year = c(2023L, 2022L, 
     2021L, 2020L, 2019L, 2018L, 2017L, 2015L, 2014L, 2013L, 2012L
@@ -611,11 +611,11 @@ structure(list(id = "https://openalex.org/A5091434366", display_name = "Cheryl C
         -16L))), works_api_url = "https://api.openalex.org/works?filter=author.id:A5091434366"), row.names = c(NA, 
 -1L), class = c("tbl_df", "tbl", "data.frame"))
 
-***** 2024-03-19 12:55:20 
+***** 2024-03-21 19:21:02 
 Searched: Niamh Wallace : Author affiliation: University of Arizona
 structure(list(id = "https://openalex.org/A5074958042", display_name = "Niamh Wallace", 
     display_name_alternatives = list(c("N. Wallace", "N P H Wallace", 
-    "Niamh Wallace")), relevance_score = 850.18915, ids = list(
+    "Niamh Wallace")), relevance_score = 847.77155, ids = list(
         c(openalex = "https://openalex.org/A5074958042")), orcid = NA, 
     works_count = 48L, cited_by_count = 21L, counts_by_year = list(
         structure(list(year = 2024:2014, works_count = c(0L, 
