@@ -1,45 +1,45 @@
 
-***** get_dept_authors_names() calling search_author():  2024-03-25 23:50:33 Francesco Serio  Author affiliation: University of Arizona 
+***** get_dept_authors_names() calling search_author():  2024-03-26 12:40:50 Francesco Serio  Author affiliation: University of Arizona 
 
-get_dept_authors_names(): logfile NOT FOUND !!!
+get_dept_authors_names(): search_author(author_name, affiliation_name) return NULL !!!
 
-***** get_dept_authors_names() calling search_author():  2024-03-25 23:50:33 Thomas Nicolai  Author affiliation: University of Arizona 
+***** get_dept_authors_names() calling search_author():  2024-03-26 12:40:51 Thomas Nicolai  Author affiliation: University of Arizona 
 
-get_dept_authors_names(): logfile NOT FOUND !!!
+get_dept_authors_names(): search_author(author_name, affiliation_name) return NULL !!!
 
-***** get_dept_authors_names() calling search_author():  2024-03-25 23:50:34 Stacey Erdman  Author affiliation: University of Arizona 
+***** get_dept_authors_names() calling search_author():  2024-03-26 12:40:52 Stacey Erdman  Author affiliation: University of Arizona 
 
-get_dept_authors_names(): logfile NOT FOUND !!!
+get_dept_authors_names(): search_author(author_name, affiliation_name) return NULL !!!
 
-***** get_dept_authors_names() calling search_author():  2024-03-25 23:50:34 Dana Lema  Author affiliation: University of Arizona 
+***** get_dept_authors_names() calling search_author():  2024-03-26 12:40:53 Dana Lema  Author affiliation: University of Arizona 
 
-get_dept_authors_names(): logfile NOT FOUND !!!
+get_dept_authors_names(): search_author(author_name, affiliation_name) return NULL !!!
 
-***** get_dept_authors_names() calling search_author():  2024-03-25 23:50:34 Nathan Wind  Author affiliation: University of Arizona 
+***** get_dept_authors_names() calling search_author():  2024-03-26 12:40:53 Nathan Wind  Author affiliation: University of Arizona 
 
-get_dept_authors_names(): logfile NOT FOUND !!!
+get_dept_authors_names(): search_author(author_name, affiliation_name) return NULL !!!
 
-***** get_dept_authors_names() calling search_author():  2024-03-25 23:50:35 Dru Smith  Author affiliation: University of Arizona 
+***** get_dept_authors_names() calling search_author():  2024-03-26 12:40:54 Dru Smith  Author affiliation: University of Arizona 
 
-get_dept_authors_names(): logfile NOT FOUND !!!
+get_dept_authors_names(): search_author(author_name, affiliation_name) return NULL !!!
 
-***** get_dept_authors_names() calling search_author():  2024-03-25 23:50:35 Hannah Caproon  Author affiliation: University of Arizona 
+***** get_dept_authors_names() calling search_author():  2024-03-26 12:40:54 Hannah Caproon  Author affiliation: University of Arizona 
 
-get_dept_authors_names(): logfile NOT FOUND !!!
+get_dept_authors_names(): search_author(author_name, affiliation_name) return NULL !!!
 
-***** get_dept_authors_names() calling search_author():  2024-03-25 23:50:35 Elizabeth Kominsky  Author affiliation: University of Arizona 
+***** get_dept_authors_names() calling search_author():  2024-03-26 12:40:54 Elizabeth Kominsky  Author affiliation: University of Arizona 
 
-get_dept_authors_names(): logfile NOT FOUND !!!
+get_dept_authors_names(): search_author(author_name, affiliation_name) return NULL !!!
 
-***** get_dept_authors_names() calling search_author():  2024-03-25 23:50:36 Daricus Larry  Author affiliation: University of Arizona 
+***** get_dept_authors_names() calling search_author():  2024-03-26 12:40:55 Daricus Larry  Author affiliation: University of Arizona 
 
-get_dept_authors_names(): logfile NOT FOUND !!!
+get_dept_authors_names(): search_author(author_name, affiliation_name) return NULL !!!
 
-***** get_dept_authors_names() calling search_author():  2024-03-25 23:50:36 Kacey Evilsizor  Author affiliation: University of Arizona 
+***** get_dept_authors_names() calling search_author():  2024-03-26 12:40:55 Kacey Evilsizor  Author affiliation: University of Arizona 
 
-get_dept_authors_names(): logfile NOT FOUND !!!
+get_dept_authors_names(): search_author(author_name, affiliation_name) return NULL !!!
 
-***** get_dept_authors_names() calling search_author():  2024-03-25 23:50:37 Elizabeth Miller  Author affiliation: University of Arizona 
+***** get_dept_authors_names() calling search_author():  2024-03-26 12:40:58 Elizabeth Miller  Author affiliation: University of Arizona 
 
 structure(list(id = c("https://openalex.org/A5021488636", "https://openalex.org/A5025038366", 
 "https://openalex.org/A5017626354", "https://openalex.org/A5073759773"
@@ -51,7 +51,7 @@ structure(list(id = c("https://openalex.org/A5021488636", "https://openalex.org/
     c("Kelly E. Miller", "K. E. Miller", "Kelly Elizabeth Miller", 
     "K Miller", "Kelly Miller", "Kelly E. Miller, Kelly Elizabeth Miller"
     ), c("Natalie Miller", "Natalie Elizabeth. Miller", "N. E. Miller"
-    )), relevance_score = c(5025.471, 2833.8154, 2510.252, 879.4397
+    )), relevance_score = c(5026.216, 2834.6628, 2510.674, 877.38257
 ), ids = list(c(openalex = "https://openalex.org/A5021488636", 
 orcid = "https://orcid.org/0000-0003-0371-0342"), c(openalex = "https://openalex.org/A5025038366", 
 orcid = "https://orcid.org/0000-0001-6856-3107", scopus = "http://www.scopus.com/inward/authorDetails.url?authorID=56007113400&partnerID=MN8TOARS"
@@ -65,7 +65,7 @@ NA), works_count = c(33L, 36L, 61L, 10L), cited_by_count = c(3798L,
     2L, 2L), cited_by_count = c(32L, 155L, 193L, 221L, 295L, 
     203L, 192L, 203L, 282L, 300L, 316L, 378L, 283L)), class = "data.frame", row.names = c(NA, 
 -13L)), structure(list(year = 2024:2012, works_count = c(0L, 
-8L, 1L, 7L, 3L, 4L, 3L, 3L, 1L, 0L, 1L, 1L, 1L), cited_by_count = c(47L, 
+8L, 1L, 7L, 3L, 4L, 3L, 3L, 1L, 0L, 1L, 1L, 1L), cited_by_count = c(48L, 
 172L, 162L, 91L, 95L, 56L, 31L, 7L, 3L, 2L, 4L, 0L, 0L)), class = "data.frame", row.names = c(NA, 
 -13L)), structure(list(year = 2024:2013, works_count = c(2L, 
 2L, 6L, 9L, 11L, 6L, 12L, 6L, 3L, 2L, 1L, 1L), cited_by_count = c(42L, 
@@ -237,23 +237,23 @@ NA), works_count = c(33L, 36L, 61L, 10L), cited_by_count = c(3798L,
     )), row.names = c(NA, -4L), class = c("tbl_df", "tbl", "data.frame"
 ))
 
-***** get_dept_authors_names() calling search_author():  2024-03-25 23:50:38 Eileen DeBellis  Author affiliation: University of Arizona 
+***** get_dept_authors_names() calling search_author():  2024-03-26 12:40:59 Eileen DeBellis  Author affiliation: University of Arizona 
 
-get_dept_authors_names(): logfile NOT FOUND !!!
+get_dept_authors_names(): search_author(author_name, affiliation_name) return NULL !!!
 
-***** get_dept_authors_names() calling search_author():  2024-03-25 23:50:38 Cheryl Schrader-Gerken  Author affiliation: University of Arizona 
+***** get_dept_authors_names() calling search_author():  2024-03-26 12:40:59 Cheryl Schrader-Gerken  Author affiliation: University of Arizona 
 
-get_dept_authors_names(): logfile NOT FOUND !!!
+get_dept_authors_names(): search_author(author_name, affiliation_name) return NULL !!!
 
-***** get_dept_authors_names() calling search_author():  2024-03-25 23:50:38 Sara Filion  Author affiliation: University of Arizona 
+***** get_dept_authors_names() calling search_author():  2024-03-26 12:41:00 Sara Filion  Author affiliation: University of Arizona 
 
-get_dept_authors_names(): logfile NOT FOUND !!!
+get_dept_authors_names(): search_author(author_name, affiliation_name) return NULL !!!
 
-***** get_dept_authors_names() calling search_author():  2024-03-25 23:50:39 Teresa Hazen  Author affiliation: University of Arizona 
+***** get_dept_authors_names() calling search_author():  2024-03-26 12:41:01 Teresa Hazen  Author affiliation: University of Arizona 
 
 structure(list(id = "https://openalex.org/A5048585808", display_name = "Teresa Hazen", 
     display_name_alternatives = list(c("Teresa Hazen", "Teresa C. Hazen", 
-    "T. Hazen")), relevance_score = 317.0084, ids = list(c(openalex = "https://openalex.org/A5048585808", 
+    "T. Hazen")), relevance_score = 317.0038, ids = list(c(openalex = "https://openalex.org/A5048585808", 
     orcid = "https://orcid.org/0000-0001-6132-5819")), orcid = "https://orcid.org/0000-0001-6132-5819", 
     works_count = 4L, cited_by_count = 1L, counts_by_year = list(
         structure(list(year = c(2023L, 2022L, 2020L, 2014L, 2012L
@@ -302,25 +302,25 @@ structure(list(id = "https://openalex.org/A5048585808", display_name = "Teresa H
     )), class = "data.frame", row.names = c(NA, -25L))), works_api_url = "https://api.openalex.org/works?filter=author.id:A5048585808"), row.names = c(NA, 
 -1L), class = c("tbl_df", "tbl", "data.frame"))
 
-***** get_dept_authors_names() calling search_author():  2024-03-25 23:50:39 Sharon Knowlton  Author affiliation: University of Arizona 
+***** get_dept_authors_names() calling search_author():  2024-03-26 12:41:01 Sharon Knowlton  Author affiliation: University of Arizona 
 
-get_dept_authors_names(): logfile NOT FOUND !!!
+get_dept_authors_names(): search_author(author_name, affiliation_name) return NULL !!!
 
-***** get_dept_authors_names() calling search_author():  2024-03-25 23:50:39 Lauren Washuk  Author affiliation: University of Arizona 
+***** get_dept_authors_names() calling search_author():  2024-03-26 12:41:02 Lauren Washuk  Author affiliation: University of Arizona 
 
-get_dept_authors_names(): logfile NOT FOUND !!!
+get_dept_authors_names(): search_author(author_name, affiliation_name) return NULL !!!
 
-***** get_dept_authors_names() calling search_author():  2024-03-25 23:50:40 Logan Dick  Author affiliation: University of Arizona 
+***** get_dept_authors_names() calling search_author():  2024-03-26 12:41:02 Logan Dick  Author affiliation: University of Arizona 
 
-get_dept_authors_names(): logfile NOT FOUND !!!
+get_dept_authors_names(): search_author(author_name, affiliation_name) return NULL !!!
 
-***** get_dept_authors_names() calling search_author():  2024-03-25 23:50:40 Cynthia Elliott  Author affiliation: University of Arizona 
+***** get_dept_authors_names() calling search_author():  2024-03-26 12:41:03 Cynthia Elliott  Author affiliation: University of Arizona 
 
 structure(list(id = c("https://openalex.org/A5077224399", "https://openalex.org/A5079703497"
 ), display_name = c("Cynthia Elliott", "Cynthia M Elliott"), 
     display_name_alternatives = list(c("C.R.N. Elliott", "Cynthia Elliott", 
-    "C. R. Elliott", "C. Elliott"), "Cynthia M Elliott"), relevance_score = c(1423.4583, 
-    183.45274), ids = list(c(openalex = "https://openalex.org/A5077224399"), 
+    "C. R. Elliott", "C. Elliott"), "Cynthia M Elliott"), relevance_score = c(1423.895, 
+    183.5209), ids = list(c(openalex = "https://openalex.org/A5077224399"), 
         c(openalex = "https://openalex.org/A5079703497")), orcid = c(NA_character_, 
     NA_character_), works_count = c(73L, 1L), cited_by_count = c(92L, 
     2L), counts_by_year = list(structure(list(year = 2024:2012, 
@@ -408,15 +408,15 @@ structure(list(id = c("https://openalex.org/A5077224399", "https://openalex.org/
     )), row.names = c(NA, -2L), class = c("tbl_df", "tbl", "data.frame"
 ))
 
-***** get_dept_authors_names() calling search_author():  2024-03-25 23:50:41 Melinda Jones  Author affiliation: University of Arizona 
+***** get_dept_authors_names() calling search_author():  2024-03-26 12:41:03 Melinda Jones  Author affiliation: University of Arizona 
 
-get_dept_authors_names(): logfile NOT FOUND !!!
+get_dept_authors_names(): search_author(author_name, affiliation_name) return NULL !!!
 
-***** get_dept_authors_names() calling search_author():  2024-03-25 23:50:42 Michael Mayer  Author affiliation: University of Arizona 
+***** get_dept_authors_names() calling search_author():  2024-03-26 12:41:04 Michael Mayer  Author affiliation: University of Arizona 
 
 structure(list(id = "https://openalex.org/A5063999350", display_name = "Michael Mayer", 
     display_name_alternatives = list(c("M. Mayer", "Michael E. Mayer", 
-    "Michael Mayer")), relevance_score = 1676.7725, ids = list(
+    "Michael Mayer")), relevance_score = 1677.1586, ids = list(
         c(openalex = "https://openalex.org/A5063999350")), orcid = NA_character_, 
     works_count = 36L, cited_by_count = 164L, counts_by_year = list(
         structure(list(year = c(2023L, 2022L, 2021L, 2020L, 2019L, 
@@ -470,6 +470,6 @@ structure(list(id = "https://openalex.org/A5063999350", display_name = "Michael 
     -25L))), works_api_url = "https://api.openalex.org/works?filter=author.id:A5063999350"), row.names = c(NA, 
 -1L), class = c("tbl_df", "tbl", "data.frame"))
 
-***** get_dept_authors_names() calling search_author():  2024-03-25 23:50:42 Lynne Carmody  Author affiliation: University of Arizona 
+***** get_dept_authors_names() calling search_author():  2024-03-26 12:41:05 Lynne Carmody  Author affiliation: University of Arizona 
 
-get_dept_authors_names(): logfile NOT FOUND !!!
+get_dept_authors_names(): search_author(author_name, affiliation_name) return NULL !!!

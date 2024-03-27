@@ -1,0 +1,6 @@
+2024-03-21 16:33:47get_works_from_authorid_by_year(), Error: a5016874418in 2023lexical error: invalid char in json text.
+                                       <!doctype html> <html lang=en> 
+                     (right here) ------^
+2024-03-21 16:34:36get_works_from_authorid_by_year(), Error: a5016874418in 2023lexical error: invalid char in json text.
+                                       <!doctype html> <html lang=en> 
+                     (right here) ------^
