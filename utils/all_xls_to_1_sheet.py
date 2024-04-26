@@ -1,4 +1,5 @@
-## Combine all the excel sheet into one 
+## This program combines all the individual Excels (each excel has one sheet) into one Excel  
+##  
 ## Tested: each excel contains one sheet
 ## Author: Yan Han
 ## Date: 2024-02-14

@@ -1,7 +1,7 @@
-## Combine all the excel sheet into one 
+## Combine all the Excel files (each Excel has one sheet) into one Excel (whose each tab is the individual Excel File)
 ## Tested: each excel contains one sheet for Banner. 160 sheets in one Excel
 ## Author: Yan Han
-## Date: 2024-02-14
+## Date: 2024-04-15
 
 import pandas as pd
 import os
