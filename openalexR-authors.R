@@ -165,7 +165,7 @@ calculate_works_count <- function(author_name, affiliation_name, year) {
 #####################################################
 search_author <- function(author_name, affiliation_name) {
   ### Better matching with a vector of strings for aff_patterns 
-  # 1st line: aff_patterns ID, ROR, title and so on on the first line
+  # 1st line: aff_patterns ID, ROR, title and so on on the first line: University of Arizona. https://openalex.org/I138006243
   # 2nd line: Banner (increasing recall),  "I2802412784": Banner Health ID, "I4210124665": Banner - University Medical Center Tucson
   # For Banner, with the 2nd line, the matching authors increased from 81 to 83 for year 2022. 
   
@@ -316,7 +316,7 @@ author_id <- "a5016874418"
 # working
 author<- oa_fetch(entity = "authors", identifier = author_id,  verbose = TRUE)
 # Not working "author.ids" is not a valid field
-author<- oa_fetch(entity = "authors", author.id = author_id,  verbose = TRUE)
+# author<- oa_fetch(entity = "authors", author.id = author_id,  verbose = TRUE)
 # Not working "identifier" 
 work <- oa_fetch(entity = "works",  
          author.id = author_id, 
@@ -735,9 +735,9 @@ UAresult1 <- search_author(author_name, affiliation_name)
 affiliation_name <- "Unversity of Arizona"
 year <- 2022
 
-### 2024-03: For UA Libraries
+### 2024-04: For UA Libraries
 
-### Veried by author: 
+### Verified by author: 
 # 2023: Wrong author: 
 # 1. Jack Oliver: https://doi.org/10.21203/rs.3.rs-3367979/v1 (Reason: authors_name as Jeffrey C. Oliver) 
 # 2. Mary Feeney: https://openalex.org/authors/A5051274338 (Reason: Two persons, same name: there is the same-name author in ASU.
@@ -758,8 +758,7 @@ year <- 2022
 # Jennifer Martin: https://api.openalex.org/works/W4310749693
 # 
 
-
-
+  
 #### Special handling of authors whose affiliations are not UArizona (because of their last publications were in their last positions)
 author_id <-"a5079884839"  # Jennifer Church-Duran
 publication_year <- "2022" 
@@ -784,6 +783,11 @@ author_id <- "a5004453378"
 author_test <- get_au_from_authorid(author_id )
 author_test$affiliations_other
 output_works_by_authorid_by_year(dept_code, author_name, author_id, 2023)
+
+# Michael Brewer https://openalex.org/A5009411264
+# Michael Brewer https://openalex.org/A5047553232
+# Michael Brewer https://openalex.org/A5081779788
+
 
 # Note: 
 ## 1. Staff generally do not have publications. By including them in the search, it reduces precision due to matching errors.
