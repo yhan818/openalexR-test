@@ -1,74 +1,75 @@
 
-***** 2024-03-22 12:04:14 
-Searched: Heather Froehlich : Author affiliation: University of Arizona
-NOT FOUND !!!
+***** get_dept_authors_names() calling search_author():  2024-04-02 15:02:37 Heather Froehlich  Author affiliation: University of Arizona 
 
-***** 2024-03-22 12:04:15 
-Searched: Megan Senseney : Author affiliation: University of Arizona
+get_dept_authors_names(): logfile NOT FOUND !!!
+
+***** get_dept_authors_names() calling search_author():  2024-04-02 15:02:37 Megan Senseney  Author affiliation: University of Arizona 
+
 structure(list(id = "https://openalex.org/A5031860314", display_name = "Megan Senseney", 
     display_name_alternatives = list(c("Megan F. Senseney", "Megan Finn Senseney", 
     "Megan Senseney", "John Senseney", "Megan E. Finn", "Megan Elizabeth Finn", 
     "Megan Finn", "Megan F. Senseney", "Megan Finn Senseney")), 
-    relevance_score = 1993.4004, ids = list(c(openalex = "https://openalex.org/A5031860314", 
+    relevance_score = 2001.0513, ids = list(c(openalex = "https://openalex.org/A5031860314", 
     orcid = "https://orcid.org/0000-0003-0081-1666", scopus = "http://www.scopus.com/inward/authorDetails.url?authorID=55756514600&partnerID=MN8TOARS"
     )), orcid = "https://orcid.org/0000-0003-0081-1666", works_count = 43L, 
-    cited_by_count = 94L, counts_by_year = list(structure(list(
+    cited_by_count = 95L, counts_by_year = list(structure(list(
         year = 2023:2012, works_count = c(0L, 0L, 1L, 0L, 3L, 
         8L, 6L, 5L, 5L, 4L, 6L, 4L), cited_by_count = c(8L, 12L, 
-        7L, 45L, 4L, 5L, 7L, 10L, 6L, 8L, 1L, 0L)), class = "data.frame", row.names = c(NA, 
+        7L, 79L, 4L, 5L, 7L, 10L, 6L, 8L, 1L, 0L)), class = "data.frame", row.names = c(NA, 
     -12L))), affiliation_display_name = "University of Arizona", 
     affiliation_id = "https://openalex.org/I138006243", affiliation_ror = "https://ror.org/03m2x1q45", 
     affiliation_country_code = "US", affiliation_type = "education", 
     affiliation_lineage = "https://openalex.org/I138006243, https://openalex.org/I3132585960", 
     affiliations_other = list(c("https://openalex.org/I4210166658", 
-    "https://openalex.org/I157725225", "https://openalex.org/I2801919071", 
-    "https://openalex.org/I102502594")), x_concepts = list(structure(list(
-        id = c("https://openalex.org/C41008148", "https://openalex.org/C136764020", 
-        "https://openalex.org/C17744445", "https://openalex.org/C199539241", 
-        "https://openalex.org/C161191863", "https://openalex.org/C142362112", 
-        "https://openalex.org/C2522767166", "https://openalex.org/C138885662", 
-        "https://openalex.org/C144024400", "https://openalex.org/C124952713", 
-        "https://openalex.org/C162324750", "https://openalex.org/C15708023", 
-        "https://openalex.org/C205649164", "https://openalex.org/C144133560", 
-        "https://openalex.org/C151719136", "https://openalex.org/C50522688", 
-        "https://openalex.org/C95457728", "https://openalex.org/C111919701", 
-        "https://openalex.org/C127413603", "https://openalex.org/C23123220", 
-        "https://openalex.org/C29595303"), wikidata = c("https://www.wikidata.org/wiki/Q21198", 
-        "https://www.wikidata.org/wiki/Q466", "https://www.wikidata.org/wiki/Q36442", 
-        "https://www.wikidata.org/wiki/Q7748", "https://www.wikidata.org/wiki/Q199655", 
-        "https://www.wikidata.org/wiki/Q735", "https://www.wikidata.org/wiki/Q2374463", 
-        "https://www.wikidata.org/wiki/Q5891", "https://www.wikidata.org/wiki/Q21201", 
-        "https://www.wikidata.org/wiki/Q8242", "https://www.wikidata.org/wiki/Q8134", 
-        "https://www.wikidata.org/wiki/Q80083", "https://www.wikidata.org/wiki/Q1071", 
-        "https://www.wikidata.org/wiki/Q4830453", "https://www.wikidata.org/wiki/Q3972943", 
-        "https://www.wikidata.org/wiki/Q189833", "https://www.wikidata.org/wiki/Q309", 
-        "https://www.wikidata.org/wiki/Q9135", "https://www.wikidata.org/wiki/Q11023", 
-        "https://www.wikidata.org/wiki/Q816826", "https://www.wikidata.org/wiki/Q165650"
-        ), display_name = c("Computer science", "World Wide Web", 
-        "Political science", "Law", "Library science", "Art", 
-        "Data science", "Philosophy", "Sociology", "Literature", 
-        "Economics", "Humanities", "Geography", "Business", "Publishing", 
-        "Economic growth", "History", "Operating system", "Engineering", 
-        "Information retrieval", "Media studies"), level = c(0L, 
-        1L, 0L, 1L, 1L, 0L, 1L, 0L, 0L, 1L, 0L, 1L, 0L, 0L, 2L, 
-        1L, 0L, 1L, 0L, 1L, 1L), score = c(97.7, 69.8, 62.8, 
-        55.8, 53.5, 51.2, 51.2, 46.5, 37.2, 32.6, 32.6, 30.2, 
-        30.2, 27.9, 25.6, 23.3, 23.3, 23.3, 23.3, 20.9, 20.9)), class = "data.frame", row.names = c(NA, 
+    "https://openalex.org/I157725225", "https://openalex.org/I4210088018", 
+    "https://openalex.org/I4210119109", "https://openalex.org/I19391748", 
+    "https://openalex.org/I2801919071", "https://openalex.org/I102502594"
+    )), x_concepts = list(structure(list(id = c("https://openalex.org/C41008148", 
+    "https://openalex.org/C136764020", "https://openalex.org/C17744445", 
+    "https://openalex.org/C199539241", "https://openalex.org/C161191863", 
+    "https://openalex.org/C142362112", "https://openalex.org/C2522767166", 
+    "https://openalex.org/C138885662", "https://openalex.org/C144024400", 
+    "https://openalex.org/C124952713", "https://openalex.org/C162324750", 
+    "https://openalex.org/C15708023", "https://openalex.org/C205649164", 
+    "https://openalex.org/C144133560", "https://openalex.org/C151719136", 
+    "https://openalex.org/C50522688", "https://openalex.org/C95457728", 
+    "https://openalex.org/C111919701", "https://openalex.org/C127413603", 
+    "https://openalex.org/C23123220", "https://openalex.org/C29595303"
+    ), wikidata = c("https://www.wikidata.org/wiki/Q21198", "https://www.wikidata.org/wiki/Q466", 
+    "https://www.wikidata.org/wiki/Q36442", "https://www.wikidata.org/wiki/Q7748", 
+    "https://www.wikidata.org/wiki/Q199655", "https://www.wikidata.org/wiki/Q735", 
+    "https://www.wikidata.org/wiki/Q2374463", "https://www.wikidata.org/wiki/Q5891", 
+    "https://www.wikidata.org/wiki/Q21201", "https://www.wikidata.org/wiki/Q8242", 
+    "https://www.wikidata.org/wiki/Q8134", "https://www.wikidata.org/wiki/Q80083", 
+    "https://www.wikidata.org/wiki/Q1071", "https://www.wikidata.org/wiki/Q4830453", 
+    "https://www.wikidata.org/wiki/Q3972943", "https://www.wikidata.org/wiki/Q189833", 
+    "https://www.wikidata.org/wiki/Q309", "https://www.wikidata.org/wiki/Q9135", 
+    "https://www.wikidata.org/wiki/Q11023", "https://www.wikidata.org/wiki/Q816826", 
+    "https://www.wikidata.org/wiki/Q165650"), display_name = c("Computer science", 
+    "World Wide Web", "Political science", "Law", "Library science", 
+    "Art", "Data science", "Philosophy", "Sociology", "Literature", 
+    "Economics", "Humanities", "Geography", "Business", "Publishing", 
+    "Economic growth", "History", "Operating system", "Engineering", 
+    "Information retrieval", "Media studies"), level = c(0L, 
+    1L, 0L, 1L, 1L, 0L, 1L, 0L, 0L, 1L, 0L, 1L, 0L, 0L, 2L, 1L, 
+    0L, 1L, 0L, 1L, 1L), score = c(97.7, 69.8, 62.8, 55.8, 53.5, 
+    51.2, 51.2, 46.5, 37.2, 32.6, 32.6, 30.2, 30.2, 27.9, 25.6, 
+    23.3, 23.3, 23.3, 23.3, 20.9, 20.9)), class = "data.frame", row.names = c(NA, 
     -21L))), works_api_url = "https://api.openalex.org/works?filter=author.id:A5031860314"), row.names = c(NA, 
 -1L), class = c("tbl_df", "tbl", "data.frame"))
 
-***** 2024-03-22 12:04:15 
-Searched: Ellen Dubinsky : Author affiliation: University of Arizona
+***** get_dept_authors_names() calling search_author():  2024-04-02 15:02:38 Ellen Dubinsky  Author affiliation: University of Arizona 
+
 structure(list(id = "https://openalex.org/A5002413850", display_name = "Ellen Dubinsky", 
     display_name_alternatives = list(c("Ellen K. Dubinsky", "Ellen Dubinsky", 
-    "E. K. Dubinsky", "Ellen K. Dubinsky")), relevance_score = 2124.4893, 
+    "E. K. Dubinsky", "Ellen K. Dubinsky")), relevance_score = 2133.013, 
     ids = list(c(openalex = "https://openalex.org/A5002413850", 
     orcid = "https://orcid.org/0000-0002-2874-0284", scopus = "http://www.scopus.com/inward/authorDetails.url?authorID=35361684300&partnerID=MN8TOARS"
     )), orcid = "https://orcid.org/0000-0002-2874-0284", works_count = 139L, 
-    cited_by_count = 136L, counts_by_year = list(structure(list(
+    cited_by_count = 137L, counts_by_year = list(structure(list(
         year = 2023:2012, works_count = c(1L, 1L, 1L, 6L, 14L, 
         2L, 40L, 1L, 22L, 9L, 7L, 6L), cited_by_count = c(7L, 
-        10L, 6L, 7L, 20L, 15L, 12L, 8L, 17L, 11L, 12L, 6L)), class = "data.frame", row.names = c(NA, 
+        10L, 7L, 7L, 20L, 15L, 12L, 8L, 17L, 11L, 12L, 6L)), class = "data.frame", row.names = c(NA, 
     -12L))), affiliation_display_name = "Arizona Department of Libraries, Archives and Public Records", 
     affiliation_id = "https://openalex.org/I4210166658", affiliation_ror = "https://ror.org/02sv7b189", 
     affiliation_country_code = "US", affiliation_type = "archive", 
@@ -91,25 +92,24 @@ structure(list(id = "https://openalex.org/A5002413850", display_name = "Ellen Du
     -8L))), works_api_url = "https://api.openalex.org/works?filter=author.id:A5002413850"), row.names = c(NA, 
 -1L), class = c("tbl_df", "tbl", "data.frame"))
 
-***** 2024-03-22 12:04:16 
-Searched: Fernando Rios : Author affiliation: University of Arizona
+***** get_dept_authors_names() calling search_author():  2024-04-02 15:02:39 Fernando Rios  Author affiliation: University of Arizona 
+
 structure(list(id = c("https://openalex.org/A5027526343", "https://openalex.org/A5045598118"
 ), display_name = c("Fernando Rios", "Fernando Rios Avila"), 
-    display_name_alternatives = list(c("F G Rios", "Jose Fernando Rios", 
-    "F. Ríos", "J. Fernando Rios", "F. Rios", "Francisco Rios", 
-    "Fernando Rios", "J. Fernando Rios"), c("F. Avila", "Fernando Avila", 
-    "Fernando Rios Avila", "Fernando Ávila")), relevance_score = c(2126.769, 
-    1048.2937), ids = list(c(openalex = "https://openalex.org/A5027526343", 
-    orcid = "https://orcid.org/0000-0001-6262-3260", scopus = "http://www.scopus.com/inward/authorDetails.url?authorID=26221942800&partnerID=MN8TOARS"
-    ), c(openalex = "https://openalex.org/A5045598118")), orcid = c("https://orcid.org/0000-0001-6262-3260", 
-    NA), works_count = c(104L, 27L), cited_by_count = c(181L, 
-    63L), counts_by_year = list(structure(list(year = 2024:2012, 
-        works_count = c(0L, 0L, 2L, 8L, 9L, 17L, 18L, 28L, 9L, 
-        1L, 1L, 3L, 0L), cited_by_count = c(3L, 28L, 32L, 25L, 
+    display_name_alternatives = list(c("Fernando Rios", "J. Fernando Rios", 
+    "F. Rios", "F. Ríos", "F G Rios", "Francisco Rios", "Jose Fernando Rios"
+    ), c("F. Avila", "Fernando Avila", "Fernando Rios Avila", 
+    "Fernando Ávila")), relevance_score = c(2116.6963, 1064.5936
+    ), ids = list(c(openalex = "https://openalex.org/A5027526343"), 
+        c(openalex = "https://openalex.org/A5045598118")), orcid = c(NA_character_, 
+    NA_character_), works_count = c(104L, 27L), cited_by_count = c(188L, 
+    65L), counts_by_year = list(structure(list(year = 2024:2012, 
+        works_count = c(1L, 0L, 2L, 8L, 9L, 17L, 18L, 28L, 9L, 
+        1L, 1L, 3L, 0L), cited_by_count = c(5L, 29L, 34L, 30L, 
         22L, 17L, 9L, 12L, 16L, 10L, 6L, 8L, 2L)), class = "data.frame", row.names = c(NA, 
     -13L)), structure(list(year = 2024:2012, works_count = c(1L, 
     2L, 1L, 3L, 2L, 2L, 2L, 1L, 1L, 1L, 0L, 3L, 0L), cited_by_count = c(2L, 
-    5L, 3L, 1L, 4L, 0L, 5L, 0L, 1L, 9L, 10L, 6L, 1L)), class = "data.frame", row.names = c(NA, 
+    6L, 4L, 1L, 4L, 0L, 5L, 0L, 1L, 9L, 10L, 6L, 1L)), class = "data.frame", row.names = c(NA, 
     -13L))), affiliation_display_name = c("Scripps Clinic", "Levy Economics Institute of Bard College"
     ), affiliation_id = c("https://openalex.org/I4210146328", 
     "https://openalex.org/I52700163"), affiliation_ror = c("https://ror.org/05kwjwj05", 
@@ -137,7 +137,7 @@ structure(list(id = c("https://openalex.org/A5027526343", "https://openalex.org/
     "Engineering", "Physics", "Operating system", "Geography", 
     "Programming language", "Geology", "Biology", "Business"), 
         level = c(0L, 0L, 0L, 1L, 0L, 1L, 0L, 0L, 0L), score = c(77.9, 
-        45.2, 34.6, 31.7, 29.8, 28.8, 23.1, 22.1, 21.2)), class = "data.frame", row.names = c(NA, 
+        45.2, 35.6, 31.7, 29.8, 28.8, 23.1, 22.1, 21.2)), class = "data.frame", row.names = c(NA, 
     -9L)), structure(list(id = c("https://openalex.org/C162324750", 
     "https://openalex.org/C33923547", "https://openalex.org/C105795698", 
     "https://openalex.org/C41008148", "https://openalex.org/C149782125", 
@@ -167,22 +167,22 @@ structure(list(id = c("https://openalex.org/A5027526343", "https://openalex.org/
     )), row.names = c(NA, -2L), class = c("tbl_df", "tbl", "data.frame"
 ))
 
-***** 2024-03-22 12:04:16 
-Searched: Vicktoria Wilcox : Author affiliation: University of Arizona
-NOT FOUND !!!
+***** get_dept_authors_names() calling search_author():  2024-04-02 15:02:40 Vicktoria Wilcox  Author affiliation: University of Arizona 
 
-***** 2024-03-22 12:04:17 
-Searched: Anthony Sanchez : Author affiliation: University of Arizona
+get_dept_authors_names(): logfile NOT FOUND !!!
+
+***** get_dept_authors_names() calling search_author():  2024-04-02 15:02:41 Anthony Sanchez  Author affiliation: University of Arizona 
+
 structure(list(id = "https://openalex.org/A5032220440", display_name = "C. A. Sanchez", 
     display_name_alternatives = list(c("Charles A. Sanchez", 
     "Charles Sanchez", "C. A Sanchez", "Charles Anthony Sanchez", 
-    "Charles Sánchez", "C. A. Sanchez", "C Sánchez")), relevance_score = 3590.9143, 
+    "Charles Sánchez", "C. A. Sanchez", "C Sánchez")), relevance_score = 3594.04, 
     ids = list(c(openalex = "https://openalex.org/A5032220440")), 
-    orcid = NA_character_, works_count = 161L, cited_by_count = 1950L, 
+    orcid = NA_character_, works_count = 161L, cited_by_count = 1951L, 
     counts_by_year = list(structure(list(year = 2024:2012, works_count = c(1L, 
-    7L, 5L, 1L, 3L, 0L, 3L, 2L, 2L, 1L, 7L, 2L, 3L), cited_by_count = c(47L, 
-    196L, 210L, 204L, 259L, 191L, 173L, 212L, 227L, 289L, 243L, 
-    231L, 148L)), class = "data.frame", row.names = c(NA, -13L
+    7L, 5L, 1L, 3L, 0L, 3L, 2L, 2L, 1L, 7L, 2L, 3L), cited_by_count = c(52L, 
+    200L, 217L, 211L, 273L, 197L, 180L, 218L, 230L, 291L, 255L, 
+    238L, 156L)), class = "data.frame", row.names = c(NA, -13L
     ))), affiliation_display_name = "University of Arizona", 
     affiliation_id = "https://openalex.org/I138006243", affiliation_ror = "https://ror.org/03m2x1q45", 
     affiliation_country_code = "US", affiliation_type = "education", 
@@ -190,8 +190,8 @@ structure(list(id = "https://openalex.org/A5032220440", display_name = "C. A. Sa
     affiliations_other = list(c("https://openalex.org/I4210125289", 
     "https://openalex.org/I2800874793", "https://openalex.org/I4210144272", 
     "https://openalex.org/I233745408", "https://openalex.org/I173911158", 
-    "https://openalex.org/I55732556", "https://openalex.org/I2799511691", 
-    "https://openalex.org/I30338065", "https://openalex.org/I84218800"
+    "https://openalex.org/I84218800", "https://openalex.org/I55732556", 
+    "https://openalex.org/I2799511691", "https://openalex.org/I30338065"
     )), x_concepts = list(structure(list(id = c("https://openalex.org/C86803240", 
     "https://openalex.org/C18903297", "https://openalex.org/C6557445", 
     "https://openalex.org/C39432304", "https://openalex.org/C185592680", 
@@ -232,16 +232,16 @@ structure(list(id = "https://openalex.org/A5032220440", display_name = "C. A. Sa
     works_api_url = "https://api.openalex.org/works?filter=author.id:A5032220440"), row.names = c(NA, 
 -1L), class = c("tbl_df", "tbl", "data.frame"))
 
-***** 2024-03-22 12:04:17 
-Searched: Kimberly Chapman : Author affiliation: University of Arizona
+***** get_dept_authors_names() calling search_author():  2024-04-02 15:02:42 Kimberly Chapman  Author affiliation: University of Arizona 
+
 structure(list(id = "https://openalex.org/A5078704068", display_name = "Kimberly Chapman", 
     display_name_alternatives = list(c("K. Chapman", "Kimberly B. Chapman", 
-    "Kimberly Chapman")), relevance_score = 1688.3646, ids = list(
+    "Kimberly Chapman")), relevance_score = 1706.0408, ids = list(
         c(openalex = "https://openalex.org/A5078704068")), orcid = NA_character_, 
-    works_count = 22L, cited_by_count = 117L, counts_by_year = list(
+    works_count = 22L, cited_by_count = 119L, counts_by_year = list(
         structure(list(year = 2024:2012, works_count = c(0L, 
         2L, 0L, 0L, 0L, 0L, 1L, 0L, 0L, 1L, 1L, 1L, 1L), cited_by_count = c(1L, 
-        3L, 9L, 10L, 8L, 17L, 8L, 6L, 21L, 24L, 19L, 10L, 4L)), class = "data.frame", row.names = c(NA, 
+        3L, 9L, 11L, 8L, 17L, 8L, 6L, 21L, 24L, 19L, 10L, 4L)), class = "data.frame", row.names = c(NA, 
         -13L))), affiliation_display_name = "University of Arizona", 
     affiliation_id = "https://openalex.org/I138006243", affiliation_ror = "https://ror.org/03m2x1q45", 
     affiliation_country_code = "US", affiliation_type = "education", 
@@ -275,78 +275,81 @@ structure(list(id = "https://openalex.org/A5078704068", display_name = "Kimberly
     works_api_url = "https://api.openalex.org/works?filter=author.id:A5078704068"), row.names = c(NA, 
 -1L), class = c("tbl_df", "tbl", "data.frame"))
 
-***** 2024-03-22 12:04:18 
-Searched: Jeffrey Oliver : Author affiliation: University of Arizona
+***** get_dept_authors_names() calling search_author():  2024-04-02 15:02:42 Jeffrey Oliver  Author affiliation: University of Arizona 
+
 structure(list(id = "https://openalex.org/A5061875763", display_name = "Jeffrey C. Oliver", 
     display_name_alternatives = list(c("Jeffrey Catlin Oliver", 
     "Jack Oliver", "Jeffrey Oliver", "J. C. Oliver", "Jeffrey C. Oliver"
-    )), relevance_score = 5553.3013, ids = list(c(openalex = "https://openalex.org/A5061875763", 
+    )), relevance_score = 5583.0625, ids = list(c(openalex = "https://openalex.org/A5061875763", 
     orcid = "https://orcid.org/0000-0003-2160-1086")), orcid = "https://orcid.org/0000-0003-2160-1086", 
-    works_count = 61L, cited_by_count = 2039L, counts_by_year = list(
+    works_count = 61L, cited_by_count = 2062L, counts_by_year = list(
         structure(list(year = 2024:2012, works_count = c(0L, 
-        2L, 2L, 4L, 1L, 7L, 7L, 6L, 0L, 1L, 5L, 5L, 2L), cited_by_count = c(61L, 
-        248L, 232L, 221L, 189L, 173L, 149L, 167L, 129L, 149L, 
+        2L, 2L, 4L, 1L, 7L, 7L, 6L, 0L, 1L, 5L, 5L, 2L), cited_by_count = c(71L, 
+        253L, 236L, 228L, 192L, 176L, 149L, 167L, 129L, 149L, 
         155L, 86L, 46L)), class = "data.frame", row.names = c(NA, 
         -13L))), affiliation_display_name = "University of Exeter", 
     affiliation_id = "https://openalex.org/I23923803", affiliation_ror = "https://ror.org/03yghzc09", 
     affiliation_country_code = "GB", affiliation_type = "education", 
     affiliation_lineage = list("https://openalex.org/I23923803"), 
     affiliations_other = list(c("https://openalex.org/I138006243", 
-    "https://openalex.org/I4210166658", "https://openalex.org/I32971472", 
-    "https://openalex.org/I131249849", "https://openalex.org/I188538660", 
-    "https://openalex.org/I84218800", "https://openalex.org/I2800531696"
-    )), x_concepts = list(structure(list(id = c("https://openalex.org/C86803240", 
-    "https://openalex.org/C18903297", "https://openalex.org/C127313418", 
-    "https://openalex.org/C151730666", "https://openalex.org/C54355233", 
-    "https://openalex.org/C59822182", "https://openalex.org/C185592680", 
-    "https://openalex.org/C55493867", "https://openalex.org/C104317684", 
-    "https://openalex.org/C71924100", "https://openalex.org/C78458016", 
-    "https://openalex.org/C90856448", "https://openalex.org/C162324750", 
-    "https://openalex.org/C144024400", "https://openalex.org/C41008148", 
-    "https://openalex.org/C144133560", "https://openalex.org/C10138342", 
-    "https://openalex.org/C106159729", "https://openalex.org/C99454951", 
-    "https://openalex.org/C149923435", "https://openalex.org/C205649164", 
-    "https://openalex.org/C2778605236", "https://openalex.org/C2908647359", 
-    "https://openalex.org/C127413603", "https://openalex.org/C193252679"
-    ), wikidata = c("https://www.wikidata.org/wiki/Q420", "https://www.wikidata.org/wiki/Q7150", 
-    "https://www.wikidata.org/wiki/Q1069", "https://www.wikidata.org/wiki/Q7205", 
-    "https://www.wikidata.org/wiki/Q7162", "https://www.wikidata.org/wiki/Q441", 
-    "https://www.wikidata.org/wiki/Q2329", "https://www.wikidata.org/wiki/Q7094", 
-    "https://www.wikidata.org/wiki/Q7187", "https://www.wikidata.org/wiki/Q11190", 
-    "https://www.wikidata.org/wiki/Q840400", "https://www.wikidata.org/wiki/Q431", 
-    "https://www.wikidata.org/wiki/Q8134", "https://www.wikidata.org/wiki/Q21201", 
-    "https://www.wikidata.org/wiki/Q21198", "https://www.wikidata.org/wiki/Q4830453", 
-    "https://www.wikidata.org/wiki/Q43015", "https://www.wikidata.org/wiki/Q2294553", 
-    "https://www.wikidata.org/wiki/Q932068", "https://www.wikidata.org/wiki/Q37732", 
-    "https://www.wikidata.org/wiki/Q1071", "https://www.wikidata.org/wiki/Q1018085", 
-    "https://www.wikidata.org/wiki/Q2625603", "https://www.wikidata.org/wiki/Q11023", 
-    "https://www.wikidata.org/wiki/Q242125"), display_name = c("Biology", 
-    "Ecology", "Geology", "Paleontology", "Genetics", "Botany", 
-    "Chemistry", "Biochemistry", "Gene", "Medicine", "Evolutionary biology", 
-    "Zoology", "Economics", "Sociology", "Computer science", 
-    "Business", "Finance", "Financial economics", "Environmental health", 
-    "Demography", "Geography", "Butterfly", "Population", "Engineering", 
-    "Phylogenetic tree"), level = c(0L, 1L, 0L, 1L, 1L, 1L, 0L, 
-    1L, 2L, 0L, 1L, 1L, 0L, 0L, 0L, 0L, 1L, 1L, 1L, 1L, 0L, 2L, 
-    2L, 0L, 3L), score = c(83.6, 67.2, 62.3, 57.4, 55.7, 50.8, 
-    47.5, 45.9, 44.3, 41, 39.3, 39.3, 39.3, 37.7, 34.4, 31.1, 
-    29.5, 29.5, 27.9, 27.9, 27.9, 27.9, 27.9, 26.2, 23)), class = "data.frame", row.names = c(NA, 
+    "https://openalex.org/I4210166658", "https://openalex.org/I43943889", 
+    "https://openalex.org/I32971472", "https://openalex.org/I131249849", 
+    "https://openalex.org/I188538660", "https://openalex.org/I84218800", 
+    "https://openalex.org/I2800531696")), x_concepts = list(structure(list(
+        id = c("https://openalex.org/C86803240", "https://openalex.org/C18903297", 
+        "https://openalex.org/C127313418", "https://openalex.org/C151730666", 
+        "https://openalex.org/C54355233", "https://openalex.org/C59822182", 
+        "https://openalex.org/C185592680", "https://openalex.org/C55493867", 
+        "https://openalex.org/C104317684", "https://openalex.org/C71924100", 
+        "https://openalex.org/C78458016", "https://openalex.org/C90856448", 
+        "https://openalex.org/C162324750", "https://openalex.org/C144024400", 
+        "https://openalex.org/C41008148", "https://openalex.org/C144133560", 
+        "https://openalex.org/C10138342", "https://openalex.org/C106159729", 
+        "https://openalex.org/C99454951", "https://openalex.org/C149923435", 
+        "https://openalex.org/C205649164", "https://openalex.org/C2778605236", 
+        "https://openalex.org/C2908647359", "https://openalex.org/C127413603", 
+        "https://openalex.org/C193252679"), wikidata = c("https://www.wikidata.org/wiki/Q420", 
+        "https://www.wikidata.org/wiki/Q7150", "https://www.wikidata.org/wiki/Q1069", 
+        "https://www.wikidata.org/wiki/Q7205", "https://www.wikidata.org/wiki/Q7162", 
+        "https://www.wikidata.org/wiki/Q441", "https://www.wikidata.org/wiki/Q2329", 
+        "https://www.wikidata.org/wiki/Q7094", "https://www.wikidata.org/wiki/Q7187", 
+        "https://www.wikidata.org/wiki/Q11190", "https://www.wikidata.org/wiki/Q840400", 
+        "https://www.wikidata.org/wiki/Q431", "https://www.wikidata.org/wiki/Q8134", 
+        "https://www.wikidata.org/wiki/Q21201", "https://www.wikidata.org/wiki/Q21198", 
+        "https://www.wikidata.org/wiki/Q4830453", "https://www.wikidata.org/wiki/Q43015", 
+        "https://www.wikidata.org/wiki/Q2294553", "https://www.wikidata.org/wiki/Q932068", 
+        "https://www.wikidata.org/wiki/Q37732", "https://www.wikidata.org/wiki/Q1071", 
+        "https://www.wikidata.org/wiki/Q1018085", "https://www.wikidata.org/wiki/Q2625603", 
+        "https://www.wikidata.org/wiki/Q11023", "https://www.wikidata.org/wiki/Q242125"
+        ), display_name = c("Biology", "Ecology", "Geology", 
+        "Paleontology", "Genetics", "Botany", "Chemistry", "Biochemistry", 
+        "Gene", "Medicine", "Evolutionary biology", "Zoology", 
+        "Economics", "Sociology", "Computer science", "Business", 
+        "Finance", "Financial economics", "Environmental health", 
+        "Demography", "Geography", "Butterfly", "Population", 
+        "Engineering", "Phylogenetic tree"), level = c(0L, 1L, 
+        0L, 1L, 1L, 1L, 0L, 1L, 2L, 0L, 1L, 1L, 0L, 0L, 0L, 0L, 
+        1L, 1L, 1L, 1L, 0L, 2L, 2L, 0L, 3L), score = c(83.6, 
+        67.2, 62.3, 57.4, 55.7, 50.8, 47.5, 45.9, 44.3, 41, 39.3, 
+        39.3, 39.3, 37.7, 34.4, 31.1, 29.5, 29.5, 27.9, 27.9, 
+        27.9, 27.9, 27.9, 26.2, 23)), class = "data.frame", row.names = c(NA, 
     -25L))), works_api_url = "https://api.openalex.org/works?filter=author.id:A5061875763"), row.names = c(NA, 
 -1L), class = c("tbl_df", "tbl", "data.frame"))
 
-***** 2024-03-22 12:04:18 
-Searched: Jeffrey Oliver : Author affiliation: University of Arizona dept1705 Alana Varner : get_dept_authors_names() Warning:  Unknown or uninitialised column: `affiliation_display_name`. 
+***** get_dept_authors_names() calling search_author():  2024-04-02 15:02:43 Alana Varner  Author affiliation: University of Arizona 
 
-***** 2024-03-22 12:04:19 
-Searched: Elizabeth Kline : Author affiliation: University of Arizona
+get_dept_authors_names(): logfile NOT FOUND !!!
+
+***** get_dept_authors_names() calling search_author():  2024-04-02 15:02:44 Elizabeth Kline  Author affiliation: University of Arizona 
+
 structure(list(id = "https://openalex.org/A5080033269", display_name = "Elizabeth Kline", 
     display_name_alternatives = list(c("E. K. Kline", "Elizabeth Kline", 
-    "E. Kline")), relevance_score = 3012.1094, ids = list(c(openalex = "https://openalex.org/A5080033269", 
+    "E. Kline")), relevance_score = 3017.9712, ids = list(c(openalex = "https://openalex.org/A5080033269", 
     orcid = "https://orcid.org/0000-0001-6700-5445")), orcid = "https://orcid.org/0000-0001-6700-5445", 
-    works_count = 27L, cited_by_count = 451L, counts_by_year = list(
+    works_count = 27L, cited_by_count = 450L, counts_by_year = list(
         structure(list(year = 2023:2012, works_count = c(1L, 
         1L, 0L, 2L, 0L, 1L, 1L, 0L, 10L, 1L, 1L, 1L), cited_by_count = c(2L, 
-        4L, 9L, 3L, 13L, 15L, 13L, 8L, 18L, 35L, 17L, 18L)), class = "data.frame", row.names = c(NA, 
+        4L, 10L, 3L, 13L, 14L, 13L, 8L, 18L, 35L, 17L, 17L)), class = "data.frame", row.names = c(NA, 
         -12L))), affiliation_display_name = "University of Arizona", 
     affiliation_id = "https://openalex.org/I138006243", affiliation_ror = "https://ror.org/03m2x1q45", 
     affiliation_country_code = "US", affiliation_type = "education", 
@@ -381,160 +384,121 @@ structure(list(id = "https://openalex.org/A5080033269", display_name = "Elizabet
     -17L))), works_api_url = "https://api.openalex.org/works?filter=author.id:A5080033269"), row.names = c(NA, 
 -1L), class = c("tbl_df", "tbl", "data.frame"))
 
-***** 2024-03-22 12:04:23 
-Searched: Daniel Martin : Author affiliation: University of Arizona
-structure(list(id = c("https://openalex.org/A5078903553", "https://openalex.org/A5011535969", 
-"https://openalex.org/A5051794858"), display_name = c("Daniel M. Martin", 
-"M. D. Johnston", "Daniel de Luis"), display_name_alternatives = list(
+***** get_dept_authors_names() calling search_author():  2024-04-02 15:02:48 Daniel Martin  Author affiliation: University of Arizona 
+
+structure(list(id = c("https://openalex.org/A5078903553", "https://openalex.org/A5011535969"
+), display_name = c("Daniel M. Martin", "M. D. Johnston"), display_name_alternatives = list(
     c("D M Sanz Martín", "D. M. Martin", "D. M Martin", "Daniel M. Martin", 
     "D M Sanz Martin", "Daniel Michael Martin", "Daniel Martín", 
     "Daniel Martin"), c("M.D.D. Johnston", "M. Daniel Johnston", 
     "M. Daniel Dan Johnston", "M. Johnston", "M. D. Johnston", 
-    "Martin D. Johnston"), c("Díez‐Martín José Luis", "D. Luis", 
-    "Daniel De Luis", "D. De Luis", "D D J Luís", "Daniel Luís", 
-    "Daniel Luis")), relevance_score = c(2215.759, 555.69446, 
-147.97395), ids = list(c(openalex = "https://openalex.org/A5078903553", 
-orcid = "https://orcid.org/0000-0001-7127-8761"), c(openalex = "https://openalex.org/A5011535969"), 
-    c(openalex = "https://openalex.org/A5051794858")), orcid = c("https://orcid.org/0000-0001-7127-8761", 
-NA, NA), works_count = c(67L, 29L, 89L), cited_by_count = c(494L, 
-395L, 326L), counts_by_year = list(structure(list(year = 2024:2012, 
-    works_count = c(1L, 6L, 2L, 5L, 2L, 0L, 2L, 0L, 1L, 2L, 4L, 
-    2L, 4L), cited_by_count = c(3L, 30L, 22L, 28L, 34L, 36L, 
-    35L, 31L, 35L, 40L, 33L, 31L, 26L)), class = "data.frame", row.names = c(NA, 
--13L)), structure(list(year = 2024:2012, works_count = c(0L, 
-0L, 0L, 0L, 0L, 0L, 2L, 6L, 1L, 0L, 0L, 0L, 0L), cited_by_count = c(2L, 
-42L, 54L, 72L, 58L, 34L, 56L, 59L, 34L, 61L, 36L, 48L, 59L)), class = "data.frame", row.names = c(NA, 
--13L)), structure(list(year = 2024:2012, works_count = c(3L, 
-7L, 4L, 17L, 5L, 6L, 5L, 0L, 2L, 3L, 3L, 1L, 8L), cited_by_count = c(18L, 
-71L, 78L, 42L, 26L, 13L, 10L, 14L, 12L, 31L, 18L, 18L, 26L)), class = "data.frame", row.names = c(NA, 
--13L))), affiliation_display_name = c("Technical University of Darmstadt", 
-"Jet Propulsion Laboratory", "Hospital Clínico Universitario de Valladolid"
-), affiliation_id = c("https://openalex.org/I31512782", "https://openalex.org/I1334627681", 
-"https://openalex.org/I4210157802"), affiliation_ror = c("https://ror.org/05n911h24", 
-"https://ror.org/027k65916", "https://ror.org/04fffmj41"), affiliation_country_code = c("DE", 
-"US", "ES"), affiliation_type = c("education", "facility", "healthcare"
-), affiliation_lineage = list("https://openalex.org/I31512782", 
-    "https://openalex.org/I122411786, https://openalex.org/I1334627681, https://openalex.org/I4210124779", 
-    "https://openalex.org/I4210157802"), affiliations_other = list(
-    c("https://openalex.org/I122411786", "https://openalex.org/I71715416", 
+    "Martin D. Johnston")), relevance_score = c(2216.0813, 561.2908
+), ids = list(c(openalex = "https://openalex.org/A5078903553", 
+orcid = "https://orcid.org/0000-0001-7127-8761"), c(openalex = "https://openalex.org/A5011535969")), 
+    orcid = c("https://orcid.org/0000-0001-7127-8761", NA), works_count = c(67L, 
+    29L), cited_by_count = c(496L, 397L), counts_by_year = list(
+        structure(list(year = 2024:2012, works_count = c(1L, 
+        6L, 2L, 5L, 2L, 0L, 2L, 0L, 1L, 2L, 4L, 2L, 4L), cited_by_count = c(3L, 
+        31L, 24L, 29L, 34L, 36L, 36L, 31L, 35L, 39L, 33L, 32L, 
+        29L)), class = "data.frame", row.names = c(NA, -13L)), 
+        structure(list(year = 2024:2012, works_count = c(0L, 
+        0L, 0L, 0L, 0L, 0L, 2L, 6L, 1L, 0L, 0L, 0L, 0L), cited_by_count = c(2L, 
+        47L, 54L, 72L, 63L, 34L, 56L, 59L, 34L, 61L, 36L, 48L, 
+        59L)), class = "data.frame", row.names = c(NA, -13L))), 
+    affiliation_display_name = c("Technical University of Darmstadt", 
+    "Jet Propulsion Laboratory"), affiliation_id = c("https://openalex.org/I31512782", 
+    "https://openalex.org/I1334627681"), affiliation_ror = c("https://ror.org/05n911h24", 
+    "https://ror.org/027k65916"), affiliation_country_code = c("DE", 
+    "US"), affiliation_type = c("education", "facility"), affiliation_lineage = list(
+        "https://openalex.org/I31512782", "https://openalex.org/I122411786, https://openalex.org/I1334627681, https://openalex.org/I4210124779"), 
+    affiliations_other = list(c("https://openalex.org/I4210092812", 
+    "https://openalex.org/I122411786", "https://openalex.org/I71715416", 
     "https://openalex.org/I55732556", "https://openalex.org/I138006243", 
     "https://openalex.org/I4210122684", "https://openalex.org/I83809506", 
-    "https://openalex.org/I165799507", "https://openalex.org/I150468666", 
-    "https://openalex.org/I24010308"), c("https://openalex.org/I122411786", 
-    "https://openalex.org/I193531525", "https://openalex.org/I138006243", 
-    "https://openalex.org/I1280536761", "https://openalex.org/I1306266525", 
-    "https://openalex.org/I1297127228"), c("https://openalex.org/I108103353", 
-    "https://openalex.org/I2960094004", "https://openalex.org/I121748325", 
-    "https://openalex.org/I4210118410", "https://openalex.org/I4210089763", 
-    "https://openalex.org/I75420490", "https://openalex.org/I4210158107", 
-    "https://openalex.org/I2800982320", "https://openalex.org/I138006243"
+    "https://openalex.org/I165799507", "https://openalex.org/I141720752"
+    ), c("https://openalex.org/I122411786", "https://openalex.org/I193531525", 
+    "https://openalex.org/I138006243", "https://openalex.org/I1280536761", 
+    "https://openalex.org/I1306266525", "https://openalex.org/I1297127228"
     )), x_concepts = list(structure(list(id = c("https://openalex.org/C41008148", 
-"https://openalex.org/C33923547", "https://openalex.org/C127413603", 
-"https://openalex.org/C121332964", "https://openalex.org/C86803240", 
-"https://openalex.org/C71924100", "https://openalex.org/C114614502", 
-"https://openalex.org/C192562407", "https://openalex.org/C199360897", 
-"https://openalex.org/C154945302", "https://openalex.org/C185592680", 
-"https://openalex.org/C118615104", "https://openalex.org/C199343813", 
-"https://openalex.org/C111919701", "https://openalex.org/C159985019", 
-"https://openalex.org/C205649164"), wikidata = c("https://www.wikidata.org/wiki/Q21198", 
-"https://www.wikidata.org/wiki/Q395", "https://www.wikidata.org/wiki/Q11023", 
-"https://www.wikidata.org/wiki/Q413", "https://www.wikidata.org/wiki/Q420", 
-"https://www.wikidata.org/wiki/Q11190", "https://www.wikidata.org/wiki/Q76592", 
-"https://www.wikidata.org/wiki/Q228736", "https://www.wikidata.org/wiki/Q9143", 
-"https://www.wikidata.org/wiki/Q11660", "https://www.wikidata.org/wiki/Q2329", 
-"https://www.wikidata.org/wiki/Q121416", "https://www.wikidata.org/wiki/Q12128", 
-"https://www.wikidata.org/wiki/Q9135", "https://www.wikidata.org/wiki/Q181790", 
-"https://www.wikidata.org/wiki/Q1071"), display_name = c("Computer science", 
-"Mathematics", "Engineering", "Physics", "Biology", "Medicine", 
-"Combinatorics", "Materials science", "Programming language", 
-"Artificial intelligence", "Chemistry", "Discrete mathematics", 
-"Dentistry", "Operating system", "Composite material", "Geography"
-), level = c(0L, 0L, 0L, 0L, 0L, 0L, 1L, 0L, 1L, 1L, 0L, 1L, 
-1L, 1L, 1L, 0L), score = c(73.1, 52.2, 52.2, 44.8, 37.3, 34.3, 
-32.8, 29.9, 28.4, 26.9, 26.9, 25.4, 23.9, 22.4, 22.4, 22.4)), class = "data.frame", row.names = c(NA, 
--16L)), structure(list(id = c("https://openalex.org/C127413603", 
-"https://openalex.org/C121332964", "https://openalex.org/C1276947", 
-"https://openalex.org/C86803240", "https://openalex.org/C87355193", 
-"https://openalex.org/C146978453", "https://openalex.org/C127313418", 
-"https://openalex.org/C205649164", "https://openalex.org/C41008148", 
-"https://openalex.org/C83260615", "https://openalex.org/C62649853", 
-"https://openalex.org/C68702407", "https://openalex.org/C2776481522", 
-"https://openalex.org/C178802073", "https://openalex.org/C78949437", 
-"https://openalex.org/C39432304", "https://openalex.org/C29829512", 
-"https://openalex.org/C33923547", "https://openalex.org/C62520636", 
-"https://openalex.org/C153294291", "https://openalex.org/C31258907", 
-"https://openalex.org/C38652104", "https://openalex.org/C134066672", 
-"https://openalex.org/C158379750", "https://openalex.org/C2778600265"
-), wikidata = c("https://www.wikidata.org/wiki/Q11023", "https://www.wikidata.org/wiki/Q413", 
-"https://www.wikidata.org/wiki/Q333", "https://www.wikidata.org/wiki/Q420", 
-"https://www.wikidata.org/wiki/Q411", "https://www.wikidata.org/wiki/Q3798668", 
-"https://www.wikidata.org/wiki/Q1069", "https://www.wikidata.org/wiki/Q1071", 
-"https://www.wikidata.org/wiki/Q21198", "https://www.wikidata.org/wiki/Q6773121", 
-"https://www.wikidata.org/wiki/Q199687", "https://www.wikidata.org/wiki/Q716774", 
-"https://www.wikidata.org/wiki/Q40218", "https://www.wikidata.org/wiki/Q8421", 
-"https://www.wikidata.org/wiki/Q6773188", "https://www.wikidata.org/wiki/Q188847", 
-"https://www.wikidata.org/wiki/Q40218", "https://www.wikidata.org/wiki/Q395", 
-"https://www.wikidata.org/wiki/Q944", "https://www.wikidata.org/wiki/Q25261", 
-"https://www.wikidata.org/wiki/Q1301371", "https://www.wikidata.org/wiki/Q3510521", 
-"https://www.wikidata.org/wiki/Q1424639", "https://www.wikidata.org/wiki/Q214111", 
-"https://www.wikidata.org/wiki/Q913850"), display_name = c("Engineering", 
-"Physics", "Astronomy", "Biology", "Astrobiology", "Aerospace engineering", 
-"Geology", "Geography", "Computer science", "Mars Exploration Program", 
-"Remote sensing", "Exploration of Mars", "Orbiter", "Aeronautics", 
-"Mars landing", "Environmental science", "Spacecraft", "Mathematics", 
-"Quantum mechanics", "Meteorology", "Computer network", "Computer security", 
-"Payload (computing)", "Network packet", "Martian"), level = c(0L, 
-0L, 1L, 0L, 1L, 1L, 0L, 0L, 0L, 2L, 1L, 3L, 2L, 1L, 4L, 0L, 2L, 
-0L, 1L, 1L, 1L, 1L, 3L, 2L, 3L), score = c(110.3, 100, 96.6, 
-93.1, 93.1, 93.1, 89.7, 89.7, 82.8, 82.8, 72.4, 65.5, 65.5, 62.1, 
-58.6, 44.8, 31, 24.1, 24.1, 24.1, 20.7, 20.7, 20.7, 20.7, 20.7
-)), class = "data.frame", row.names = c(NA, -25L)), structure(list(
-    id = c("https://openalex.org/C71924100", "https://openalex.org/C126322002", 
-    "https://openalex.org/C86803240", "https://openalex.org/C134018914", 
-    "https://openalex.org/C142724271", "https://openalex.org/C185592680", 
-    "https://openalex.org/C55493867", "https://openalex.org/C54355233", 
-    "https://openalex.org/C555293320", "https://openalex.org/C511355011", 
-    "https://openalex.org/C104317684", "https://openalex.org/C141071460", 
-    "https://openalex.org/C90924648", "https://openalex.org/C150903083", 
-    "https://openalex.org/C2779306644", "https://openalex.org/C144024400", 
-    "https://openalex.org/C2780221984", "https://openalex.org/C126838900", 
-    "https://openalex.org/C135763542"), wikidata = c("https://www.wikidata.org/wiki/Q11190", 
-    "https://www.wikidata.org/wiki/Q11180", "https://www.wikidata.org/wiki/Q420", 
-    "https://www.wikidata.org/wiki/Q162606", "https://www.wikidata.org/wiki/Q7208", 
-    "https://www.wikidata.org/wiki/Q2329", "https://www.wikidata.org/wiki/Q7094", 
-    "https://www.wikidata.org/wiki/Q7162", "https://www.wikidata.org/wiki/Q12206", 
-    "https://www.wikidata.org/wiki/Q12174", "https://www.wikidata.org/wiki/Q7187", 
-    "https://www.wikidata.org/wiki/Q40821", "https://www.wikidata.org/wiki/Q120569", 
-    "https://www.wikidata.org/wiki/Q7108", "https://www.wikidata.org/wiki/Q2002370", 
-    "https://www.wikidata.org/wiki/Q21201", "https://www.wikidata.org/wiki/Q131191", 
-    "https://www.wikidata.org/wiki/Q77604", "https://www.wikidata.org/wiki/Q106016"
-    ), display_name = c("Medicine", "Internal medicine", "Biology", 
-    "Endocrinology", "Pathology", "Chemistry", "Biochemistry", 
-    "Genetics", "Diabetes mellitus", "Obesity", "Gene", "Surgery", 
-    "Gastroenterology", "Biotechnology", "Insulin", "Sociology", 
-    "Body mass index", "Radiology", "Genotype"), level = c(0L, 
-    1L, 0L, 1L, 1L, 0L, 1L, 1L, 2L, 2L, 2L, 1L, 1L, 1L, 2L, 0L, 
-    2L, 1L, 3L), score = c(100, 86.5, 79.8, 70.8, 61.8, 51.7, 
-    50.6, 47.2, 37.1, 36, 30.3, 29.2, 28.1, 24.7, 24.7, 22.5, 
-    22.5, 20.2, 20.2)), class = "data.frame", row.names = c(NA, 
--19L))), works_api_url = c("https://api.openalex.org/works?filter=author.id:A5078903553", 
-"https://api.openalex.org/works?filter=author.id:A5011535969", 
-"https://api.openalex.org/works?filter=author.id:A5051794858"
-)), row.names = c(NA, -3L), class = c("tbl_df", "tbl", "data.frame"
+    "https://openalex.org/C33923547", "https://openalex.org/C127413603", 
+    "https://openalex.org/C121332964", "https://openalex.org/C86803240", 
+    "https://openalex.org/C71924100", "https://openalex.org/C114614502", 
+    "https://openalex.org/C192562407", "https://openalex.org/C199360897", 
+    "https://openalex.org/C154945302", "https://openalex.org/C185592680", 
+    "https://openalex.org/C118615104", "https://openalex.org/C199343813", 
+    "https://openalex.org/C111919701", "https://openalex.org/C159985019", 
+    "https://openalex.org/C205649164"), wikidata = c("https://www.wikidata.org/wiki/Q21198", 
+    "https://www.wikidata.org/wiki/Q395", "https://www.wikidata.org/wiki/Q11023", 
+    "https://www.wikidata.org/wiki/Q413", "https://www.wikidata.org/wiki/Q420", 
+    "https://www.wikidata.org/wiki/Q11190", "https://www.wikidata.org/wiki/Q76592", 
+    "https://www.wikidata.org/wiki/Q228736", "https://www.wikidata.org/wiki/Q9143", 
+    "https://www.wikidata.org/wiki/Q11660", "https://www.wikidata.org/wiki/Q2329", 
+    "https://www.wikidata.org/wiki/Q121416", "https://www.wikidata.org/wiki/Q12128", 
+    "https://www.wikidata.org/wiki/Q9135", "https://www.wikidata.org/wiki/Q181790", 
+    "https://www.wikidata.org/wiki/Q1071"), display_name = c("Computer science", 
+    "Mathematics", "Engineering", "Physics", "Biology", "Medicine", 
+    "Combinatorics", "Materials science", "Programming language", 
+    "Artificial intelligence", "Chemistry", "Discrete mathematics", 
+    "Dentistry", "Operating system", "Composite material", "Geography"
+    ), level = c(0L, 0L, 0L, 0L, 0L, 0L, 1L, 0L, 1L, 1L, 0L, 
+    1L, 1L, 1L, 1L, 0L), score = c(73.1, 52.2, 52.2, 44.8, 37.3, 
+    34.3, 32.8, 29.9, 28.4, 26.9, 26.9, 25.4, 23.9, 22.4, 22.4, 
+    22.4)), class = "data.frame", row.names = c(NA, -16L)), structure(list(
+        id = c("https://openalex.org/C127413603", "https://openalex.org/C121332964", 
+        "https://openalex.org/C1276947", "https://openalex.org/C86803240", 
+        "https://openalex.org/C87355193", "https://openalex.org/C146978453", 
+        "https://openalex.org/C127313418", "https://openalex.org/C205649164", 
+        "https://openalex.org/C41008148", "https://openalex.org/C83260615", 
+        "https://openalex.org/C62649853", "https://openalex.org/C68702407", 
+        "https://openalex.org/C2776481522", "https://openalex.org/C178802073", 
+        "https://openalex.org/C78949437", "https://openalex.org/C39432304", 
+        "https://openalex.org/C29829512", "https://openalex.org/C33923547", 
+        "https://openalex.org/C62520636", "https://openalex.org/C153294291", 
+        "https://openalex.org/C31258907", "https://openalex.org/C38652104", 
+        "https://openalex.org/C134066672", "https://openalex.org/C158379750", 
+        "https://openalex.org/C2778600265"), wikidata = c("https://www.wikidata.org/wiki/Q11023", 
+        "https://www.wikidata.org/wiki/Q413", "https://www.wikidata.org/wiki/Q333", 
+        "https://www.wikidata.org/wiki/Q420", "https://www.wikidata.org/wiki/Q411", 
+        "https://www.wikidata.org/wiki/Q3798668", "https://www.wikidata.org/wiki/Q1069", 
+        "https://www.wikidata.org/wiki/Q1071", "https://www.wikidata.org/wiki/Q21198", 
+        "https://www.wikidata.org/wiki/Q6773121", "https://www.wikidata.org/wiki/Q199687", 
+        "https://www.wikidata.org/wiki/Q716774", "https://www.wikidata.org/wiki/Q40218", 
+        "https://www.wikidata.org/wiki/Q8421", "https://www.wikidata.org/wiki/Q6773188", 
+        "https://www.wikidata.org/wiki/Q188847", "https://www.wikidata.org/wiki/Q40218", 
+        "https://www.wikidata.org/wiki/Q395", "https://www.wikidata.org/wiki/Q944", 
+        "https://www.wikidata.org/wiki/Q25261", "https://www.wikidata.org/wiki/Q1301371", 
+        "https://www.wikidata.org/wiki/Q3510521", "https://www.wikidata.org/wiki/Q1424639", 
+        "https://www.wikidata.org/wiki/Q214111", "https://www.wikidata.org/wiki/Q913850"
+        ), display_name = c("Engineering", "Physics", "Astronomy", 
+        "Biology", "Astrobiology", "Aerospace engineering", "Geology", 
+        "Geography", "Computer science", "Mars Exploration Program", 
+        "Remote sensing", "Exploration of Mars", "Orbiter", "Aeronautics", 
+        "Mars landing", "Environmental science", "Spacecraft", 
+        "Mathematics", "Quantum mechanics", "Meteorology", "Computer network", 
+        "Computer security", "Payload (computing)", "Network packet", 
+        "Martian"), level = c(0L, 0L, 1L, 0L, 1L, 1L, 0L, 0L, 
+        0L, 2L, 1L, 3L, 2L, 1L, 4L, 0L, 2L, 0L, 1L, 1L, 1L, 1L, 
+        3L, 2L, 3L), score = c(110.3, 100, 96.6, 93.1, 93.1, 
+        93.1, 89.7, 89.7, 82.8, 82.8, 72.4, 65.5, 65.5, 62.1, 
+        58.6, 44.8, 31, 24.1, 24.1, 24.1, 20.7, 20.7, 20.7, 20.7, 
+        20.7)), class = "data.frame", row.names = c(NA, -25L))), 
+    works_api_url = c("https://api.openalex.org/works?filter=author.id:A5078903553", 
+    "https://api.openalex.org/works?filter=author.id:A5011535969"
+    )), row.names = c(NA, -2L), class = c("tbl_df", "tbl", "data.frame"
 ))
 
-***** 2024-03-22 12:04:32 
-Searched: Yan Han : Author affiliation: University of Arizona
+***** get_dept_authors_names() calling search_author():  2024-04-02 15:02:57 Yan Han  Author affiliation: University of Arizona 
+
 structure(list(id = "https://openalex.org/A5056855636", display_name = "Yan Han", 
     display_name_alternatives = list(c("Yan Han", "Y. Han", "Yan Long Han", 
     "Yan Hong Han", "Yu Han", "Han Y", "Yu Ting Han", "Han Yan"
-    )), relevance_score = 2218.6265, ids = list(c(openalex = "https://openalex.org/A5056855636", 
+    )), relevance_score = 2217.0442, ids = list(c(openalex = "https://openalex.org/A5056855636", 
     orcid = "https://orcid.org/0000-0003-1293-8111")), orcid = "https://orcid.org/0000-0003-1293-8111", 
     works_count = 81L, cited_by_count = 397L, counts_by_year = list(
         structure(list(year = 2024:2012, works_count = c(0L, 
-        1L, 4L, 8L, 4L, 3L, 2L, 2L, 4L, 2L, 5L, 8L, 6L), cited_by_count = c(6L, 
-        59L, 101L, 99L, 17L, 18L, 19L, 16L, 29L, 34L, 29L, 27L, 
-        21L)), class = "data.frame", row.names = c(NA, -13L))), 
+        1L, 4L, 8L, 4L, 3L, 2L, 2L, 4L, 2L, 5L, 8L, 6L), cited_by_count = c(5L, 
+        42L, 70L, 64L, 15L, 19L, 20L, 16L, 29L, 34L, 29L, 27L, 
+        19L)), class = "data.frame", row.names = c(NA, -13L))), 
     affiliation_display_name = "Capital Medical University", 
     affiliation_id = "https://openalex.org/I183519381", affiliation_ror = "https://ror.org/013xs5b60", 
     affiliation_country_code = "CN", affiliation_type = "education", 
@@ -543,7 +507,7 @@ structure(list(id = "https://openalex.org/A5056855636", display_name = "Yan Han"
     "https://openalex.org/I194450716", "https://openalex.org/I138006243", 
     "https://openalex.org/I99065089", "https://openalex.org/I76569877", 
     "https://openalex.org/I10535382", "https://openalex.org/I4210088511", 
-    "https://openalex.org/I4210136497", "https://openalex.org/I1318643470"
+    "https://openalex.org/I4210136497", "https://openalex.org/I4210129222"
     )), x_concepts = list(structure(list(id = c("https://openalex.org/C41008148", 
     "https://openalex.org/C127413603", "https://openalex.org/C162324750", 
     "https://openalex.org/C86803240", "https://openalex.org/C111919701", 
@@ -567,11 +531,11 @@ structure(list(id = "https://openalex.org/A5056855636", display_name = "Yan Han"
     -13L))), works_api_url = "https://api.openalex.org/works?filter=author.id:A5056855636"), row.names = c(NA, 
 -1L), class = c("tbl_df", "tbl", "data.frame"))
 
-***** 2024-03-22 12:04:32 
-Searched: Cheryl Casey : Author affiliation: University of Arizona
+***** get_dept_authors_names() calling search_author():  2024-04-02 15:02:58 Cheryl Casey  Author affiliation: University of Arizona 
+
 structure(list(id = "https://openalex.org/A5091434366", display_name = "Cheryl Casey", 
     display_name_alternatives = list(c("Cheryl Anne Casey", "Cheryl Casey"
-    )), relevance_score = 2481.913, ids = list(c(openalex = "https://openalex.org/A5091434366")), 
+    )), relevance_score = 2485.5671, ids = list(c(openalex = "https://openalex.org/A5091434366")), 
     orcid = NA_character_, works_count = 13L, cited_by_count = 260L, 
     counts_by_year = list(structure(list(year = c(2023L, 2022L, 
     2021L, 2020L, 2019L, 2018L, 2017L, 2015L, 2014L, 2013L, 2012L
@@ -611,16 +575,16 @@ structure(list(id = "https://openalex.org/A5091434366", display_name = "Cheryl C
         -16L))), works_api_url = "https://api.openalex.org/works?filter=author.id:A5091434366"), row.names = c(NA, 
 -1L), class = c("tbl_df", "tbl", "data.frame"))
 
-***** 2024-03-22 12:04:33 
-Searched: Niamh Wallace : Author affiliation: University of Arizona
+***** get_dept_authors_names() calling search_author():  2024-04-02 15:02:58 Niamh Wallace  Author affiliation: University of Arizona 
+
 structure(list(id = "https://openalex.org/A5074958042", display_name = "Niamh Wallace", 
     display_name_alternatives = list(c("N. Wallace", "N P H Wallace", 
-    "Niamh Wallace")), relevance_score = 847.62744, ids = list(
+    "Niamh Wallace")), relevance_score = 879.8602, ids = list(
         c(openalex = "https://openalex.org/A5074958042")), orcid = NA, 
-    works_count = 48L, cited_by_count = 21L, counts_by_year = list(
+    works_count = 48L, cited_by_count = 23L, counts_by_year = list(
         structure(list(year = 2024:2014, works_count = c(0L, 
         0L, 0L, 1L, 1L, 3L, 8L, 8L, 9L, 41L, 1L), cited_by_count = c(2L, 
-        3L, 2L, 4L, 4L, 0L, 2L, 2L, 3L, 0L, 0L)), class = "data.frame", row.names = c(NA, 
+        3L, 2L, 6L, 4L, 1L, 2L, 2L, 3L, 0L, 0L)), class = "data.frame", row.names = c(NA, 
         -11L))), affiliation_display_name = "University of Arizona", 
     affiliation_id = "https://openalex.org/I138006243", affiliation_ror = "https://ror.org/03m2x1q45", 
     affiliation_country_code = "US", affiliation_type = "education", 
