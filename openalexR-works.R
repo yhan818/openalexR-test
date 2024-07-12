@@ -62,48 +62,58 @@ works_from_dois <- oa_fetch(entity = "works", doi = c("https://doi.org/10.6017/i
 works_from_dois$cited_by_api_url
 works_from_dois$ids
 
+##################################################################################3
+#### Location info:
+### 1. Documentation: https://docs.openalex.org/api-entities/works/filter-works 
+### 2. three options: best_oa_location, locations and preimary_location
 
 ### UA institution       ID: "https://openalex.org/I138006243"
 ### UA campus repository ID:"https://openalex.org/S2764879211"
 ## 
-# Example : primarly_location and best _oa_location: https://api.openalex.org/works/W4300666610 
-# Example: 
+# Example : primarly_location and best _oa_location: https://api.openalex.org/works/W4300666610 <-> https://repository.arizona.edu/handle/10150/612997
+# Example 2 : best_oa_location: https://openalex.org/W2585292421   <->  https://repository.arizona.edu/handle/10150/623545  
 
 # Best OA location. find out host organization. 
+# count: 8394 (2024-07-11)
+# This fetch will take a few minutes. So be patient . 
 UA_host <- oa_fetch(
   entity = "works",
   # UA campus repository ID does not work as a filter
   best_oa_location.source.host_organization = "https://openalex.org/I138006243",
-  #count_only = TRUE
-)
-# count: 8393
-
-# Best OA location
-# This fetch will take a few minutes. So be patient . 
-UA_host <- oa_fetch(
-  entity = "works",
-  best_oa_location.source.host_organization = "https://openalex.org/I138006243",
+  count_only = TRUE
   # If only need some samples. using the below line.
   # options = list(sample = 100, seed = 1)
 )
-UA_host
-
-# no result using UA campus repository source ID. 
-UA_host2 <- oa_fetch (
-  entity = "works",
- best_oa_location.source.host_organization = "https://openalex.org/S2764879211",
- count_only = TRUE
-)
-
 
 # Primary_location.source.host_organization. 
-UA_host3 <- oa_fetch (
+# count: 24 (2024-07-11)
+UA_host2 <- oa_fetch (
   entity = "works",
   primary_location.source.host_organization = "https://openalex.org/I138006243",
   count_only = TRUE
 )
-# count: 24
 
+# locations: 
+# count: 14909 (2024-07-11)
+UA_host3 <- oa_fetch (
+  entity = "works",
+  locations.source.host_organization = "https://openalex.org/I138006243",
+  count_only = TRUE
+)
+
+############### Use campus repository source ID. 
+# no result using UA campus repository source ID. 
+UA_host5 <- oa_fetch (
+  entity = "works",
+  best_oa_location.source.host_organization = "https://openalex.org/S2764879211",
+  count_only = TRUE
+)
+
+UA_host6 <- oa_fetch (
+  entity = "works",
+  locations.source.host_organization = "https://openalex.org/S2764879211",
+  count_only = TRUE
+)
 
 
 ################################ Coding not working ####################3
