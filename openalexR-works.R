@@ -115,6 +115,22 @@ UA_host6 <- oa_fetch (
   count_only = TRUE
 )
 
+### Filtering source = journal of rangement management
+class (UA_host)
+
+# Filter the dataframe to get all rows where "so" is "journal of range management" (JRM) (case insenstive)
+df_jrm <- subset(UA_host, grepl("journal of range management", so, ignore.case = TRUE))
+
+# 3,991 from JRM.
+count_jrm <- nrow(df_jrm)
+
+# Count the number of occurrences of each unique value in the "source" column using dplyr
+source_counts_df <- UA_host %>%
+  count(so, sort = TRUE)
+
+# Display the dataframe with counts
+print(source_counts_df)
+
 
 ################################ Coding not working ####################3
 
