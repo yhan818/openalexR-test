@@ -121,7 +121,6 @@ UA_host6 <- oa_fetch (
 
 # Filter the dataframe to get all rows where "so" is "journal of range management" (JRM) (case insenstive)
 df_jrm <- subset(UA_host_all_location, grepl("journal of range management", so, ignore.case = TRUE))  #4,183
-df_rem <- subset(UA_host_all_location, grepl("Range Ecology and Management", so, ignore.case = TRUE)) # 432
 
 # count_jrm <- nrow(df_jrm) + nrow (df_rem)
 
@@ -130,9 +129,9 @@ source_counts_df <- UA_host_all_location %>%
   count(so, sort = TRUE)
 
 # Display the dataframe with counts
-# JRM/REM:  4183+836 (3991 + 804 for best_oa)
-# Rangelands: 782 (685 for best_oa)
-# NA: 384
+# JRM/REM:  4183+836 (3991 + 804 for best_oa) vs UA (6,029)
+# Rangelands: 782 (685 for best_oa) vs UA (1,160)
+
 print(source_counts_df)
 
 library(dplyr)
@@ -142,9 +141,9 @@ library(dplyr)
 # Count rows with DOIs
 count_with_doi <- UA_host_all_location %>% filter(grepl("doi.org", url, ignore.case = TRUE)) %>% nrow()
 
-# there is only 261 items having doi:10.2458  (seems havesting directing from UA campus repo)
+# there is only 261 items having doi:10.2458  
 # most are JRM, rangelands, radiocarbon, and JPE
-# some of the URLs have "uair.arizona.edu" (possiblely harvested from crossref)
+# some of the URLs have "uair.arizona.edu" (possibly harvested from crossref)
 ua_doi1 <- UA_host_all_location %>% filter(grepl("10.2458", url, ignore.case = TRUE)) 
 count2 <- ua_doi1%>% nrow()
 
@@ -192,8 +191,15 @@ if (!is.null(metadata)) {
   print("No metadata found for the given DOI.")
 }
 
-
-
+### Example 3:
+# https://doi.org/10.1038/ng.3667" 
+doi <- "https://doi.org/10.1038/ng.3667"
+metadata <- get_doi_metadata(doi)
+if (!is.null(metadata)) {
+  print(metadata)
+} else {
+  print("No metadata found for the given DOI.")
+}
 
 ################################ Coding not working ####################3
 
