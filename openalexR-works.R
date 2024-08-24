@@ -31,7 +31,8 @@ citation("openalexR")
 
 # check to see if openAlexR has the latest entities in OpenAlex (OpenAlex updated its data model(Entities) in June 2023)
 # Before April 2023: they are [1] "works"        "authors"      "venues"       "institutions" "concepts"    
-# If not, need to use openalexR developer's version
+# Aug 2024: [1] "works"        "authors"      "institutions" "concepts"     "funders"      "sources"      "publishers"   "topics"      
+
 oa_entities()
 
 options (openalexR.mailto="yhan@arizona.edu")
@@ -73,13 +74,24 @@ works_from_dois$ids
 # Example : primarly_location and best _oa_location: https://api.openalex.org/works/W4300666610 <-> https://repository.arizona.edu/handle/10150/612997
 # Example 2 : best_oa_location: https://openalex.org/W2585292421   <->  https://repository.arizona.edu/handle/10150/623545  
 
+
+# All locations: 
+# count: 14903 (2024-07-11)
+UA_host_all_location <- oa_fetch (
+  entity = "works",
+  locations.source.host_organization = "https://openalex.org/I138006243",
+  #count_only = TRUE
+)
+
 # Best OA location. find out host organization. 
 # count: 8394 (2024-07-11)
 # This fetch will take a few minutes. So be patient . 
-UA_host <- oa_fetch(
+UA_host_best_location <- oa_fetch(
   entity = "works",
   # UA campus repository ID does not work as a filter
   best_oa_location.source.host_organization = "https://openalex.org/I138006243",
+
+  # If only need count, uncomment the below line for a quick run.   
   count_only = TRUE
   # If only need some samples. using the below line.
   # options = list(sample = 100, seed = 1)
@@ -90,14 +102,6 @@ UA_host <- oa_fetch(
 UA_host2 <- oa_fetch (
   entity = "works",
   primary_location.source.host_organization = "https://openalex.org/I138006243",
-  count_only = TRUE
-)
-
-# locations: 
-# count: 14909 (2024-07-11)
-UA_host3 <- oa_fetch (
-  entity = "works",
-  locations.source.host_organization = "https://openalex.org/I138006243",
   count_only = TRUE
 )
 
@@ -115,22 +119,88 @@ UA_host6 <- oa_fetch (
   count_only = TRUE
 )
 
-### Filtering source = journal of rangement management
-class (UA_host)
 
 # Filter the dataframe to get all rows where "so" is "journal of range management" (JRM) (case insenstive)
-df_jrm <- subset(UA_host, grepl("journal of range management", so, ignore.case = TRUE))
+df_jrm <- subset(UA_host_all_location, grepl("journal of range management", so, ignore.case = TRUE))  #4,183
 
-# 3,991 from JRM.
-count_jrm <- nrow(df_jrm)
+# count_jrm <- nrow(df_jrm) + nrow (df_rem)
 
 # Count the number of occurrences of each unique value in the "source" column using dplyr
-source_counts_df <- UA_host %>%
+source_counts_df <- UA_host_all_location %>%
   count(so, sort = TRUE)
 
 # Display the dataframe with counts
+# JRM/REM:  4183+836 (3991 + 804 for best_oa) vs UA (6,029)
+# Rangelands: 782 (685 for best_oa) vs UA (1,160)
+
 print(source_counts_df)
 
+library(dplyr)
+(select(UA_host_all_location, 'id', 'so'))
+
+## counting DOIs 
+# Count rows with DOIs
+count_with_doi <- UA_host_all_location %>% filter(grepl("doi.org", url, ignore.case = TRUE)) %>% nrow()
+
+# there is only 261 items having doi:10.2458  
+# most are JRM, rangelands, radiocarbon, and JPE
+# some of the URLs have "uair.arizona.edu" (possibly harvested from crossref)
+ua_doi1 <- UA_host_all_location %>% filter(grepl("10.2458", url, ignore.case = TRUE)) 
+count2 <- ua_doi1%>% nrow()
+
+# 10.1016 from Elsevier DOI for its journals : more than REM (432 obj)
+rem_doi <- UA_host_all_location %>% filter(grepl("10.1016", url, ignore.case=TRUE))
+
+
+### get metadata for a DOI
+install.packages("rcrossref")
+library(rcrossref)
+library (httr)
+library(jsonlite)
+# Function to get metadata for a DOI
+get_doi_metadata <- function(doi) {
+  url <- paste0("https://api.crossref.org/works/", doi)
+  response <- GET(url)
+  
+  if (status_code(response) == 200) {
+    metadata <- content(response, as = "text", encoding = "UTF-8")
+    metadata <- fromJSON(metadata, flatten = TRUE)
+    return(metadata$message)
+  } else {
+    message("Error retrieving metadata: ", status_code(response))
+    return(NULL)
+  }
+}
+
+#### Example 1: More like openalex pulled directly from crossref. 
+###  Campus repo: 
+doi <- "10.2458/v24i1.22003"
+metadata <- get_doi_metadata(doi)
+if (!is.null(metadata)) {
+  print(metadata)
+} else {
+  print("No metadata found for the given DOI.")
+}
+
+### Example 2: More like openAlex pulled directly from crossref by checking DOI's metadata (which do not contain other DOIs, and have date info 2006
+### UA: https://repository.arizona.edu/handle/10150/643523 (it contains other DOIs. also issue date as 2004.  have additional link rangelands.org
+doi <- "https://doi.org/10.2458/azu_jrm_v57i2_cox"
+metadata <- get_doi_metadata(doi)
+if (!is.null(metadata)) {
+  print(metadata)
+} else {
+  print("No metadata found for the given DOI.")
+}
+
+### Example 3:
+# https://doi.org/10.1038/ng.3667" 
+doi <- "https://doi.org/10.1038/ng.3667"
+metadata <- get_doi_metadata(doi)
+if (!is.null(metadata)) {
+  print(metadata)
+} else {
+  print("No metadata found for the given DOI.")
+}
 
 ################################ Coding not working ####################3
 
@@ -166,8 +236,6 @@ print(paste("Total number of works with 'is_oa_anywhere' tag:", total_results))
 
 # View the first few results
 head(results$data)
-
-
 
 # To see is_oa field
 

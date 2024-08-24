@@ -160,6 +160,7 @@ calculate_works_count <- function(author_name, affiliation_name, year) {
 # Function: Find author via his/her affiliation 
 # The matching is done by comparing two fields : affiliation_display_name first, and then affiliations_other
 # Para "affiliation_name" is a string for matching var "aff_patterns". This is necessay because 'aff_patterns' can be in multiple formats
+# return: the filtered list of authors if matches are found, otherwise logs a message and returns NULL.
 # Note: "affiliations_other" can be a string or a vector of strings. So both cases shall be taken care of. 
 # For searching other universities, the var "aff_patterns" shall be updated for the correct string 
 #####################################################
@@ -621,10 +622,10 @@ output_works_by_authorid_by_year(dept_code, author_name, author_id, publication_
 ############################################################################
 #### Now getting every author's works by each dept ###
 ### Function: 
-### Parameter: dept_authors_names: list 
+### Parameter: dept_authors: a list contaning authors info, including author_name and author_id. author_id is used for acurate matching to openAlex 
 ### return: calling get_works_from_authorid_by_year() and output_works_by_authorid_by_year() 
 ######################################################################################
-output_dept_author_works_by_year <- function(dept_code, dept_authors_names, year) {
+output_dept_author_works_by_year <- function(dept_code, dept_authors, year) {
   if (is.null(dept_code) || !nzchar(dept_code)) {
     stop("Department code ('dept_code') must be provided and cannot be empty.")
   }
@@ -638,15 +639,15 @@ output_dept_author_works_by_year <- function(dept_code, dept_authors_names, year
   log_file   <- file.path(base_dir, paste0(dept_code, "_", year, ".log")) # Define log file path
   log_file_author <- file.path(base_dir, paste0(dept_code, "_", year, "_author.log")) # Define log file path
   
-  if (length(dept_authors_names) == 0) {
+  if (length(dept_authors) == 0) {
     msg <- paste0("output_dept_author_works_by_year(): ", Sys.time(), dept_code, ": ", dept_authors_names, " in ", year, ": No authors found for this department.")
     write(msg, file = log_file, append = TRUE)
     message(msg)
     return()  # Exit the function early
   }
   
-  for (i in seq_along(dept_authors_names)) {
-    current_df <- dept_authors_names[[i]]
+  for (i in seq_along(dept_authors)) {
+    current_df <- dept_authors[[i]]
     author_name <- current_df$author_name
     author_id <- current_df$author_result_affiliation.id
     
@@ -677,6 +678,41 @@ output_dept_author_works_by_year <- function(dept_code, dept_authors_names, year
 }
 
 #######################################
+
+# 2024-07-28
+
+author_name <- "Jarrod Mosier"
+affiliation_name <- "University of Arizona"
+author_from_names <- oa_fetch(entity = "author", search = author_name)
+author_id <- author_from_names$id
+UAresult1 <- search_author(author_name, affiliation_name)
+
+dept_code <- "test"
+author_works <- get_works_from_authorid_by_year(dept_code, author_id, 2022)
+output_works_by_authorid_by_year(dept_code, author_name, author_id, 2022)
+author_works <- get_works_from_authorid_by_year(dept_code, author_id, 2023)
+output_works_by_authorid_by_year(dept_code, author_name, author_id, 2023)
+
+author_id <-"https://openalex.org/A5002885008"
+author_works <- get_works_from_authorid_by_year(dept_code, author_id, 2024)
+
+
+####### 
+
+author_name <- "Joshua Gaither"
+author_from_names <- oa_fetch(entity = "author", search = author_name)
+author_id <- author_from_names$id
+UAresult2 <- search_author(author_name, affiliation_name)
+
+author_works <- get_works_from_authorid_by_year(dept_code, author_id, 2021)
+author_works <- get_works_from_authorid_by_year(dept_code, author_id, 2022)
+output_works_by_authorid_by_year(dept_code, author_name, author_id, 2022)
+author_works <- get_works_from_authorid_by_year(dept_code, author_id, 2023)
+output_works_by_authorid_by_year(dept_code, author_name, author_id, 2023)
+
+
+
+
 
 #dept_code <- readline(prompt = "Please enter the department code: ")
 #affiliation_name <- readline(prompt = "Please enter the affiliation: ")
