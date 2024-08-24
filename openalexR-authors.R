@@ -684,15 +684,31 @@ output_dept_author_works_by_year <- function(dept_code, dept_authors, year) {
 author_name <- "Jarrod Mosier"
 affiliation_name <- "University of Arizona"
 author_from_names <- oa_fetch(entity = "author", search = author_name)
+author_id <- author_from_names$id
 UAresult1 <- search_author(author_name, affiliation_name)
-author_id <- "https://openalex.org/A5002885008"
+
 dept_code <- "test"
 author_works <- get_works_from_authorid_by_year(dept_code, author_id, 2022)
 output_works_by_authorid_by_year(dept_code, author_name, author_id, 2022)
-
 author_works <- get_works_from_authorid_by_year(dept_code, author_id, 2023)
 output_works_by_authorid_by_year(dept_code, author_name, author_id, 2023)
 
+author_id <-"https://openalex.org/A5002885008"
+author_works <- get_works_from_authorid_by_year(dept_code, author_id, 2024)
+
+
+####### 
+
+author_name <- "Joshua Gaither"
+author_from_names <- oa_fetch(entity = "author", search = author_name)
+author_id <- author_from_names$id
+UAresult2 <- search_author(author_name, affiliation_name)
+
+author_works <- get_works_from_authorid_by_year(dept_code, author_id, 2021)
+author_works <- get_works_from_authorid_by_year(dept_code, author_id, 2022)
+output_works_by_authorid_by_year(dept_code, author_name, author_id, 2022)
+author_works <- get_works_from_authorid_by_year(dept_code, author_id, 2023)
+output_works_by_authorid_by_year(dept_code, author_name, author_id, 2023)
 
 
 

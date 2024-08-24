@@ -31,7 +31,8 @@ citation("openalexR")
 
 # check to see if openAlexR has the latest entities in OpenAlex (OpenAlex updated its data model(Entities) in June 2023)
 # Before April 2023: they are [1] "works"        "authors"      "venues"       "institutions" "concepts"    
-# If not, need to use openalexR developer's version
+# Aug 2024: [1] "works"        "authors"      "institutions" "concepts"     "funders"      "sources"      "publishers"   "topics"      
+
 oa_entities()
 
 options (openalexR.mailto="yhan@arizona.edu")
@@ -235,8 +236,6 @@ print(paste("Total number of works with 'is_oa_anywhere' tag:", total_results))
 
 # View the first few results
 head(results$data)
-
-
 
 # To see is_oa field
 
