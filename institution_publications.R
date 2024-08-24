@@ -14,7 +14,6 @@ install.packages("ggplot2")
 library(openalexR)
 library(dplyr)
 library(tidyr)
-library(tidyverse)
 
 options (openalexR.mailto="yhan@arizona.edu")
 getwd()
@@ -28,14 +27,23 @@ UAUMC.df <-oa_fetch(
 
 # Univesrity of Arizona:  https://api.openalex.org/institutions/I138006243
 
-UArizona_works <-oa_fetch(
+# Just run 5-year data, 50,000 records
+# It took about 15 mins to run. 
+UAworks1 <-oa_fetch(
   entity="works",
-  #authorships.affiliations.institution_ids = "I138006243"
-  #affiliation_ror=c("03m2xlq45"),
-  institutions.ror=c("03m2xlq45"),
-  from_publication_date ="2013-01-01"
+  institutions.ror=c("03m2x1q45"),
+  from_publication_date ="2019-01-01"
+  #count_only = TRUE
   )
 
+# Since 2013, the query takes 15 mins to run. close to 100,000 records
+# Since 2014, close to 86,000 records
+UAworks2 <-oa_fetch(
+  entity="works",
+  institutions.ror=c("03m2x1q45"),
+  from_publication_date ="2014-01-01",
+  count_only = TRUE
+  )
 
 # Will take about 2 mins to run. 
 UArizona_works2 <- oa_fetch(
