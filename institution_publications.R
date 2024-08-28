@@ -32,7 +32,7 @@ UAUMC.df <-oa_fetch(
 UAworks1 <-oa_fetch(
   entity="works",
   institutions.ror=c("03m2x1q45"),
-  from_publication_date ="2019-01-01"
+  from_publication_date ="2023-01-01"
   #count_only = TRUE
   )
 
@@ -43,12 +43,14 @@ UAworks2 <-oa_fetch(
   count_only = TRUE
   )
 
+# alternative to get referenced works (to verify: The below is to make sure UA authors only)
+WorksCited_alt <- as.list(unique(do.call(rbind, UAworks1$referenced_works)))
 
 # 2. Data cleanup
 # Flattening authors fields from the DF (multiple authors per work). 
 # 426,000 obs (multiple authors) from 50,400 obs (works)
-UAworks_since2019 <- UAworks1
-UAWorks_authors<-UAworks1%>%
+UAworks_since <- UAworks1
+UAWorks_authors<-UAworks_since%>%
   mutate(author=lapply(author, function(x){
     names(x) <-paste0(names(x), "author")
     return(x)
@@ -66,6 +68,8 @@ WorksCited <- as.list(unique(do.call(rbind, UAWorks_UAauthors2$referenced_works)
 #Removing any values of NA and any duplicate values
 # reduced to 1.07 million (hm... need to check )
 WorksCited <-unique(WorksCited) %>%discard(is.na)
+
+
 
 #Creating an empty dataframe to store the results of the for loop.
 WorksCited.df <-data.frame()
