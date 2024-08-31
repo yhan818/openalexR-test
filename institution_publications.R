@@ -102,8 +102,8 @@ view(oa_fetch_test1[[4]][[1]])
 
 oa_fetch_test2 <-oa_fetch_test2 <-oa_fetch( entity="authors",  id="https://openalex.org/A5003933592")
 
-#UAWorks_UAauthors3 <- UAWorks_authors%>%filter(institution_lineageauthor== "https://ror.org/03m2x1q45")
-
+#### This is not 100% accurate because UArizona has child organization whose ROR is associated with an article. By filtering institution_rorauthor
+# to UArizona's ROR, certain articles are left out!!! 
 UAWorks_UAauthors2 <- UAWorks_authors%>%filter(institution_rorauthor== "https://ror.org/03m2x1q45")
 
 ## why https://openalex.org/W2991357209 (can be filtered out)
@@ -112,7 +112,6 @@ UAWorks_UAauthors2 <- UAWorks_authors%>%filter(institution_rorauthor== "https://
 # 8.2 million 
 ref_works2 <- UAWorks_UAauthors2$referenced_works
 #########################
-
 
 # Combine all the references and do further data analysis
 ref_works_combined2 <- unlist(ref_works2, use.names = FALSE)
@@ -127,21 +126,53 @@ summary(ref_works_more_cited2)
 ref_works_cited2 <- unique(ref_works_combined2)
 summary(ref_works_cited2)
 
+######################## TEST
 # Elements in vector1 but not in vector2
 diff1 <- setdiff(ref_works_cited, ref_works_cited2)
 print(diff1)
-
 
 # Find the indices of elements matching a pattern
 matching_indices <- grep("https://openalex.org/W4401226694", ref_works2 )
 print(matching_indices)  # Returns the index(es) of matching elements
 
 
+
+
+#Running the loop to retrieve works cited data (may take some time to run)
+# 1,000 for testing ONLY
+num_of_works <- 1000 
+summary(ref_works2)
+
+### Testing if a work is found. 
+search_string <- "https://openalex.org/W2919115771"
+result <- lapply(ref_works2, function(x) grep(search_string, x, value = TRUE))
+print(result)
+matches <- result[sapply(result, length) > 0]
+print(matches)
+indices <- which(sapply(ref_works2, function(x) any(grepl(search_string, x))))
+for (i in indices) {
+  cat("Index:", i, "\n")
+  cat("Element:\n", ref_works2[[i]], "\n\n")
+}
+
+# the real number of works cited
+#num_of_works <- length(ref_works_cited2)
+
+#Creating an empty dataframe to store the results of the for loop.
+WorksCited2.df <-data.frame()
+# getting these works' metadata. 50 works a time (It will take 20-40 mins to run!!!) 
+for(i in seq(1, num_of_works, by=50)){
+  batch_identifiers <-ref_works_cited2[i:min(i+49, num_of_works)]
+  batch_data <-oa_fetch(identifier=batch_identifiers)
+ WorksCited2.df<-rbind(WorksCited2.df, batch_data)
+}
+
+
+#############################################333
+WorksCited <- as.list(unique(do.call(rbind,WorksUnique.df$referenced_works)))
+
 #Removing any values of NA and any duplicate values
-# reduced to 1.07 million (hm... need to check )
 WorksCited <-unique(WorksCited) %>%discard(is.na)
-
-
 
 #Creating an empty dataframe to store the results of the for loop.
 WorksCited.df <-data.frame()
@@ -152,5 +183,3 @@ for(i in seq(1, length(WorksCited), by=50)){
   batch_data <-oa_fetch(identifier=batch_identifiers)
   WorksCited.df<-rbind(WorksCited.df, batch_data)
 }
-
-
