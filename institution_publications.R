@@ -1,7 +1,7 @@
 ############# Institution authors publication analysis and Collection Management ##########
 ######## Author: Yan Han with help of ChatGPT 4
 ######## Date: Sep 6, 2024
-######## Updated: 
+######## Updated: Fixed NA issue with host_organization
 ##### Search an institution authors' publication using openAlex data ####
 # OpenAlex R Documentation: https://github.com/ropensci/openalexR
 
