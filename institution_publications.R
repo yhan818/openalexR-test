@@ -1,6 +1,6 @@
 ############# Institution authors publication analysis and Collection Management ##########
-######## Author: Yan Han
-######## Date: Sep 3, 2024
+######## Author: Yan Han with help of ChatGPT 4
+######## Date: Sep 6, 2024
 ######## Updated: 
 ##### Search an institution authors' publication using openAlex data ####
 # OpenAlex R Documentation: https://github.com/ropensci/openalexR
@@ -22,7 +22,10 @@ options("max.print" = 100000)
 
 options (openalexR.mailto="yhan@arizona.edu")
 getwd()
-setwd("/home/yhan/Documents/UA-datasets/openalexR-test/")
+setwd("/home/yhan/Documents/openalexR-test/")
+
+# Load saved rds file into a data frame. This is year 2023 UA works
+org_works <- readRDS("../works_cited.rds")
 
 # Banner-University Medical Center Tucson. 399 works.
 UAUMC.df <-oa_fetch(
@@ -33,6 +36,7 @@ UAUMC.df <-oa_fetch(
 ##### 1. Getting data. (retrieved 2024-09-02)
 # Retrieving all publications association with UArizona's ROR (Research Organization Registry) ID.
 # Need to run 2 years data. or need better computer. 
+# Year 2023: 9,157 works.
 # 2023-current: 14,660 works : 5 min to get UAworks with 3 GB mem, 264 mins to pull 372,000 reference's data with 8.6 GB  
 # 2022-current: 23,360 works: 10 mins to get UAWorks with 6 GB RAM, 450 mins to pull 560,000 citedWorks's data with 12 GB. crashed R studio.
 # 2020-current: 
@@ -48,22 +52,21 @@ UAworks_count <-oa_fetch(
   count_only = TRUE
 )
 
-
 ### 1.2 Getting all the works based on the institution ROR and publication date. It takes longer time. 
 # see above for the running time
-UAworks <-oa_fetch(
+org_works <-oa_fetch(
   entity="works",
   institutions.ror=c("03m2x1q45"),
-  from_publication_date ="2023-01-01"
-  # , to_publication_date = "2021-12-31"
-  )
+  from_publication_date ="2023-01-01",
+  to_publication_date = "2023-12-31"
+)
 
 # alternative to get referenced works (to verify: The below is to make sure UA authors only)
 # 15k works ==> 20 M references??? 
 
 ##### 2. Checking and verifying data
 ###### change this line only to update the right dataset.
-ref_works <- UAworks$referenced_works
+ref_works <- org_works$referenced_works
 #########################
 
 ### 2.1 Checking Column referenced_works:  a list
@@ -72,21 +75,19 @@ class(ref_works)
 # Find "NA" indexes 
 na_indices <- which(sapply(ref_works, function(x) is.logical(x) && is.na(x)))
 print(na_indices)
-# count how many "NA" in referenced_works col. ~ 20% of works contain "NA"
+# count how many "NA" in referenced_works col. ~ 10%-20%  of works contain "NA"
 na_count <- sum(sapply(ref_works, function(x) is.logical(x) && is.na(x)))
 print(na_count)
 
 ### 2.2 Combine all the references and do further data analysis
 ref_works_combined <- unlist(ref_works, use.names = FALSE)
 ref_works_combined <- ref_works_combined[!is.na(ref_works_combined)]  # Remove NA values
-print(ref_works_combined)
 summary(ref_works_combined)
 
 ### 2.21 finding these duplicates, which mean the duplicates have been cited multiple times 
 # (probably more important to have these journals subscribed!)
-# cited more: ~25% (2023 data)
+# cited more: ~25% - 33%  (2023 data)
 ref_works_more_cited <- ref_works_combined[duplicated(ref_works_combined)]
-print(ref_works_more_cited)
 summary(ref_works_more_cited)
 
 # 2.22 remove the duplicates for further processing. 
@@ -97,14 +98,18 @@ summary(ref_works_cited)
 # 3. Data cleanup.
 # Flattening authors fields from the DF (multiple authors per work). 
 # 426,000 obs (multiple authors) from 50,400 obs (works)
-UAworks_since <- UAworks
+org_works_since <- org_works
 
-UAWorks_authors<-UAworks_since%>%
+org_works_authors<-org_works_since%>%
   mutate(author=lapply(author, function(x){
     names(x) <-paste0(names(x), "author")
     return(x)
   }))%>%
-unnest(author)
+  unnest(author)
+
+# After flattening, authors' fields (e.g. au_idauthor, institution_rorauthor) are displayed
+colnames(org_works)
+colnames(org_works_UAauthors)
 
 #### TESTING!!!
 # Then extract UArizona authors only
@@ -119,13 +124,13 @@ oa_fetch_test2 <-oa_fetch_test2 <-oa_fetch( entity="authors",  id="https://opena
 
 #### This is not 100% accurate because UArizona has child organization whose ROR is associated with an article. By filtering institution_rorauthor
 # to UArizona's ROR, certain articles are left out!!! 
-UAWorks_UAauthors2 <- UAWorks_authors%>%filter(institution_rorauthor== "https://ror.org/03m2x1q45")
+org_works_UAauthors <- org_works_authors%>%filter(institution_rorauthor== "https://ror.org/03m2x1q45")
 
 ## why https://openalex.org/W2991357209 (can be filtered out)
 
-# 3. check workcited
+# 3. check work_cited
 # 8.2 million 
-ref_works2 <- UAWorks_UAauthors2$referenced_works
+ref_works2 <- org_works_UAauthors$referenced_works
 #########################
 
 # Combine all the references and do further data analysis
@@ -154,18 +159,16 @@ print(diff2)
 # Find the indices of elements matching a pattern
 matching_indices <- grep("https://openalex.org/W4401226694", ref_works2 )
 print(matching_indices)  # Returns the index(es) of matching elements
-
 matching_indices <- grep("https://openalex.org/W3203440266", ref_works )
 print(matching_indices)  # Returns the index(es) of matching elements
-
 
 #Running the loop to retrieve works cited data (may take someref_works_cited2#Running the loop to retrieve works cited data (may take some time to run)
 # 1,000 for testing ONLY
 num_of_works <- 1000
 
 # the real number of works cited
-# 2023: 379,978
-# 2022: 571,227. Note: This crashed R studio with 12 GB memeroy used. showing 560,000
+# 2023-current: 379,978
+# 2022-current: 571,227. Note: This crashed R studio with 12 GB memeroy used. showing 560,000
 num_of_works <- length(ref_works_cited2)
 summary(ref_works2)
 
@@ -181,48 +184,81 @@ for (i in indices) {
   cat("Element:\n", ref_works2[[i]], "\n\n")
 }
 
-
 #Creating an empty dataframe to store the results of the for loop.
+works_cited_df <-data.frame()
 WorksCited2.df <-data.frame()
-# getting these works' metadata. 50 works a time (It will take 20-40 mins to run!!!) 
+# getting these works' metadata. 100 or 1,000 works a time (It will take 60 - 180 mins to run!!!) 
 # 18,211 works for 2024 citations
-# 2023: 379,978 works: 2 hrs to run? 
+# 2023: 241,252. 171 min to run
 
-fetch_number <- 1000
-time_taken <- system.time({
-  # Take by=100 one time gets 205 obs.  cannot set it too high. 500 will miss works.
+# the number of works to fetch at a time has little influence the time to run oa_fetch
+# 2024-09: fetch_number = 1,000, reduced the total running time of 10% comparing to fetch_number 100
+# 2024-09: fetching 241,000 works took 188 minutes
+# test 100 records per time
+
+fetch_number <- 100
+time_taken <- system.time({ 
   for(i in seq(1, num_of_works, by=fetch_number)){
     batch_identifiers <-ref_works_cited2[i:min(i+fetch_number-1, num_of_works)]
     batch_data <-oa_fetch(identifier=batch_identifiers)
-    WorksCited2.df<-rbind(WorksCited2.df, batch_data)
+    works_cited_df<-rbind(works_cited_df, batch_data)
   }
 })
 print(paste("time to run: ", time_taken["elapsed"] / 60, "minutes"))
 
+UAauthors <-unique(org_works_UAauthors)
+
+# Saving data frames to RDS files
+library(writexl)
+saveRDS(org_works, "org_works.rds")
+
+write_xlsx(UAauthors2, "UAauthors.xlsx")
+
+
+
+###################### Citation Analysis
 # 372,000 works use 0.2 GB memory
-df <- WorksCited2.df
-# further analysis
+articles_cited_df <- org_works
+
+# Empty or NULL records
+count_null_empty_id <- sum(is.na(articles_cited_df$id) | trimws(articles_cited_df$id) == "")
+count_null_empty_id
+
+missing_ids <- articles_cited_df[is.na(articles_cited_df$id) | trimws(articles_cited_df$id) == "", ]
+print(missing_ids)
+
+articles_cited_df <- articles_cited_df[!(is.na(articles_cited_df$id) | trimws(articles_cited_df$id) == ""), ]
+
+# 1. Analyse journal usage
+#  - remove any row whose col "issn_l" is empty or NULL 
+#  - 224,000 articles out of 241,000 works
+temp_df <- articles_cited_df
+articles_cited_df <- temp_df[!(is.na(temp_df$issn_l) | temp_df$issn_l == ""), ]
+
+### 
+# Count the number of NA or empty strings in articles_cited_df
+count_null_empty_id <- sum(is.na(articles_cited_df$id) | trimws(articles_cited_df$id) == "")
+
+
 # publisher: host_organization
-unique_publishers <- unique(df$host_organization)
-# number of publishers
+
+### CDC has a weekly journal with ISSN: https://portal.issn.org/resource/ISSN/1545-8636
+
+unique_publishers <- unique(articles_cited_df$host_organization)
+# number of publishers: 1,600
 num_unique_publishers <- length(unique_publishers)
 # list top 50 publishers
 print(unique_publishers[1:50])
 # list NULL publishers. 18,000 / 372,000 works
-num_na <- sum(is.na(df$host_organization))
+num_na <- sum(is.na(articles_cited_df$host_organization))
 print(num_na)
 
+# showing all CDC's journals
+CDC_journals <- data.frame()
+CDC_journals <- articles_cited_df[articles_cited_df$host_organization == "Centers for Disease Control and Prevention", ]
 
+# NULL records
+count_null_empty_id <- sum(is.na(CDC_journals$id) | trimws(CDC_journals$id) == "")
 
-#############################################
-WorksCited <- as.list(unique(do.call(rbind,WorksUnique.df$referenced_works)))
-#Removing any values of NA and any duplicate values
-WorksCited <-unique(WorksCited) %>%discard(is.na)
-#Creating an empty dataframe to store the results of the for loop.
-WorksCited.df <-data.frame()
-#Running the loop to retrieve works cited data (may take some time to run)
-for(i in seq(1, length(WorksCited), by=50)){
-  batch_identifiers <-WorksCited[i:min(i+49, length(WorksCited))]
-  batch_data <-oa_fetch(identifier=batch_identifiers)
-  WorksCited.df<-rbind(WorksCited.df, batch_data)
-}
+CDC_journals <- articles_cited_df[articles_cited_df$host_organization == "Centers for Disease Control and Prevention", ]
+
