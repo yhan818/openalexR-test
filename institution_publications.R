@@ -61,6 +61,8 @@ org_works <-oa_fetch(
   to_publication_date = "2023-12-31"
 )
 
+saveRDS(org_works, "..\org_works.rds")
+
 # alternative to get referenced works (to verify: The below is to make sure UA authors only)
 # 15k works ==> 20 M references??? 
 
@@ -109,7 +111,7 @@ org_works_authors<-org_works_since%>%
 
 # After flattening, authors' fields (e.g. au_idauthor, institution_rorauthor) are displayed
 colnames(org_works)
-colnames(org_works_UAauthors)
+colnames(org_works_authors)
 
 #### TESTING!!!
 # Then extract UArizona authors only
@@ -130,34 +132,23 @@ org_works_UAauthors <- org_works_authors%>%filter(institution_rorauthor== "https
 
 # 3. check work_cited
 # 8.2 million 
-ref_works2 <- org_works_UAauthors$referenced_works
+org_ref_works <- org_works_UAauthors$referenced_works
 #########################
 
 # Combine all the references and do further data analysis
-ref_works_combined2 <- unlist(ref_works2, use.names = FALSE)
-ref_works_combined2 <- ref_works_combined2[!is.na(ref_works_combined2)]  # Remove NA values
-summary(ref_works_combined2)
+org_ref_works_combined <- unlist(org_ref_works, use.names = FALSE)
+org_ref_works_combined <- org_ref_works_combined[!is.na(org_ref_works_combined)]  # Remove NA values
 
 # finding these duplicates, which mean the duplicates have been cited multiple times 
 # Cited multiple times: 65% ?
-ref_works_more_cited2 <- ref_works_combined[duplicated(ref_works_combined2)]
-summary(ref_works_more_cited2)
+org_ref_works_more_cited <- org_ref_works_combined[duplicated(org_ref_works_combined)]
 
-# 2.22 remove the duplicates for further processing. 
-# Cited: 
-ref_works_cited2 <- unique(ref_works_combined2)
-summary(ref_works_cited2)
+# 2.22 remove the duplicates for further processing. Cited
+org_ref_works_cited <- unique(org_ref_works_combined)
 
-######################## TEST
-# Elements in vector1 but not in vector2
-diff1 <- setdiff(ref_works_cited, ref_works_cited2)
-print(diff1)
-
-diff2 <- setdiff(ref_works_cited2, ref_works_cited)
-print(diff2)
 
 # Find the indices of elements matching a pattern
-matching_indices <- grep("https://openalex.org/W4401226694", ref_works2 )
+matching_indices <- grep("https://openalex.org/W4401226694", org_ref_works)
 print(matching_indices)  # Returns the index(es) of matching elements
 matching_indices <- grep("https://openalex.org/W3203440266", ref_works )
 print(matching_indices)  # Returns the index(es) of matching elements
@@ -169,8 +160,7 @@ num_of_works <- 1000
 # the real number of works cited
 # 2023-current: 379,978
 # 2022-current: 571,227. Note: This crashed R studio with 12 GB memeroy used. showing 560,000
-num_of_works <- length(ref_works_cited2)
-summary(ref_works2)
+num_of_works <- length(org_ref_works_cited)
 
 ### Testing if a work is found. 
 search_string <- "https://openalex.org/W2919115771"
@@ -178,15 +168,15 @@ result <- lapply(ref_works2, function(x) grep(search_string, x, value = TRUE))
 print(result)
 matches <- result[sapply(result, length) > 0]
 print(matches)
-indices <- which(sapply(ref_works2, function(x) any(grepl(search_string, x))))
+indices <- which(sapply(org_ref_works, function(x) any(grepl(search_string, x))))
 for (i in indices) {
   cat("Index:", i, "\n")
-  cat("Element:\n", ref_works2[[i]], "\n\n")
+  cat("Element:\n", org_ref_works[[i]], "\n\n")
 }
 
 #Creating an empty dataframe to store the results of the for loop.
 works_cited_df <-data.frame()
-WorksCited2.df <-data.frame()
+#WorksCited2.df <-data.frame()
 # getting these works' metadata. 100 or 1,000 works a time (It will take 60 - 180 mins to run!!!) 
 # 18,211 works for 2024 citations
 # 2023: 241,252. 171 min to run
@@ -199,7 +189,7 @@ WorksCited2.df <-data.frame()
 fetch_number <- 100
 time_taken <- system.time({ 
   for(i in seq(1, num_of_works, by=fetch_number)){
-    batch_identifiers <-ref_works_cited2[i:min(i+fetch_number-1, num_of_works)]
+    batch_identifiers <-org_ref_works_cited[i:min(i+fetch_number-1, num_of_works)]
     batch_data <-oa_fetch(identifier=batch_identifiers)
     works_cited_df<-rbind(works_cited_df, batch_data)
   }
@@ -210,7 +200,7 @@ UAauthors <-unique(org_works_UAauthors)
 
 # Saving data frames to RDS files
 library(writexl)
-saveRDS(org_works, "org_works.rds")
+saveRDS(org_ref_works_cited, "../org_ref_works_cited.rds")
 
 write_xlsx(UAauthors2, "UAauthors.xlsx")
 
@@ -220,25 +210,25 @@ write_xlsx(UAauthors2, "UAauthors.xlsx")
 # 372,000 works use 0.2 GB memory
 articles_cited_df <- org_works
 
+# Trim and normalize the host_organization column
+articles_cited_df$host_organization <- trimws(articles_cited_df$host_organization)
+articles_cited_df$issn_l <- trimws(articles_cited_df$issn_l)
+
 # Empty or NULL records
 count_null_empty_id <- sum(is.na(articles_cited_df$id) | trimws(articles_cited_df$id) == "")
 count_null_empty_id
-
-missing_ids <- articles_cited_df[is.na(articles_cited_df$id) | trimws(articles_cited_df$id) == "", ]
-print(missing_ids)
 
 articles_cited_df <- articles_cited_df[!(is.na(articles_cited_df$id) | trimws(articles_cited_df$id) == ""), ]
 
 # 1. Analyse journal usage
 #  - remove any row whose col "issn_l" is empty or NULL 
-#  - 224,000 articles out of 241,000 works
+#  - 2023: 224,000 articles out of 241,000 works
 temp_df <- articles_cited_df
-articles_cited_df <- temp_df[!(is.na(temp_df$issn_l) | temp_df$issn_l == ""), ]
+temp_df <- temp_df[!(is.na(temp_df$issn_l) | temp_df$issn_l == ""), ]
 
 ### 
 # Count the number of NA or empty strings in articles_cited_df
 count_null_empty_id <- sum(is.na(articles_cited_df$id) | trimws(articles_cited_df$id) == "")
-
 
 # publisher: host_organization
 
@@ -253,12 +243,31 @@ print(unique_publishers[1:50])
 num_na <- sum(is.na(articles_cited_df$host_organization))
 print(num_na)
 
+# Replace NA values and empty strings with "NA"
+articles_cited_df$host_organization[is.na(articles_cited_df$host_organization) | trimws(articles_cited_df$host_organization) == ""] <- "NA"
+
+# 1. First, showing all NA publisher: meaning publisher info is not available. 
+publisher_NA <- articles_cited_df[articles_cited_df$host_organization == "NA", ]
+
+# Springer
+publisher_springer <- articles_cited_df[articles_cited_df$host_organization == "Springer Science+Business Media", ]
+count_null_id <- sum(is.na(publisher_springer$id)) 
+
+# Elsevier
+publisher_elsevier <- articles_cited_df[articles_cited_df$host_organization == "Elsevier BV", ]
+
 # showing all CDC's journals
-CDC_journals <- data.frame()
-CDC_journals <- articles_cited_df[articles_cited_df$host_organization == "Centers for Disease Control and Prevention", ]
+publisher_cdc <- articles_cited_df[articles_cited_df$host_organization == "Centers for Disease Control and Prevention", ]
 
-# NULL records
-count_null_empty_id <- sum(is.na(CDC_journals$id) | trimws(CDC_journals$id) == "")
+# Group by 'host_organization' and count the number of articles for each publisher
+publisher_ranking <- articles_cited_df %>%
+  group_by(host_organization) %>%
+  summarise(article_count = n()) %>%
+  arrange(desc(article_count))
 
-CDC_journals <- articles_cited_df[articles_cited_df$host_organization == "Centers for Disease Control and Prevention", ]
+# View the top 50 publishers
+top_50_publishers <- head(publisher_ranking, 50)
+
+# Display the result
+print(top_50_publishers)
 
