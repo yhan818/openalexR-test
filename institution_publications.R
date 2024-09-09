@@ -25,7 +25,7 @@ getwd()
 setwd("/home/yhan/Documents/openalexR-test/")
 
 # Load saved rds file into a data frame. This is year 2023 UA works
-org_works <- readRDS("../works_cited.rds")
+works_cited <- readRDS("../works_cited.rds")
 
 # Banner-University Medical Center Tucson. 399 works.
 UAUMC.df <-oa_fetch(
@@ -54,17 +54,16 @@ UAworks_count <-oa_fetch(
 
 ### 1.2 Getting all the works based on the institution ROR and publication date. It takes longer time. 
 # see above for the running time
-org_works <-oa_fetch(
+org_works_2023 <-oa_fetch(
   entity="works",
   institutions.ror=c("03m2x1q45"),
   from_publication_date ="2023-01-01",
   to_publication_date = "2023-12-31"
 )
 
-saveRDS(org_works, "..\org_works.rds")
+saveRDS(org_works_2023, "../org_works_2023.rds")
 
-# alternative to get referenced works (to verify: The below is to make sure UA authors only)
-# 15k works ==> 20 M references??? 
+org_works <- org_works_2023
 
 ##### 2. Checking and verifying data
 ###### change this line only to update the right dataset.
@@ -126,6 +125,7 @@ oa_fetch_test2 <-oa_fetch_test2 <-oa_fetch( entity="authors",  id="https://opena
 
 #### This is not 100% accurate because UArizona has child organization whose ROR is associated with an article. By filtering institution_rorauthor
 # to UArizona's ROR, certain articles are left out!!! 
+# 2024-09: I am currently working with openAlexR developers to fix this. 
 org_works_UAauthors <- org_works_authors%>%filter(institution_rorauthor== "https://ror.org/03m2x1q45")
 
 ## why https://openalex.org/W2991357209 (can be filtered out)
@@ -135,17 +135,17 @@ org_works_UAauthors <- org_works_authors%>%filter(institution_rorauthor== "https
 org_ref_works <- org_works_UAauthors$referenced_works
 #########################
 
-# Combine all the references and do further data analysis
+# Combine all the references and do further data analysis.
+# Giving avg 30-40 references per work, the size will be 40x.
 org_ref_works_combined <- unlist(org_ref_works, use.names = FALSE)
 org_ref_works_combined <- org_ref_works_combined[!is.na(org_ref_works_combined)]  # Remove NA values
 
 # finding these duplicates, which mean the duplicates have been cited multiple times 
-# Cited multiple times: 65% ?
+# Cited multiple times = 65% 
 org_ref_works_more_cited <- org_ref_works_combined[duplicated(org_ref_works_combined)]
 
-# 2.22 remove the duplicates for further processing. Cited
+# 2.22 remove the duplicates for further processing. unique works cited = 38% 
 org_ref_works_cited <- unique(org_ref_works_combined)
-
 
 # Find the indices of elements matching a pattern
 matching_indices <- grep("https://openalex.org/W4401226694", org_ref_works)
@@ -208,7 +208,7 @@ write_xlsx(UAauthors2, "UAauthors.xlsx")
 
 ###################### Citation Analysis
 # 372,000 works use 0.2 GB memory
-articles_cited_df <- org_works
+articles_cited_df <- works_cited
 
 # Trim and normalize the host_organization column
 articles_cited_df$host_organization <- trimws(articles_cited_df$host_organization)
@@ -235,13 +235,13 @@ count_null_empty_id <- sum(is.na(articles_cited_df$id) | trimws(articles_cited_d
 ### CDC has a weekly journal with ISSN: https://portal.issn.org/resource/ISSN/1545-8636
 
 unique_publishers <- unique(articles_cited_df$host_organization)
-# number of publishers: 1,600
+# number of publishers: ~1,600
 num_unique_publishers <- length(unique_publishers)
 # list top 50 publishers
 print(unique_publishers[1:50])
-# list NULL publishers. 18,000 / 372,000 works
+# list NULL publishers = 5%
 num_na <- sum(is.na(articles_cited_df$host_organization))
-print(num_na)
+nrow(articles_cited_df)
 
 # Replace NA values and empty strings with "NA"
 articles_cited_df$host_organization[is.na(articles_cited_df$host_organization) | trimws(articles_cited_df$host_organization) == ""] <- "NA"
@@ -249,12 +249,12 @@ articles_cited_df$host_organization[is.na(articles_cited_df$host_organization) |
 # 1. First, showing all NA publisher: meaning publisher info is not available. 
 publisher_NA <- articles_cited_df[articles_cited_df$host_organization == "NA", ]
 
-# Springer
+# 2. Elsevier
+publisher_elsevier <- articles_cited_df[articles_cited_df$host_organization == "Elsevier BV", ]
+
+# 3. Springer
 publisher_springer <- articles_cited_df[articles_cited_df$host_organization == "Springer Science+Business Media", ]
 count_null_id <- sum(is.na(publisher_springer$id)) 
-
-# Elsevier
-publisher_elsevier <- articles_cited_df[articles_cited_df$host_organization == "Elsevier BV", ]
 
 # showing all CDC's journals
 publisher_cdc <- articles_cited_df[articles_cited_df$host_organization == "Centers for Disease Control and Prevention", ]
@@ -265,9 +265,6 @@ publisher_ranking <- articles_cited_df %>%
   summarise(article_count = n()) %>%
   arrange(desc(article_count))
 
-# View the top 50 publishers
-top_50_publishers <- head(publisher_ranking, 50)
-
-# Display the result
-print(top_50_publishers)
-
+# View the top 50 publishers.  
+# Top 10: Elsevier (20%), Wiley (9.4%), Oxfor University Press (6.3%), Springer(5.7%), Nature Portfolio,
+#  IOP Publishing, Lippincott Williams & Wilkins, Taylor & Francis, SAGE Publishing (2.6%)
