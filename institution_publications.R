@@ -35,7 +35,7 @@ UAUMC.df <-oa_fetch(
 
 ##### 1. Getting data. (retrieved 2024-09-02)
 # Retrieving all publications association with UArizona's ROR (Research Organization Registry) ID.
-# Need to run 2 years data. or need better computer. 
+# UA publications per year is ~9,000. For running 2 years data, need better computer or crashed R studio.
 # Year 2023: 9,157 works.
 # 2023-current: 14,660 works : 5 min to get UAworks with 3 GB mem, 264 mins to pull 372,000 reference's data with 8.6 GB  
 # 2022-current: 23,360 works: 10 mins to get UAWorks with 6 GB RAM, 450 mins to pull 560,000 citedWorks's data with 12 GB. crashed R studio.
@@ -48,7 +48,8 @@ UAUMC.df <-oa_fetch(
 UAworks_count <-oa_fetch(
   entity="works",
   institutions.ror=c("03m2x1q45"),
-  from_publication_date ="2022-01-01",
+  from_publication_date ="2021-01-01",
+  to_publication_date = "2021-12-31",
   count_only = TRUE
 )
 
@@ -60,10 +61,18 @@ org_works_2023 <-oa_fetch(
   from_publication_date ="2023-01-01",
   to_publication_date = "2023-12-31"
 )
-
 saveRDS(org_works_2023, "../org_works_2023.rds")
 
-org_works <- org_works_2023
+org_works_2022 <-oa_fetch(
+  entity="works",
+  institutions.ror=c("03m2x1q45"),
+  from_publication_date ="2022-01-01",
+  to_publication_date = "2022-12-31"
+)
+saveRDS(org_works_2022, "../org_works_2022.rds")
+
+# change working data here 
+org_works <- org_works_2022
 
 ##### 2. Checking and verifying data
 ###### change this line only to update the right dataset.
@@ -76,7 +85,7 @@ class(ref_works)
 # Find "NA" indexes 
 na_indices <- which(sapply(ref_works, function(x) is.logical(x) && is.na(x)))
 print(na_indices)
-# count how many "NA" in referenced_works col. ~ 10%-20%  of works contain "NA"
+# count how many "NA" in referenced_works col. ~ 15%-20%  of works contain "NA"
 na_count <- sum(sapply(ref_works, function(x) is.logical(x) && is.na(x)))
 print(na_count)
 
@@ -87,9 +96,19 @@ summary(ref_works_combined)
 
 ### 2.21 finding these duplicates, which mean the duplicates have been cited multiple times 
 # (probably more important to have these journals subscribed!)
-# cited more: ~25% - 33%  (2023 data)
+# cited more: ~20% - 25%  (2022, 2023 UArizona data)
 ref_works_more_cited <- ref_works_combined[duplicated(ref_works_combined)]
-summary(ref_works_more_cited)
+
+table(ref_works_more_cited)
+
+### 2.23 For Testing purpose
+# Find the index of multiple samples
+which(ref_works_combined %in% c("https://openalex.org/W4292309267", "https://openalex.org/W621173178"))
+# Find the index of "ref1" in the published works' referenced_works. 
+which(sapply(org_works$referenced_works, function(x) "https://openalex.org/W4292309267" %in% x))
+# We can see the original works for samples
+org_works[706, "id"]
+org_works[779, "id"]
 
 # 2.22 remove the duplicates for further processing. 
 # cited:  
@@ -112,7 +131,7 @@ org_works_authors<-org_works_since%>%
 colnames(org_works)
 colnames(org_works_authors)
 
-#### TESTING!!!
+#### 3.3 TESTING!!!
 # Then extract UArizona authors only
 # 94,500 obs from 426,000 obs (UA authors only).  
 ## https://openalex.org/A5033317672 Saurav Mallik (is at two affiliations for https://api.openalex.org/works/W4389611927. Harvard and University of Arizona)
@@ -200,15 +219,24 @@ UAauthors <-unique(org_works_UAauthors)
 
 # Saving data frames to RDS files
 library(writexl)
-saveRDS(org_ref_works_cited, "../org_ref_works_cited.rds")
+saveRDS(works_cited_df, "../works_cited_2022.rds")
 
-write_xlsx(UAauthors2, "UAauthors.xlsx")
-
+#write_xlsx(UAauthors2, "UAauthors.xlsx")
 
 
 ###################### Citation Analysis
 # 372,000 works use 0.2 GB memory
-articles_cited_df <- works_cited
+
+articles_cited_df <- works_cited_df
+# 1. Analyse journal usage
+#  - remove any row whose col "issn_l" is empty or NULL 
+#  - 2023: 224,000 articles out of 241,000 works
+articles_cited_df <- articles_cited_df[!(is.na(articles_cited_df$issn_l) | articles_cited_df$issn_l == ""), ]
+nrow(articles_cited_df)
+
+# articles_cited_df_2022: 226,471 out of 243,452 
+# articles_cited_df_2022: 224,000 
+saveRDS(articles_cited_df, "../articles_cited_df_2022.rds")
 
 # Trim and normalize the host_organization column
 articles_cited_df$host_organization <- trimws(articles_cited_df$host_organization)
@@ -219,16 +247,6 @@ count_null_empty_id <- sum(is.na(articles_cited_df$id) | trimws(articles_cited_d
 count_null_empty_id
 
 articles_cited_df <- articles_cited_df[!(is.na(articles_cited_df$id) | trimws(articles_cited_df$id) == ""), ]
-
-# 1. Analyse journal usage
-#  - remove any row whose col "issn_l" is empty or NULL 
-#  - 2023: 224,000 articles out of 241,000 works
-temp_df <- articles_cited_df
-temp_df <- temp_df[!(is.na(temp_df$issn_l) | temp_df$issn_l == ""), ]
-
-### 
-# Count the number of NA or empty strings in articles_cited_df
-count_null_empty_id <- sum(is.na(articles_cited_df$id) | trimws(articles_cited_df$id) == "")
 
 # publisher: host_organization
 
@@ -241,23 +259,27 @@ num_unique_publishers <- length(unique_publishers)
 print(unique_publishers[1:50])
 # list NULL publishers = 5%
 num_na <- sum(is.na(articles_cited_df$host_organization))
-nrow(articles_cited_df)
 
 # Replace NA values and empty strings with "NA"
 articles_cited_df$host_organization[is.na(articles_cited_df$host_organization) | trimws(articles_cited_df$host_organization) == ""] <- "NA"
 
 # 1. First, showing all NA publisher: meaning publisher info is not available. 
 publisher_NA <- articles_cited_df[articles_cited_df$host_organization == "NA", ]
+write_xlsx(publisher_NA, "publisher_NA.xlsx")
 
 # 2. Elsevier
 publisher_elsevier <- articles_cited_df[articles_cited_df$host_organization == "Elsevier BV", ]
 
 # 3. Springer
 publisher_springer <- articles_cited_df[articles_cited_df$host_organization == "Springer Science+Business Media", ]
-count_null_id <- sum(is.na(publisher_springer$id)) 
 
 # showing all CDC's journals
 publisher_cdc <- articles_cited_df[articles_cited_df$host_organization == "Centers for Disease Control and Prevention", ]
+
+publisher_ncte <- articles_cited_df[articles_cited_df$host_organization == "National Council of Teachers of English", ]
+
+publisher_ua <- articles_cited_df[articles_cited_df$host_organization == "University of Arizona", ]
+publisher_uap <- articles_cited_df[articles_cited_df$host_organization == "University of Arizona Press", ]
 
 # Group by 'host_organization' and count the number of articles for each publisher
 publisher_ranking <- articles_cited_df %>%
@@ -265,6 +287,27 @@ publisher_ranking <- articles_cited_df %>%
   summarise(article_count = n()) %>%
   arrange(desc(article_count))
 
+library(ggplot2)
+top_10_publishers <- publisher_ranking %>% slice(1:10)
+
+# Bar plot for top 10 publishers
+ggplot(top_10_publishers, aes(x = reorder(host_organization, -article_count), y = article_count)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  coord_flip() +  # Flip the axis for better readability
+  labs(x = "Publisher", y = "Number of Articles", title = "Top 10 Publishers by Number of Articles Cited") +
+  theme_minimal()
+
+
+top_20_publishers <- publisher_ranking %>% slice(1:20)
+# Bar plot for top 10 publishers
+ggplot(top_20_publishers, aes(x = reorder(host_organization, -article_count), y = article_count)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  coord_flip() +  # Flip the axis for better readability
+  labs(x = "Publisher", y = "Number of Articles", title = "Top 20 Publishers by Number of Articles Cited") +
+  theme_minimal()
+
+
+view(publisher_ranking)
 # View the top 50 publishers.  
-# Top 10: Elsevier (20%), Wiley (9.4%), Oxfor University Press (6.3%), Springer(5.7%), Nature Portfolio,
+# Top 10: Elsevier (20%), Wiley (9.4%), Oxford University Press (6.3%), Springer(5.7%), Nature Portfolio,
 #  IOP Publishing, Lippincott Williams & Wilkins, Taylor & Francis, SAGE Publishing (2.6%)
