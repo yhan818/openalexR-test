@@ -84,12 +84,13 @@ class(ref_works)
 
 # Find "NA" indexes 
 na_indices <- which(sapply(ref_works, function(x) is.logical(x) && is.na(x)))
-print(na_indices)
 # count how many "NA" in referenced_works col. ~ 15%-20%  of works contain "NA"
 na_count <- sum(sapply(ref_works, function(x) is.logical(x) && is.na(x)))
 print(na_count)
 
 ### 2.2 Combine all the references and do further data analysis
+# Avg # of references per article: 38
+# Year 2022 total references: 345,904 
 ref_works_combined <- unlist(ref_works, use.names = FALSE)
 ref_works_combined <- ref_works_combined[!is.na(ref_works_combined)]  # Remove NA values
 summary(ref_works_combined)
@@ -101,7 +102,8 @@ ref_works_more_cited <- ref_works_combined[duplicated(ref_works_combined)]
 
 table(ref_works_more_cited)
 
-### 2.23 For Testing purpose
+############################################################
+### 2.23 For Testing purpose: Trace back from the cited article -> $referenced_works -> original published article
 # Find the index of multiple samples
 which(ref_works_combined %in% c("https://openalex.org/W4292309267", "https://openalex.org/W621173178"))
 # Find the index of "ref1" in the published works' referenced_works. 
@@ -109,17 +111,25 @@ which(sapply(org_works$referenced_works, function(x) "https://openalex.org/W4292
 # We can see the original works for samples
 org_works[706, "id"]
 org_works[779, "id"]
+###########################################################
 
 # 2.22 remove the duplicates for further processing. 
-# cited:  
+# Year 2022 cited: 280,231
+
 ref_works_cited <- unique(ref_works_combined)
 summary(ref_works_cited)
 
-# 3. Data cleanup.
+##### 3. Data cleanup.
 # Flattening authors fields from the DF (multiple authors per work). 
 # 426,000 obs (multiple authors) from 50,400 obs (works)
 org_works_since <- org_works
 
+#### Year 2022: 
+# -- org_works_authors: 75,222
+# -- org_works_UAauthors: 16,432
+# -- Org_ref_works_combined: 656,712
+# -- Org_ref_works_cited: 249,629
+# 
 org_works_authors<-org_works_since%>%
   mutate(author=lapply(author, function(x){
     names(x) <-paste0(names(x), "author")
@@ -146,16 +156,16 @@ oa_fetch_test2 <-oa_fetch_test2 <-oa_fetch( entity="authors",  id="https://opena
 # to UArizona's ROR, certain articles are left out!!! 
 # 2024-09: I am currently working with openAlexR developers to fix this. 
 org_works_UAauthors <- org_works_authors%>%filter(institution_rorauthor== "https://ror.org/03m2x1q45")
+org_works_UAauthors_unique <- unique (org_works_UAauthors)
 
 ## why https://openalex.org/W2991357209 (can be filtered out)
 
-# 3. check work_cited
-# 8.2 million 
+# 3.4 check work_cited
 org_ref_works <- org_works_UAauthors$referenced_works
-#########################
+class(org_ref_works) # a list
 
 # Combine all the references and do further data analysis.
-# Giving avg 30-40 references per work, the size will be 40x.
+# Giving avg ~ 38 references per work, the number of all the references'  will be 38x of the works. 
 org_ref_works_combined <- unlist(org_ref_works, use.names = FALSE)
 org_ref_works_combined <- org_ref_works_combined[!is.na(org_ref_works_combined)]  # Remove NA values
 
@@ -163,7 +173,7 @@ org_ref_works_combined <- org_ref_works_combined[!is.na(org_ref_works_combined)]
 # Cited multiple times = 65% 
 org_ref_works_more_cited <- org_ref_works_combined[duplicated(org_ref_works_combined)]
 
-# 2.22 remove the duplicates for further processing. unique works cited = 38% 
+# 2.22 remove the duplicates for further processing. unique works cited ~38% 
 org_ref_works_cited <- unique(org_ref_works_combined)
 
 # Find the indices of elements matching a pattern
@@ -183,7 +193,7 @@ num_of_works <- length(org_ref_works_cited)
 
 ### Testing if a work is found. 
 search_string <- "https://openalex.org/W2919115771"
-result <- lapply(ref_works2, function(x) grep(search_string, x, value = TRUE))
+result <- lapply(org_ref_works, function(x) grep(search_string, x, value = TRUE))
 print(result)
 matches <- result[sapply(result, length) > 0]
 print(matches)
@@ -195,17 +205,18 @@ for (i in indices) {
 
 #Creating an empty dataframe to store the results of the for loop.
 works_cited_df <-data.frame()
-#WorksCited2.df <-data.frame()
+WorksCited2.df <- works_cited_df
 # getting these works' metadata. 100 or 1,000 works a time (It will take 60 - 180 mins to run!!!) 
 # 18,211 works for 2024 citations
-# 2023: 241,252. 171 min to run
+# 2023: 241,252. 171 min to fetch: file size 4
+# 2022: 249,629, 174 min to fetch all the works; file size 438 M
 
 # the number of works to fetch at a time has little influence the time to run oa_fetch
 # 2024-09: fetch_number = 1,000, reduced the total running time of 10% comparing to fetch_number 100
 # 2024-09: fetching 241,000 works took 188 minutes
 # test 100 records per time
 
-fetch_number <- 100
+fetch_number <- 1000
 time_taken <- system.time({ 
   for(i in seq(1, num_of_works, by=fetch_number)){
     batch_identifiers <-org_ref_works_cited[i:min(i+fetch_number-1, num_of_works)]
@@ -219,7 +230,7 @@ UAauthors <-unique(org_works_UAauthors)
 
 # Saving data frames to RDS files
 library(writexl)
-saveRDS(works_cited_df, "../works_cited_2022.rds")
+saveRDS(works_cited_df, "../works_cited_2022-1.rds")
 
 #write_xlsx(UAauthors2, "UAauthors.xlsx")
 
@@ -231,11 +242,9 @@ articles_cited_df <- works_cited_df
 # 1. Analyse journal usage
 #  - remove any row whose col "issn_l" is empty or NULL 
 #  - 2023: 224,000 articles out of 241,000 works
+#  - 2022: 226,471 articles out of 243,452 works
 articles_cited_df <- articles_cited_df[!(is.na(articles_cited_df$issn_l) | articles_cited_df$issn_l == ""), ]
 nrow(articles_cited_df)
-
-# articles_cited_df_2022: 226,471 out of 243,452 
-# articles_cited_df_2022: 224,000 
 saveRDS(articles_cited_df, "../articles_cited_df_2022.rds")
 
 # Trim and normalize the host_organization column
@@ -249,9 +258,6 @@ count_null_empty_id
 articles_cited_df <- articles_cited_df[!(is.na(articles_cited_df$id) | trimws(articles_cited_df$id) == ""), ]
 
 # publisher: host_organization
-
-### CDC has a weekly journal with ISSN: https://portal.issn.org/resource/ISSN/1545-8636
-
 unique_publishers <- unique(articles_cited_df$host_organization)
 # number of publishers: ~1,600
 num_unique_publishers <- length(unique_publishers)
@@ -265,7 +271,7 @@ articles_cited_df$host_organization[is.na(articles_cited_df$host_organization) |
 
 # 1. First, showing all NA publisher: meaning publisher info is not available. 
 publisher_NA <- articles_cited_df[articles_cited_df$host_organization == "NA", ]
-write_xlsx(publisher_NA, "publisher_NA.xlsx")
+write_xlsx(publisher_NA, "publisher_NA_2022.xlsx")
 
 # 2. Elsevier
 publisher_elsevier <- articles_cited_df[articles_cited_df$host_organization == "Elsevier BV", ]
@@ -275,8 +281,6 @@ publisher_springer <- articles_cited_df[articles_cited_df$host_organization == "
 
 # showing all CDC's journals
 publisher_cdc <- articles_cited_df[articles_cited_df$host_organization == "Centers for Disease Control and Prevention", ]
-
-publisher_ncte <- articles_cited_df[articles_cited_df$host_organization == "National Council of Teachers of English", ]
 
 publisher_ua <- articles_cited_df[articles_cited_df$host_organization == "University of Arizona", ]
 publisher_uap <- articles_cited_df[articles_cited_df$host_organization == "University of Arizona Press", ]
@@ -288,22 +292,14 @@ publisher_ranking <- articles_cited_df %>%
   arrange(desc(article_count))
 
 library(ggplot2)
-top_10_publishers <- publisher_ranking %>% slice(1:10)
-
-# Bar plot for top 10 publishers
-ggplot(top_10_publishers, aes(x = reorder(host_organization, -article_count), y = article_count)) +
-  geom_bar(stat = "identity", fill = "steelblue") +
-  coord_flip() +  # Flip the axis for better readability
-  labs(x = "Publisher", y = "Number of Articles", title = "Top 10 Publishers by Number of Articles Cited") +
-  theme_minimal()
-
-
 top_20_publishers <- publisher_ranking %>% slice(1:20)
-# Bar plot for top 10 publishers
+
+# Bar plot for top 20 publishers
 ggplot(top_20_publishers, aes(x = reorder(host_organization, -article_count), y = article_count)) +
   geom_bar(stat = "identity", fill = "steelblue") +
+  geom_text(aes(label = article_count), vjust = 0.5, hjust = -0.2) +  # Add count labels on the bars
   coord_flip() +  # Flip the axis for better readability
-  labs(x = "Publisher", y = "Number of Articles", title = "Top 20 Publishers by Number of Articles Cited") +
+  labs(x = "Publisher", y = "Number of Articles", title = "2022 UA Top 10 Publishers (Number of Articles Cited)") +
   theme_minimal()
 
 
