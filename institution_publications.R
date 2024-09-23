@@ -14,7 +14,7 @@ install.packages("ggplot2")
 library(openalexR)
 #library(dplyr)
 library(tidyverse)
-
+library(writexl)
 # free unused obj to manage memory
 rm(list=ls())
 gc
@@ -25,7 +25,7 @@ getwd()
 setwd("/home/yhan/Documents/openalexR-test/")
 
 # Load saved rds file into a data frame. This is year 2023 UA works
-works_cited <- readRDS("../works_cited.rds")
+#works_cited <- readRDS("../works_cited.rds")
 
 # Banner-University Medical Center Tucson. 399 works.
 UAUMC.df <-oa_fetch(
@@ -63,6 +63,9 @@ org_works_2023 <-oa_fetch(
 )
 saveRDS(org_works_2023, "../org_works_2023.rds")
 
+org_works_2023 <- readRDS("../org_works_2023.rds")
+
+
 org_works_2022 <-oa_fetch(
   entity="works",
   institutions.ror=c("03m2x1q45"),
@@ -70,9 +73,10 @@ org_works_2022 <-oa_fetch(
   to_publication_date = "2022-12-31"
 )
 saveRDS(org_works_2022, "../org_works_2022.rds")
+org_works_2022 <- readRDS("../org_works_2022.rds")
 
 # change working data here 
-org_works <- org_works_2022
+org_works <- org_works_2023
 
 ##### 2. Checking and verifying data
 ###### change this line only to update the right dataset.
@@ -173,6 +177,7 @@ org_ref_works_combined <- org_ref_works_combined[!is.na(org_ref_works_combined)]
 # Cited multiple times = 65% 
 org_ref_works_more_cited <- org_ref_works_combined[duplicated(org_ref_works_combined)]
 
+
 # 2.22 remove the duplicates for further processing. unique works cited ~38% 
 org_ref_works_cited <- unique(org_ref_works_combined)
 
@@ -205,16 +210,17 @@ for (i in indices) {
 
 #Creating an empty dataframe to store the results of the for loop.
 works_cited_df <-data.frame()
-WorksCited2.df <- works_cited_df
+Works_Cited2_df <- works_cited_df
 # getting these works' metadata. 100 or 1,000 works a time (It will take 60 - 180 mins to run!!!) 
 # 18,211 works for 2024 citations
-# 2023: 241,252. 171 min to fetch: file size 4
+# 2023: 241,644. 175 min to fetch: file size 4
 # 2022: 249,629, 174 min to fetch all the works; file size 438 M
 
 # the number of works to fetch at a time has little influence the time to run oa_fetch
 # 2024-09: fetch_number = 1,000, reduced the total running time of 10% comparing to fetch_number 100
 # 2024-09: fetching 241,000 works took 188 minutes
-# test 100 records per time
+# optimize code: ... <to do> 
+# 
 
 fetch_number <- 1000
 time_taken <- system.time({ 
@@ -226,26 +232,86 @@ time_taken <- system.time({
 })
 print(paste("time to run: ", time_taken["elapsed"] / 60, "minutes"))
 
+########################################
+### Testing optimization of rbind and oa_fetch
+### 2024-09-21: 10,000 works in R old version (4.1.2): 270 seconds
+### 2024-09-23: 10,000 works in R latest version (4.4.1): 112 seconds 
+### 
+
+malaria_topic <- oa_fetch(entity = "topics", search = "malaria") %>% 
+  filter(display_name == "Malaria") %>% 
+  pull(id)
+malaria_topic
+#> [1] "https://openalex.org/T10091"
+
+system.time({
+  res <- oa_fetch(
+    topics.id = malaria_topic,
+    entity = "works",
+    verbose = TRUE,
+    options = list(sample = 10000, seed = 1),
+    output = "list"
+  )
+})
+
+fetch_number <- 1000
+num_of_works <- 1000
+
+system.time({
+  batch_identifiers <-org_ref_works_cited[1:10000]
+  res <-oa_fetch(identifier=batch_identifiers, 
+                 entity = "works",
+                 options= list(sample=10000, seed=1), 
+                 output="list")
+})
+
+
+# fetch_number =50, 170 mins
+# fetch_number = 1,000, 161 mins
+library(data.table)
+fetch_number <- 10000
+num_of_works <- 10000
+
+range_i <- seq(1, num_of_works, by=fetch_number)
+works_cited_ls <- vector("list", length = length(range_i))
+time_taken <-system.time({
+  for (idx in seq_along(range_i)) {
+    i <- range_i[idx]
+    batch_identifiers <-org_ref_works_cited[i:min(i+fetch_number-1, num_of_works)]
+    batch_data <-oa_fetch(entity="works", identifier=batch_identifiers, 
+                          options= list(sample=10000, seed=1), output="list")
+    works_cited_ls[[idx]] <- batch_data
+  }
+})
+print(paste("fetch time: ", time_taken["elapsed"] / 60, "minutes"))
+  
+
+time_taken2 <- system.time ({
+  works_cited2_df <- rbindlist(works_cited_ls, use.names=TRUE, fill=TRUE) 
+})
+print(paste("rbind time: ", time_taken2["elapsed"] / 60, "minutes"))
+
+
 UAauthors <-unique(org_works_UAauthors)
 
-# Saving data frames to RDS files
-library(writexl)
-saveRDS(works_cited_df, "../works_cited_2022-1.rds")
+saveRDS(works_cited_df, "../works_cited_2023.rds")
+
+works_cited_df <- readRDS("../works_cited_2023.rds")
+
 
 #write_xlsx(UAauthors2, "UAauthors.xlsx")
 
-
-###################### Citation Analysis
+###################### Citation Analysis ####################################
 # 372,000 works use 0.2 GB memory
 
 articles_cited_df <- works_cited_df
 # 1. Analyse journal usage
 #  - remove any row whose col "issn_l" is empty or NULL 
-#  - 2023: 224,000 articles out of 241,000 works
+#  - 2023: 224,572 articles out of 241,752 works
 #  - 2022: 226,471 articles out of 243,452 works
 articles_cited_df <- articles_cited_df[!(is.na(articles_cited_df$issn_l) | articles_cited_df$issn_l == ""), ]
 nrow(articles_cited_df)
-saveRDS(articles_cited_df, "../articles_cited_df_2022.rds")
+saveRDS(articles_cited_df, "../articles_cited_df_2023.rds")
 
 # Trim and normalize the host_organization column
 articles_cited_df$host_organization <- trimws(articles_cited_df$host_organization)
@@ -271,7 +337,27 @@ articles_cited_df$host_organization[is.na(articles_cited_df$host_organization) |
 
 # 1. First, showing all NA publisher: meaning publisher info is not available. 
 publisher_NA <- articles_cited_df[articles_cited_df$host_organization == "NA", ]
-write_xlsx(publisher_NA, "publisher_NA_2022.xlsx")
+
+publisher_NA_id <-unique(publisher_NA$id)
+
+# Check if any 'id' values are duplicated
+any_duplicated_ids <- any(duplicated(publisher_NA$id))
+
+
+# Not using unnect() because it flattens out every article per author, which creates a lot of duplicated info
+library(jsonlite)
+
+# Convert the 'author' dataframe to JSON for each row
+publisher_NA <- publisher_NA %>%
+  mutate(author = sapply(author, function(x) toJSON(x)))
+
+# Truncate only strings that exceed Excel's 32,767 character limit
+publisher_NA <- publisher_NA %>%
+  mutate(across(where(is.character), ~ ifelse(nchar(.) > 32767, substr(., 1, 32767), .)))
+
+# Save the modified dataset to Excel
+write_xlsx(publisher_NA, "publisher_NA_2023.xlsx")
+
 
 # 2. Elsevier
 publisher_elsevier <- articles_cited_df[articles_cited_df$host_organization == "Elsevier BV", ]
@@ -279,11 +365,24 @@ publisher_elsevier <- articles_cited_df[articles_cited_df$host_organization == "
 # 3. Springer
 publisher_springer <- articles_cited_df[articles_cited_df$host_organization == "Springer Science+Business Media", ]
 
-# showing all CDC's journals
+
+# Some of open source publishers
+publisher_plos <-articles_cited_df[articles_cited_df$host_organization == "Public Library of Science", ]
+write_xlsx(publisher_plos, "publisher_plos_2023.xlsx")
+
+publisher_aaas <-articles_cited_df[articles_cited_df$host_organization == "American Association for the Advancement of Science", ]
+write_xlsx(publisher_aaas, "publisher_aaas_2023.xlsx")
+
+publisher_nature <-articles_cited_df[articles_cited_df$host_organization == "Nature Portfolio", ]
+write_xlsx(publisher_nature, "publisher_nature_2023.xlsx")
+
+
+
 publisher_cdc <- articles_cited_df[articles_cited_df$host_organization == "Centers for Disease Control and Prevention", ]
 
 publisher_ua <- articles_cited_df[articles_cited_df$host_organization == "University of Arizona", ]
 publisher_uap <- articles_cited_df[articles_cited_df$host_organization == "University of Arizona Press", ]
+
 
 # Group by 'host_organization' and count the number of articles for each publisher
 publisher_ranking <- articles_cited_df %>%
@@ -299,7 +398,7 @@ ggplot(top_20_publishers, aes(x = reorder(host_organization, -article_count), y 
   geom_bar(stat = "identity", fill = "steelblue") +
   geom_text(aes(label = article_count), vjust = 0.5, hjust = -0.2) +  # Add count labels on the bars
   coord_flip() +  # Flip the axis for better readability
-  labs(x = "Publisher", y = "Number of Articles", title = "2022 UA Top 10 Publishers (Number of Articles Cited)") +
+  labs(x = "Publisher", y = "Number of Articles", title = "2023 UA Top 20 Publishers (Number of Articles Cited)") +
   theme_minimal()
 
 
@@ -307,3 +406,25 @@ view(publisher_ranking)
 # View the top 50 publishers.  
 # Top 10: Elsevier (20%), Wiley (9.4%), Oxford University Press (6.3%), Springer(5.7%), Nature Portfolio,
 #  IOP Publishing, Lippincott Williams & Wilkins, Taylor & Francis, SAGE Publishing (2.6%)
+
+################### Analyze top journals for each publisher
+
+library(dplyr)
+
+# Function to rank top cited journals
+# Usage example:
+#rank_top_cited_journals(publisher_nature, "so", 10)  # Top 10 cited journals
+
+rank_top_cited_journals <- function(data, journal_col, top_n = 10) {
+  top_cited_journals <- data %>%
+    group_by(!!sym(journal_col)) %>%      # Group by the journal names (column provided by the user)
+    summarise(citation_count = n()) %>%   # Count the number of articles per journal
+    arrange(desc(citation_count)) %>%     # Sort by citation count in descending order
+    slice(1:top_n)                        # Select top 'n' journals
+  
+  print(top_cited_journals, n = top_n)
+}
+
+rank_top_cited_journals(publisher_plos, "so")
+rank_top_cited_journals(publisher_aaas, "so")
+rank_top_cited_journals(publisher_nature, "so")
