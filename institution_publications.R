@@ -409,6 +409,9 @@ count_journals_by_publisher <- function(articles_cited, publisher_name) {
 publisher_name <- "Microbiology society"
 journal_counts_df <- count_journals_by_publisher(articles_cited, publisher_name)
 print(journal_counts_df)
+# Note: Errors
+# https://openalex.org/W2165027548 (1994 v44n3, Journal name changes and ISSN changed)
+
 
 publisher_name <- "Optica Publishing Group"
 publisher1 <-  articles_cited[grepl(publisher_name, articles_cited$host_organization, ignore.case = TRUE), ]
@@ -442,14 +445,20 @@ top_20_publishers$host_organization <- substr(top_20_publishers$host_organizatio
 
 # Bar plot for top 20 publishers
 
+
 ggplot(top_20_publishers, aes(x = reorder(host_organization, -article_count), y = article_count)) +
   geom_bar(stat = "identity", fill = "steelblue") +
-  geom_text(aes(label = paste(article_count, sprintf("(%.1f%%)", percentage))), 
-            vjust = 0.5, hjust = -0.2, size = 3) +  # Label size
+  # Real number (article count) inside the bar
+  geom_text(aes(label = article_count), 
+            vjust = 0.5, hjust = 1.2, size = 3, color = "white") +  # Adjust hjust and color for positioning inside
+  # Percentage outside the bar
+  geom_text(aes(label = sprintf("(%.0f%%)", percentage)), 
+            vjust = 0.5, hjust = -0.2, size = 3) +  # Adjust hjust for positioning outside
   coord_flip() +  # Flip the axis for better readability
   labs(x = "Publisher", y = "Number of Articles", title = "2023 UA Top 20 Publishers (Number of Articles Cited)") +
   theme_minimal() +
-  theme(axis.text.y = element_text(size = 6))  # Reduce font size of publisher names
+  theme(axis.text.y = element_text(size = 7))  # Reduce font size of publisher names
+
 
 
 view(publisher_ranking)
