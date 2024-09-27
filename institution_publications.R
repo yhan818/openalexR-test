@@ -95,10 +95,10 @@ na_percent <- na_count/length(org_works_ref) * 100
 
 # Remove NA, logical(0) from list (Meaning: no references) 
 org_works_ref <- Filter(function(x) length(x) > 0, org_works_ref)
+class(org_works_ref)
 
 org_works_ref_combined <- unlist(org_works_ref, use.names = FALSE)
 org_works_ref_combined <- org_works_ref_combined[!is.na(org_works_ref_combined)]  # Remove NA values
-summary(org_works_ref_combined)
 
 ### 2.21 finding these duplicates, which mean the duplicates have been cited multiple times 
 # (probably more important to have these journals subscribed!)
@@ -106,15 +106,28 @@ summary(org_works_ref_combined)
 org_works_ref_more_cited <- org_works_ref_combined[duplicated(org_works_ref_combined)]
 org_works_ref_unique <- org_works_ref_combined[!duplicated(org_works_ref_combined)]
 
+
 ############################################################
 ### 2.23 For Testing purpose: Trace back from the cited article -> $referenced_works -> original published article
 # Find the index of multiple samples
-which(org_works_ref_combined %in% c("https://openalex.org/W4292309267", "https://openalex.org/W621173178"))
-# Find the index of "ref1" in the published works' referenced_works. 
-which(sapply(org_works$referenced_works, function(x) "https://openalex.org/W4292309267" %in% x))
+head(org_works$referenced_works)
+head(org_works_ref_unique)
+
+# Use sapply to find matching elements in the org_works_ref for testing. 
+matching_indices <- which(sapply(org_works_ref, function(x) 
+  any(x %in% c("https://openalex.org/W1624352668", "https://openalex.org/W1548779692"))))
+
 # We can see the original works for samples
-org_works[706, "id"]
-org_works[779, "id"]
+org_works[1, "id"]
+org_works[3941, "id"]
+
+# Test to see how many times a work is cited. 
+index <- which(org_works_ref_more_cited == "https://openalex.org/W4247665917")
+print(index)
+
+index <- which(org_works_ref_unique == "https://openalex.org/W4247665917")
+print(index)
+
 ###########################################################
 
 ##### 3. From authors' DF. 
@@ -164,9 +177,6 @@ duplicates <- org_works_authors_ua[duplicated(org_works_authors_ua), ]
 # class(org_works_ua_authors_ref) # a list
 
 #Running the loop to retrieve works cited data (may take someref_works_cited2#Running the loop to retrieve works cited data (may take some time to run)
-# 1,000 for testing ONLY
-num_of_works <- 1000
-
 # the real number of works cited
 # 2023-2024: 379,978
 # 2022-2024: . Note: This crashed R studio with 12 GB memeroy used. showing 560,000
@@ -188,8 +198,8 @@ for (i in indices) {
 
 
 #Creating an empty dataframe to store the results of the for loop.
-works_cited_df <-data.frame()
-Works_Cited2_df <- works_cited_df
+works_cited <-data.frame()
+Works_Cited2 <- works_cited
 # getting these works' metadata. 100 or 1,000 works a time (It will take 60 - 180 mins to run!!!) 
 # 18,211 works for 2024 citations
 # 2023: 241,644. 175 min to fetch: file size 4
@@ -223,7 +233,7 @@ system.time({
   )
 })
 
-fetch_number <- 10000
+fetch_number <- 100
 num_of_works <- 10000
 ### The only difference from the above oa_fetch is the topics.id vs. id
 ## maybe it is my network?? 
@@ -240,10 +250,9 @@ system.time({
 })
 
 #
-
 library(data.table)
 fetch_number <- 100
-num_of_works <- 10000
+num_of_works <- 260000
 num_of_works <- length (org_works_ref_unique)
 
 range_i <- seq(1, num_of_works, by=fetch_number)
@@ -271,44 +280,50 @@ print(paste("rbind time: ", time_taken2["elapsed"] / 60, "minutes"))
   for(i in seq(1, num_of_works, by=fetch_number)){
     batch_identifiers <-org_works_ref_unique[i:min(i+fetch_number-1, num_of_works)]
     batch_data <-oa_fetch(identifier=batch_identifiers)
-    works_cited_df<-rbind(works_cited_df, batch_data)
+    works_cited<-rbind(works_cited, batch_data)
   }
 })
 print(paste("time to run: ", time_taken["elapsed"] / 60, "minutes"))
-
-
-
-
-
-
-
-
-
-
 
 ########################
 UAauthors <-unique(org_works_UAauthors)
 #write_xlsx(UAauthors2, "UAauthors.xlsx")
 
+
+### Count how many multiple cited. 
+class(org_works_ref_more_cited)
+# Count the occurrences of each unique element in the vector
+works_ref_more_cited_counts <- table(org_works_ref_more_cited)
+
+# Calculate the total number of occurrences (including duplicates and non-duplicates)
+total_works_ref_more_cited_occurrences <- sum(works_ref_more_cited_counts)
+
+#### Step 1: Re-generate a new row if it matches (meaning; cited multiple times.)
+works_cited_final <- works_cited
+# Step 2: Add these matching rows as new rows 
+matching_rows <- works_cited[works_cited$id %in% names(works_ref_more_cited_counts), ]
+# Step 3: Repeat each row in the DataFrame based on the count in org_works_ref_more_cited
+matching_rows_expanded <- matching_rows[rep(1:nrow(matching_rows), times = works_ref_more_cited_counts[matching_rows$id]), ]
+
+# We have the final works cited, including multiple occurances of a work
+works_cited_final <- rbind(works_cited_final, matching_rows_expanded)
+
+
+
+
 ######################
-saveRDS(works_cited, "../works_cited_2023.rds")
-works_cited <- readRDS("../works_cited_2023.rds")
+saveRDS(works_cited_final, "../works_cited_final_2023.rds")
+works_cited_final <- readRDS("../works_cited_final_2023.rds")
 
 ### 
-### get articles out of works
-### Year 2023: articles/works: 224,752/241,644 = 93%
-summary(works_cited)
-articles_cited <- works_cited[!is.na(works_cited$issn_l), ]
-
-
 
 ###################### Citation Analysis ####################################
-# 372,000 works use 0.2 GB memory
 
 # 1. Analyse journal usage
 #  - remove any row whose col "issn_l" is empty or NULL 
-#  - 2023: 224,572 articles out of 241,752 works
-#  - 2022: 226,471 articles out of 243,452 works
+#  - 2023: 334,820 articles out of 357,056 works: 94%
+
+articles_cited <- works_cited_final[!(is.na(works_cited_final$issn_l)), ]
 articles_cited <- articles_cited[!(is.na(articles_cited$issn_l) | articles_cited$issn_l == ""), ]
 nrow(articles_cited)
 saveRDS(articles_cited, "../articles_cited_2023.rds")
@@ -320,8 +335,6 @@ articles_cited$issn_l <- trimws(articles_cited$issn_l)
 # Empty or NULL records
 count_null_empty_id <- sum(is.na(articles_cited$id) | trimws(articles_cited$id) == "")
 count_null_empty_id
-
-articles_cited <- articles_cited[!(is.na(articles_cited$id) | trimws(articles_cited$id) == ""), ]
 
 # publisher: host_organization
 unique_publishers <- unique(articles_cited$host_organization)
@@ -376,6 +389,38 @@ write_xlsx(publisher_aaas, "publisher_aaas_2023.xlsx")
 publisher_nature <-articles_cited[articles_cited$host_organization == "Nature Portfolio", ]
 write_xlsx(publisher_nature, "publisher_nature_2023.xlsx")
 
+######################################
+######################################
+### Function: To count journal occurrences for a given publisher
+# @param: dataframe articles_cited
+#          publisher_name
+# return: journal and counts cited 
+count_journals_by_publisher <- function(articles_cited, publisher_name) {
+  # Filter rows where host_organization matches the specified publisher
+  publisher1 <-  articles_cited[grepl(publisher_name, articles_cited$host_organization, ignore.case = TRUE), ]
+  
+  # Count the occurrences of each journal under the specified publisher
+  journal_counts <- table(publisher1$so)
+  journal_counts_df <- as.data.frame(journal_counts)
+  
+  return(journal_counts_df)
+}
+
+publisher_name <- "Microbiology society"
+journal_counts_df <- count_journals_by_publisher(articles_cited, publisher_name)
+print(journal_counts_df)
+
+publisher_name <- "Optica Publishing Group"
+publisher1 <-  articles_cited[grepl(publisher_name, articles_cited$host_organization, ignore.case = TRUE), ]
+journal_counts_df <- count_journals_by_publisher(articles_cited, publisher_name)
+print(journal_counts_df)
+
+publisher_name <- "Canadian Science Publishing"
+publisher1 <-  articles_cited[grepl(publisher_name, articles_cited$host_organization, ignore.case = TRUE), ]
+journal_counts_df <- count_journals_by_publisher(articles_cited, publisher_name)
+print(journal_counts_df)
+
+
 
 
 publisher_cdc <- articles_cited[articles_cited$host_organization == "Centers for Disease Control and Prevention", ]
@@ -392,20 +437,25 @@ publisher_ranking <- articles_cited %>%
 
 library(ggplot2)
 top_20_publishers <- publisher_ranking %>% slice(1:20)
+top_20_publishers$percentage <- (top_20_publishers$article_count / sum(top_20_publishers$article_count)) * 100
+top_20_publishers$host_organization <- substr(top_20_publishers$host_organization, 1, 10)
 
 # Bar plot for top 20 publishers
+
 ggplot(top_20_publishers, aes(x = reorder(host_organization, -article_count), y = article_count)) +
   geom_bar(stat = "identity", fill = "steelblue") +
-  geom_text(aes(label = article_count), vjust = 0.5, hjust = -0.2) +  # Add count labels on the bars
+  geom_text(aes(label = paste(article_count, sprintf("(%.1f%%)", percentage))), 
+            vjust = 0.5, hjust = -0.2, size = 3) +  # Label size
   coord_flip() +  # Flip the axis for better readability
   labs(x = "Publisher", y = "Number of Articles", title = "2023 UA Top 20 Publishers (Number of Articles Cited)") +
-  theme_minimal()
+  theme_minimal() +
+  theme(axis.text.y = element_text(size = 6))  # Reduce font size of publisher names
 
 
 view(publisher_ranking)
 # View the top 50 publishers.  
-# Top 10: Elsevier (20%), Wiley (9.4%), Oxford University Press (6.3%), Springer(5.7%), Nature Portfolio,
-#  IOP Publishing, Lippincott Williams & Wilkins, Taylor & Francis, SAGE Publishing (2.6%)
+# Top 10: Elsevier (29%), Wiley (12%), Oxford University Press (9.2%), ICP (6.8%), Springer(6.3%), Nature,
+# IOP Publishing, Lippincott Williams & Wilkins, Taylor & Francis, SAGE Publishing (3%)
 
 ################### Analyze top journals for each publisher
 
