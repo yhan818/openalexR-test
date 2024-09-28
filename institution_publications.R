@@ -16,8 +16,9 @@ library(dplyr)
 library(tidyverse)
 library(writexl)
 # free unused obj to manage memory
+gc()
 rm(list=ls())
-gc
+gc()
 options("max.print" = 100000)
 
 options (openalexR.mailto="yhan@arizona.edu")
@@ -46,34 +47,35 @@ UAUMC.df <-oa_fetch(
 UAworks_count <-oa_fetch(
   entity="works",
   institutions.ror=c("03m2x1q45"),
-  from_publication_date ="2021-01-01",
-  to_publication_date = "2021-12-31",
+  from_publication_date ="2020-01-01",
+  to_publication_date = "2020-12-31",
   count_only = TRUE
 )
 
 ### 1.2 Getting all the works based on the institution ROR and publication date. It takes longer time. 
 # see above for the running time
-org_works_2023 <-oa_fetch(
+org_works_2020 <-oa_fetch(
   entity="works",
   institutions.ror=c("03m2x1q45"),
-  from_publication_date ="2023-01-01",
-  to_publication_date = "2023-12-31"
+  from_publication_date ="2020-01-01",
+  to_publication_date = "2020-12-31"
 )
-saveRDS(org_works_2023, "../org_works_2023.rds")
-
-org_works_2023 <- readRDS("../org_works_2023.rds")
-
 org_works_2022 <-oa_fetch(
   entity="works",
   institutions.ror=c("03m2x1q45"),
   from_publication_date ="2022-01-01",
   to_publication_date = "2022-12-31"
 )
-saveRDS(org_works_2022, "../org_works_2022.rds")
-org_works_2022 <- readRDS("../org_works_2022.rds")
+
+saveRDS(org_works_2021, "../org_works_2021.rds")
+# saveRDS(org_works_2022, "../org_works_2022.rds")
+
+org_works_2021 <- readRDS("../org_works_2021.rds")
+# org_works_2022 <- readRDS("../org_works_2022.rds")
+# org_works_2023 <- readRDS("../org_works_2023.rds")
 
 # change working data here 
-org_works <- org_works_2023
+org_works <- org_works_2021
 
 ##### 2. Checking and verifying data
 ##### 2.1 Route 1: Getting citation data from $referenced_works
@@ -115,18 +117,21 @@ head(org_works_ref_unique)
 
 # Use sapply to find matching elements in the org_works_ref for testing. 
 matching_indices <- which(sapply(org_works_ref, function(x) 
-  any(x %in% c("https://openalex.org/W1624352668", "https://openalex.org/W1548779692"))))
+  any(x %in% c("https://openalex.org/W1624352668", "https://openalex.org/W1548779692")))) # https://openalex.org/W1624352668 were cited on 2021 and 2023 data
+print(matching_indices)
 
 # We can see the original works for samples
-org_works[1, "id"]
-org_works[3941, "id"]
+org_works[2, "id"]
+org_works[174, "id"]
 
 # Test to see how many times a work is cited. 
 index <- which(org_works_ref_more_cited == "https://openalex.org/W4247665917")
 print(index)
 
+# https://openalex.org/W4247665917 were cited in 2021 and 2023 data
 index <- which(org_works_ref_unique == "https://openalex.org/W4247665917")
 print(index)
+org_works_ref_unique[136]
 
 ###########################################################
 
@@ -147,6 +152,11 @@ org_works_authors<-org_works_since%>%
     return(x)
   }))%>%
   unnest(author)
+
+rm(list = c("org_works_authors", "na_percent" ))
+
+UAauthors <-unique(org_works_authors)
+#write_xlsx(UAauthors2, "UAauthors.xlsx")
 
 # After flattening, authors' fields (e.g. au_idauthor, institution_rorauthor) are displayed
 colnames(org_works)
@@ -252,7 +262,7 @@ system.time({
 #
 library(data.table)
 fetch_number <- 100
-num_of_works <- 260000
+num_of_works <- 240000
 num_of_works <- length (org_works_ref_unique)
 
 range_i <- seq(1, num_of_works, by=fetch_number)
@@ -286,9 +296,6 @@ print(paste("rbind time: ", time_taken2["elapsed"] / 60, "minutes"))
 print(paste("time to run: ", time_taken["elapsed"] / 60, "minutes"))
 
 ########################
-UAauthors <-unique(org_works_UAauthors)
-#write_xlsx(UAauthors2, "UAauthors.xlsx")
-
 
 ### Count how many multiple cited. 
 class(org_works_ref_more_cited)
@@ -308,12 +315,17 @@ matching_rows_expanded <- matching_rows[rep(1:nrow(matching_rows), times = works
 # We have the final works cited, including multiple occurances of a work
 works_cited_final <- rbind(works_cited_final, matching_rows_expanded)
 
-
+### Questions: 
+# 1. I fetched 316,401 unique works, but returned 329,720 (about 2% more... )
+# 2. 
 
 
 ######################
-saveRDS(works_cited_final, "../works_cited_final_2023.rds")
-works_cited_final <- readRDS("../works_cited_final_2023.rds")
+saveRDS(works_cited, "../works_cited_2021.rds")
+saveRDS(works_cited_final, "../works_cited_final_2021.rds")
+
+works_cited_final <- readRDS("../works_cited_final_2021.rds")
+
 
 ### 
 
@@ -326,7 +338,7 @@ works_cited_final <- readRDS("../works_cited_final_2023.rds")
 articles_cited <- works_cited_final[!(is.na(works_cited_final$issn_l)), ]
 articles_cited <- articles_cited[!(is.na(articles_cited$issn_l) | articles_cited$issn_l == ""), ]
 nrow(articles_cited)
-saveRDS(articles_cited, "../articles_cited_2023.rds")
+saveRDS(articles_cited, "../articles_cited_2021.rds")
 
 # Trim and normalize the host_organization column
 articles_cited$host_organization <- trimws(articles_cited$host_organization)
@@ -368,26 +380,28 @@ publisher_NA <- publisher_NA %>%
 publisher_NA <- publisher_NA %>%
   mutate(across(where(is.character), ~ ifelse(nchar(.) > 32767, substr(., 1, 32767), .)))
 
-# Save the modified dataset to Excel
-write_xlsx(publisher_NA, "publisher_NA_2023.xlsx")
-
-
 # 2. Elsevier
 publisher_elsevier <- articles_cited[articles_cited$host_organization == "Elsevier BV", ]
-
 # 3. Springer
 publisher_springer <- articles_cited[articles_cited$host_organization == "Springer Science+Business Media", ]
 
-
 # Some of open source publishers
 publisher_plos <-articles_cited[articles_cited$host_organization == "Public Library of Science", ]
-write_xlsx(publisher_plos, "publisher_plos_2023.xlsx")
-
 publisher_aaas <-articles_cited[articles_cited$host_organization == "American Association for the Advancement of Science", ]
-write_xlsx(publisher_aaas, "publisher_aaas_2023.xlsx")
-
 publisher_nature <-articles_cited[articles_cited$host_organization == "Nature Portfolio", ]
-write_xlsx(publisher_nature, "publisher_nature_2023.xlsx")
+
+publisher_cdc <- articles_cited[articles_cited$host_organization == "Centers for Disease Control and Prevention", ]
+
+publisher_ua <- articles_cited[articles_cited$host_organization == "University of Arizona", ]
+publisher_uap <- articles_cited[articles_cited$host_organization == "University of Arizona Press", ]
+
+
+
+# Save the modified dataset to Excel
+write_xlsx(publisher_NA, "publisher_NA_2021.xlsx")
+write_xlsx(publisher_aaas, "publisher_aaas_2021.xlsx")
+write_xlsx(publisher_nature, "publisher_nature_2021.xlsx")
+write_xlsx(publisher_plos, "publisher_plos_2021.xlsx")
 
 ######################################
 ######################################
@@ -423,15 +437,6 @@ publisher1 <-  articles_cited[grepl(publisher_name, articles_cited$host_organiza
 journal_counts_df <- count_journals_by_publisher(articles_cited, publisher_name)
 print(journal_counts_df)
 
-
-
-
-publisher_cdc <- articles_cited[articles_cited$host_organization == "Centers for Disease Control and Prevention", ]
-
-publisher_ua <- articles_cited[articles_cited$host_organization == "University of Arizona", ]
-publisher_uap <- articles_cited[articles_cited$host_organization == "University of Arizona Press", ]
-
-
 # Group by 'host_organization' and count the number of articles for each publisher
 publisher_ranking <- articles_cited %>%
   group_by(host_organization) %>%
@@ -444,8 +449,6 @@ top_20_publishers$percentage <- (top_20_publishers$article_count / sum(top_20_pu
 top_20_publishers$host_organization <- substr(top_20_publishers$host_organization, 1, 10)
 
 # Bar plot for top 20 publishers
-
-
 ggplot(top_20_publishers, aes(x = reorder(host_organization, -article_count), y = article_count)) +
   geom_bar(stat = "identity", fill = "steelblue") +
   # Real number (article count) inside the bar
@@ -455,10 +458,9 @@ ggplot(top_20_publishers, aes(x = reorder(host_organization, -article_count), y 
   geom_text(aes(label = sprintf("(%.0f%%)", percentage)), 
             vjust = 0.5, hjust = -0.2, size = 3) +  # Adjust hjust for positioning outside
   coord_flip() +  # Flip the axis for better readability
-  labs(x = "Publisher", y = "Number of Articles", title = "2023 UA Top 20 Publishers (Number of Articles Cited)") +
+  labs(x = "Publisher", y = "Number of Articles", title = "2021 UA Top 20 Publishers (Number of Articles Cited)") +
   theme_minimal() +
   theme(axis.text.y = element_text(size = 7))  # Reduce font size of publisher names
-
 
 
 view(publisher_ranking)
@@ -487,3 +489,4 @@ rank_top_cited_journals <- function(data, journal_col, top_n = 10) {
 rank_top_cited_journals(publisher_plos, "so")
 rank_top_cited_journals(publisher_aaas, "so")
 rank_top_cited_journals(publisher_nature, "so")
+
