@@ -67,6 +67,7 @@ org_works_2022 <-oa_fetch(
   to_publication_date = "2022-12-31"
 )
 
+saveRDS(org_works_2020, "../org_works_2020.rds")
 saveRDS(org_works_2021, "../org_works_2021.rds")
 # saveRDS(org_works_2022, "../org_works_2022.rds")
 
@@ -75,7 +76,7 @@ org_works_2021 <- readRDS("../org_works_2021.rds")
 # org_works_2023 <- readRDS("../org_works_2023.rds")
 
 # change working data here 
-org_works <- org_works_2021
+org_works <- org_works_2020
 
 ##### 2. Checking and verifying data
 ##### 2.1 Route 1: Getting citation data from $referenced_works
@@ -107,6 +108,11 @@ org_works_ref_combined <- org_works_ref_combined[!is.na(org_works_ref_combined)]
 # cited more: ~20% - 25%  (2022, 2023 UArizona data)
 org_works_ref_more_cited <- org_works_ref_combined[duplicated(org_works_ref_combined)]
 org_works_ref_unique <- org_works_ref_combined[!duplicated(org_works_ref_combined)]
+
+### Method 2: there are different
+citation_counts <- table(org_works_ref_combined)
+# Extract citations that occur more than once (i.e., duplicates)
+org_works_ref_more_cited2 <- names(citation_counts[citation_counts > 1])
 
 
 ############################################################
@@ -300,7 +306,7 @@ print(paste("time to run: ", time_taken["elapsed"] / 60, "minutes"))
 ### Count how many multiple cited. 
 class(org_works_ref_more_cited)
 # Count the occurrences of each unique element in the vector
-works_ref_more_cited_counts <- table(org_works_ref_more_cited)
+#works_ref_more_cited_counts <- table(org_works_ref_more_cited)
 
 # Calculate the total number of occurrences (including duplicates and non-duplicates)
 total_works_ref_more_cited_occurrences <- sum(works_ref_more_cited_counts)
@@ -312,6 +318,13 @@ matching_rows <- works_cited[works_cited$id %in% names(works_ref_more_cited_coun
 # Step 3: Repeat each row in the DataFrame based on the count in org_works_ref_more_cited
 matching_rows_expanded <- matching_rows[rep(1:nrow(matching_rows), times = works_ref_more_cited_counts[matching_rows$id]), ]
 
+# 42,1866 same result
+#matching_rows <- works_cited[works_cited$id %in% names(citation_counts), ]
+# Step 3: Repeat each row in the DataFrame based on the count in org_works_ref_more_cited
+#matching_rows_expanded <- matching_rows[rep(1:nrow(matching_rows), times = citation_counts[matching_rows$id]), ]
+
+
+
 # We have the final works cited, including multiple occurances of a work
 works_cited_final <- rbind(works_cited_final, matching_rows_expanded)
 
@@ -319,10 +332,31 @@ works_cited_final <- rbind(works_cited_final, matching_rows_expanded)
 # 1. I fetched 316,401 unique works, but returned 329,720 (about 2% more... )
 # 2. 
 
+############# Testing
+
+difference_df1_df2 <- setdiff(works_cited_final$id, org_works_ref_combined)
+difference_df2_df1 <- setdiff(org_works_ref_combined, works_cited_final$id)
+head(difference_df2_df1)
+head(works_cited_final$id)
+head(matching_rows$id)
+
+index <- which(works_cited_final$id == "https://openalex.org/W1927648166")
+print(index)
+works_cited_final$id[1]
+works_cited_final$id[328131]
+
+index <- which(matching_rows$id == "https://openalex.org/W1927648166")
+print(index)
+
+index <- which(matching_rows_expanded$id == "https://openalex.org/W1927648166")
+print(index)
+
+index <- which(works_ref_more_cited_counts == "https://openalex.org/W1927648166")
+print(index)
 
 ######################
-saveRDS(works_cited, "../works_cited_2021.rds")
-saveRDS(works_cited_final, "../works_cited_final_2021.rds")
+saveRDS(works_cited, "../works_cited_2020.rds")
+saveRDS(works_cited_final, "../works_cited_final_2020.rds")
 
 works_cited_final <- readRDS("../works_cited_final_2021.rds")
 
@@ -338,7 +372,7 @@ works_cited_final <- readRDS("../works_cited_final_2021.rds")
 articles_cited <- works_cited_final[!(is.na(works_cited_final$issn_l)), ]
 articles_cited <- articles_cited[!(is.na(articles_cited$issn_l) | articles_cited$issn_l == ""), ]
 nrow(articles_cited)
-saveRDS(articles_cited, "../articles_cited_2021.rds")
+saveRDS(articles_cited, "../articles_cited_2020.rds")
 
 # Trim and normalize the host_organization column
 articles_cited$host_organization <- trimws(articles_cited$host_organization)
@@ -398,10 +432,10 @@ publisher_uap <- articles_cited[articles_cited$host_organization == "University 
 
 
 # Save the modified dataset to Excel
-write_xlsx(publisher_NA, "publisher_NA_2021.xlsx")
-write_xlsx(publisher_aaas, "publisher_aaas_2021.xlsx")
-write_xlsx(publisher_nature, "publisher_nature_2021.xlsx")
-write_xlsx(publisher_plos, "publisher_plos_2021.xlsx")
+write_xlsx(publisher_NA, "publisher_NA_2020.xlsx")
+write_xlsx(publisher_aaas, "publisher_aaas_2020.xlsx")
+write_xlsx(publisher_nature, "publisher_nature_2020.xlsx")
+write_xlsx(publisher_plos, "publisher_plos_2020.xlsx")
 
 ######################################
 ######################################
@@ -458,7 +492,7 @@ ggplot(top_20_publishers, aes(x = reorder(host_organization, -article_count), y 
   geom_text(aes(label = sprintf("(%.0f%%)", percentage)), 
             vjust = 0.5, hjust = -0.2, size = 3) +  # Adjust hjust for positioning outside
   coord_flip() +  # Flip the axis for better readability
-  labs(x = "Publisher", y = "Number of Articles", title = "2021 UA Top 20 Publishers (Number of Articles Cited)") +
+  labs(x = "Publisher", y = "Number of Articles", title = "2020 UA Top 20 Publishers (Number of Articles Cited)") +
   theme_minimal() +
   theme(axis.text.y = element_text(size = 7))  # Reduce font size of publisher names
 
