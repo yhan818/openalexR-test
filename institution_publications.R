@@ -1,6 +1,6 @@
 ############# Institution authors publication analysis and Collection Management ##########
 ######## Author: Yan Han with help of ChatGPT 4
-######## Date: Sep 6, 2024
+######## Updated: Oct 1, 2024
 ######## Updated: Fixed NA issue with host_organization
 ##### Search an institution authors' publication using openAlex data ####
 # OpenAlex R Documentation: https://github.com/ropensci/openalexR
@@ -19,6 +19,7 @@ library(writexl)
 gc()
 rm(list=ls())
 gc()
+
 options("max.print" = 100000)
 
 options (openalexR.mailto="yhan@arizona.edu")
@@ -34,8 +35,10 @@ UAUMC.df <-oa_fetch(
 ##### 1. Getting data. (retrieved 2024-09-02)
 # Retrieving all publications association with UArizona's ROR (Research Organization Registry) ID.
 # UA publications per year is ~9,000. For running 2 years data, need better computer or crashed R studio.
-# Year 2023: 9,157 works.
+# Year 2023: 9,384 works.
 # Year 2021: 9,473 works
+# Year 2020: 
+# Year 2019: 8,847 
 # 2023-current: 14,660 works : 5 min to get UAworks with 3 GB mem, 264 mins to pull 372,000 reference's data with 8.6 GB  
 # 2022-current: 23,360 works: 10 mins to get UAWorks with 6 GB RAM, 450 mins to pull 560,000 citedWorks's data with 12 GB. crashed R studio.
 # 2020-current: 
@@ -54,12 +57,21 @@ UAworks_count <-oa_fetch(
 
 ### 1.2 Getting all the works based on the institution ROR and publication date. It takes longer time. 
 # see above for the running time
+# 2019 
+org_works_2019 <-oa_fetch(
+  entity="works",
+  institutions.ror=c("03m2x1q45"),
+  from_publication_date ="2020-01-01",
+  to_publication_date = "2020-12-31"
+)
+
 org_works_2020 <-oa_fetch(
   entity="works",
   institutions.ror=c("03m2x1q45"),
   from_publication_date ="2020-01-01",
   to_publication_date = "2020-12-31"
 )
+
 org_works_2022 <-oa_fetch(
   entity="works",
   institutions.ror=c("03m2x1q45"),
@@ -67,16 +79,28 @@ org_works_2022 <-oa_fetch(
   to_publication_date = "2022-12-31"
 )
 
-saveRDS(org_works_2020, "../org_works_2020.rds")
-saveRDS(org_works_2021, "../org_works_2021.rds")
-# saveRDS(org_works_2022, "../org_works_2022.rds")
+org_works_2023 <-oa_fetch(
+  entity="works",
+  institutions.ror=c("03m2x1q45"),
+  from_publication_date ="2023-01-01",
+  to_publication_date = "2023-12-31"
+)
 
-org_works_2021 <- readRDS("../org_works_2021.rds")
+
+# saveRDS(org_works_2019, "../org_works_2019.rds")
+# saveRDS(org_works_2020, "../org_works_2020.rds")
+# saveRDS(org_works_2021, "../org_works_2021.rds")
+# saveRDS(org_works_2022, "../org_works_2022.rds")
+ saveRDS(org_works_2023, "../org_works_2023.rds")
+
+org_works_2019 <- readRDS("../org_works_2019.rds")
+# org_works_2020 <- readRDS("../org_works_2020.rds")
+# org_works_2021 <- readRDS("../org_works_2021.rds")
 # org_works_2022 <- readRDS("../org_works_2022.rds")
 # org_works_2023 <- readRDS("../org_works_2023.rds")
 
 # change working data here 
-org_works <- org_works_2020
+org_works <- org_works_2023
 
 ##### 2. Checking and verifying data
 ##### 2.1 Route 1: Getting citation data from $referenced_works
@@ -85,8 +109,10 @@ org_works <- org_works_2020
 org_works_ref <- org_works$referenced_works
 #########################
 
-# Find "NA" indexes: 20-25% no references
-# Year 2023: 2273 / 9166 have "NA". 
+# Find "NA" indexes: 20-25% no references 
+# Questions for openAlex: is this normal? any plan to improve? 
+# Year 2023: 2245 / 9384 have "NA". 
+
 na_indices <- which(sapply(org_works_ref, function(x) is.logical(x) && is.na(x)))
 na_count <- sum(sapply(org_works_ref, function(x) is.logical(x) && is.na(x)))
 na_percent <- na_count/length(org_works_ref) * 100
@@ -111,6 +137,7 @@ org_works_ref_unique <- org_works_ref_combined[!duplicated(org_works_ref_combine
 
 ### Method 2: there are different
 citation_counts <- table(org_works_ref_combined)
+head(citation_counts)
 # Extract citations that occur more than once (i.e., duplicates)
 org_works_ref_more_cited2 <- names(citation_counts[citation_counts > 1])
 
@@ -134,7 +161,7 @@ org_works[174, "id"]
 index <- which(org_works_ref_more_cited == "https://openalex.org/W4247665917")
 print(index)
 
-# https://openalex.org/W4247665917 were cited in 2021 and 2023 data
+# https://openalex.org/W4247665917 were cited in 2019, 2021 and 2023 data
 index <- which(org_works_ref_unique == "https://openalex.org/W4247665917")
 print(index)
 org_works_ref_unique[136]
@@ -168,7 +195,21 @@ UAauthors <-unique(org_works_authors)
 colnames(org_works)
 colnames(org_works_authors)
 
-#### 3.3 TESTING!!!
+#Creating an empty dataframe to store the results of the for loop.
+works_cited <-data.frame()
+
+# Getting these works' metadata. This takes long time to run. 
+# Warnings(). a work > 100 authors will be truncated 
+# 2024: 
+# 2023: 352,509 (checked) out of 364,304 
+# 2022: 249,629 (re-check), 174 min to fetch all the works; file size 438 M
+# 2021: 
+# 2019: 331,657 (checked).
+
+
+#####################################################
+#################### 3.3 TESTING!!!#################
+####################################################
 # Then extract UArizona authors only
 # 94,500 obs from 426,000 obs (UA authors only).  
 ## https://openalex.org/A5033317672 Saurav Mallik (is at two affiliations for https://api.openalex.org/works/W4389611927. Harvard and University of Arizona)
@@ -186,21 +227,12 @@ org_works_authors_ua <- org_works_authors%>%filter(institution_rorauthor== "http
 org_works_authors_ua_unique <- unique (org_works_authors_ua)
 duplicates <- org_works_authors_ua[duplicated(org_works_authors_ua), ]
 
-# 3.4 
+# 3.32 
 ### Note: one article can be authored by multiple UA authors. However, the references cited are the same. 
 ### This data can study UA internal collaboration! 
-# org_works_ua_authors_ref <- org_works_UAauthors$referenced_works
-# class(org_works_ua_authors_ref) # a list
 
-#Running the loop to retrieve works cited data (may take someref_works_cited2#Running the loop to retrieve works cited data (may take some time to run)
-# the real number of works cited
-# 2023-2024: 379,978
-# 2022-2024: . Note: This crashed R studio with 12 GB memeroy used. showing 560,000
-# 2023: 658,631 
-
-# num_of_works <- length(org_works_ua_authors_ref_cited)
-
-### Testing if a work is found. 
+### 3.33 Testing if a cited work is found. 
+# Deep Learning, Nature, by Yann LeCun, Yoshua Bengio, Geoffrey Hinton. Cited by: 62,210
 search_string <- "https://openalex.org/W2919115771"
 result <- lapply(org_works_ref_combined, function(x) grep(search_string, x, value = TRUE))
 print(result)
@@ -211,16 +243,13 @@ for (i in indices) {
   cat("Index:", i, "\n")
   cat("Element:\n", org_works_ref_combined[[i]], "\n\n")
 }
+# Find it from the original article
+search_string <- "https://openalex.org/W2594545996"  # this article was cited 81 times in 2019. 
+indices_with_string <- which(sapply(org_works$referenced_works, function(x) search_string %in% x))
+print(indices_with_string)
+org_works[indices_with_string, ]$id
 
-
-#Creating an empty dataframe to store the results of the for loop.
-works_cited <-data.frame()
-Works_Cited2 <- works_cited
-# getting these works' metadata. 100 or 1,000 works a time (It will take 60 - 180 mins to run!!!) 
-# 18,211 works for 2024 citations
-# 2023: 241,644. 175 min to fetch: file size 4
-# 2022: 249,629, 174 min to fetch all the works; file size 438 M
-
+##### 3.34  Fetch time 
 # the number of works to fetch at a time has little influence the time to run oa_fetch
 # 2024-09: fetch_number = 1,000, reduced the total running time of 10% comparing to fetch_number 100
 # 2024-09: fetching 241,000 works took 188 minutes
@@ -249,6 +278,8 @@ system.time({
   )
 })
 
+rm(res)
+
 fetch_number <- 100
 num_of_works <- 10000
 ### The only difference from the above oa_fetch is the topics.id vs. id
@@ -265,11 +296,21 @@ system.time({
                  output="list")
 })
 
+
 #
+
+########################################################################
+###################### End of Testing ##################################
+########################################################################
+
+
+
 library(data.table)
-fetch_number <- 100
-num_of_works <- 240000
-num_of_works <- length (org_works_ref_unique)
+fetch_number <- 50
+# num_of_works <- 240000
+# num_of_works <- length (org_works_ref_unique)
+
+num_of_works <- length (org_works_ref_combined)
 
 range_i <- seq(1, num_of_works, by=fetch_number)
 works_cited_ls <- vector("list", length = length(range_i))
@@ -294,7 +335,7 @@ print(paste("rbind time: ", time_taken2["elapsed"] / 60, "minutes"))
 
  time_taken <- system.time({ 
   for(i in seq(1, num_of_works, by=fetch_number)){
-    batch_identifiers <-org_works_ref_unique[i:min(i+fetch_number-1, num_of_works)]
+    batch_identifiers <-org_works_ref_combined[i:min(i+fetch_number-1, num_of_works)]
     batch_data <-oa_fetch(identifier=batch_identifiers)
     works_cited<-rbind(works_cited, batch_data)
   }
@@ -308,25 +349,22 @@ class(org_works_ref_more_cited)
 # Count the occurrences of each unique element in the vector
 #works_ref_more_cited_counts <- table(org_works_ref_more_cited)
 
-# Calculate the total number of occurrences (including duplicates and non-duplicates)
-total_works_ref_more_cited_occurrences <- sum(works_ref_more_cited_counts)
-
 #### Step 1: Re-generate a new row if it matches (meaning; cited multiple times.)
 works_cited_final <- works_cited
-# Step 2: Add these matching rows as new rows 
-matching_rows <- works_cited[works_cited$id %in% names(works_ref_more_cited_counts), ]
-# Step 3: Repeat each row in the DataFrame based on the count in org_works_ref_more_cited
-matching_rows_expanded <- matching_rows[rep(1:nrow(matching_rows), times = works_ref_more_cited_counts[matching_rows$id]), ]
 
-# 42,1866 same result
+#### need to recheck the numbers
+# Step 2: Add these matching rows as new rows 
+# matching_rows <- works_cited[works_cited$id %in% names(works_ref_more_cited_counts), ]
+# Step 3: Repeat each row in the DataFrame based on the count in org_works_ref_more_cited
+# matching_rows_expanded <- matching_rows[rep(1:nrow(matching_rows), times = works_ref_more_cited_counts[matching_rows$id]), ]
+
 #matching_rows <- works_cited[works_cited$id %in% names(citation_counts), ]
 # Step 3: Repeat each row in the DataFrame based on the count in org_works_ref_more_cited
 #matching_rows_expanded <- matching_rows[rep(1:nrow(matching_rows), times = citation_counts[matching_rows$id]), ]
 
+# Step4: We have the final works cited, including multiple occurances of a work
+# works_cited_final <- rbind(works_cited_final, matching_rows_expanded)
 
-
-# We have the final works cited, including multiple occurances of a work
-works_cited_final <- rbind(works_cited_final, matching_rows_expanded)
 
 ### Questions: 
 # 1. I fetched 316,401 unique works, but returned 329,720 (about 2% more... )
@@ -355,10 +393,15 @@ index <- which(works_ref_more_cited_counts == "https://openalex.org/W1927648166"
 print(index)
 
 ######################
-saveRDS(works_cited, "../works_cited_2020.rds")
-saveRDS(works_cited_final, "../works_cited_final_2020.rds")
 
-works_cited_final <- readRDS("../works_cited_final_2021.rds")
+
+saveRDS(works_cited_final, "../works_cited_final_2023.rds")
+
+# works_cited_final <- readRDS("../works_cited_final_2019.rds")
+# works_cited_final <- readRDS("../works_cited_final_2020.rds")
+# works_cited_final <- readRDS("../works_cited_final_2021.rds")
+# works_cited_final <- readRDS("../works_cited_final_2022.rds")
+works_cited_final <- readRDS("../works_cited_final_2023.rds")
 
 
 ### 
@@ -367,12 +410,15 @@ works_cited_final <- readRDS("../works_cited_final_2021.rds")
 
 # 1. Analyse journal usage
 #  - remove any row whose col "issn_l" is empty or NULL 
-#  - 2023: 334,820 articles out of 357,056 works: 94%
+# 2023: 329,389 articles out of 352,509 works: 94%
+# 2022: 382,495 articles out of 421,866 works: 91%
+# 2019: 
 
 articles_cited <- works_cited_final[!(is.na(works_cited_final$issn_l)), ]
 articles_cited <- articles_cited[!(is.na(articles_cited$issn_l) | articles_cited$issn_l == ""), ]
 nrow(articles_cited)
-saveRDS(articles_cited, "../articles_cited_2020.rds")
+
+# saveRDS(articles_cited, "../articles_cited_2019.rds")
 
 # Trim and normalize the host_organization column
 articles_cited$host_organization <- trimws(articles_cited$host_organization)
@@ -430,12 +476,35 @@ publisher_ua <- articles_cited[articles_cited$host_organization == "University o
 publisher_uap <- articles_cited[articles_cited$host_organization == "University of Arizona Press", ]
 
 
+#### Find duplicates and frequencies #####
+# change DF here
+df <-articles_cited
+# Find the rows that are duplicated
+duplicate_rows <- df[duplicated(df) | duplicated(df, fromLast = TRUE), ]
+# Create a table to count the frequency of duplicated rows
+#duplicate_frequency <- table(apply(duplicate_rows, 1, paste, collapse = "-"))
+duplicate_frequency <- table(duplicate_rows$id)
+# show more than 10 times cited. change "10" to any number
+duplicate_ids <- names(duplicate_frequency[duplicate_frequency > 10])
+
+duplicate_multi_cited_rows <- df[df$id %in% duplicate_ids, ]
+
+duplicate_multi_cited_rows <- duplicate_multi_cited_rows %>%   
+  mutate(across(where(is.character), ~ ifelse(nchar(.) > 32767, substr(., 1, 32767), .)))
+
+# Remove duplicate rows from duplicate_multi_cited_rows
+duplicate_multi_cited_rows_unique <- duplicate_multi_cited_rows[!duplicated(duplicate_multi_cited_rows), ]
+
+write_xlsx(duplicate_multi_cited_rows, "citations/duplicate_multi_cited_2023.xlsx")
+write_xlsx(duplicate_multi_cited_rows_unique, "citations/duplicate_multi_cited_unique_2023.xlsx")
 
 # Save the modified dataset to Excel
-write_xlsx(publisher_NA, "publisher_NA_2020.xlsx")
-write_xlsx(publisher_aaas, "publisher_aaas_2020.xlsx")
-write_xlsx(publisher_nature, "publisher_nature_2020.xlsx")
-write_xlsx(publisher_plos, "publisher_plos_2020.xlsx")
+write_xlsx(publisher_NA, "citations/publisher_NA_2023.xlsx")
+
+write_xlsx(publisher_aaas, "citations/publisher_aaas_2023.xlsx")
+write_xlsx(publisher_nature, "citations/publisher_nature_2023.xlsx")
+
+write_xlsx(publisher_plos, "citations/publisher_plos_2023.xlsx")
 
 ######################################
 ######################################
@@ -459,7 +528,6 @@ journal_counts_df <- count_journals_by_publisher(articles_cited, publisher_name)
 print(journal_counts_df)
 # Note: Errors
 # https://openalex.org/W2165027548 (1994 v44n3, Journal name changes and ISSN changed)
-
 
 publisher_name <- "Optica Publishing Group"
 publisher1 <-  articles_cited[grepl(publisher_name, articles_cited$host_organization, ignore.case = TRUE), ]
@@ -486,13 +554,13 @@ top_20_publishers$host_organization <- substr(top_20_publishers$host_organizatio
 ggplot(top_20_publishers, aes(x = reorder(host_organization, -article_count), y = article_count)) +
   geom_bar(stat = "identity", fill = "steelblue") +
   # Real number (article count) inside the bar
-  geom_text(aes(label = article_count), 
-            vjust = 0.5, hjust = 1.2, size = 3, color = "white") +  # Adjust hjust and color for positioning inside
+  geom_text(aes(label = article_count), vjust = 0.5, hjust = 1.2, size = 2.5, color = "white") +  
+  # Adjust hjust and color for positioning inside
   # Percentage outside the bar
-  geom_text(aes(label = sprintf("(%.0f%%)", percentage)), 
-            vjust = 0.5, hjust = -0.2, size = 3) +  # Adjust hjust for positioning outside
+  geom_text(aes(label = sprintf("(%.1f%%)", percentage)), vjust = 0.5, hjust = -0.2, size = 3) +  
+  # Adjust hjust for positioning outside
   coord_flip() +  # Flip the axis for better readability
-  labs(x = "Publisher", y = "Number of Articles", title = "2020 UA Top 20 Publishers (Number of Articles Cited)") +
+  labs(x = "Publisher", y = "Number of Articles", title = "2019 UA Top 20 Publishers (Number of Articles Cited)") +
   theme_minimal() +
   theme(axis.text.y = element_text(size = 7))  # Reduce font size of publisher names
 
@@ -502,10 +570,7 @@ view(publisher_ranking)
 # Top 10: Elsevier (29%), Wiley (12%), Oxford University Press (9.2%), ICP (6.8%), Springer(6.3%), Nature,
 # IOP Publishing, Lippincott Williams & Wilkins, Taylor & Francis, SAGE Publishing (3%)
 
-################### Analyze top journals for each publisher
-
-library(dplyr)
-
+################### Analyze top journals for each publisher ############
 # Function to rank top cited journals
 # Usage example:
 #rank_top_cited_journals(publisher_nature, "so", 10)  # Top 10 cited journals
