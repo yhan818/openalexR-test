@@ -93,11 +93,11 @@ org_works_2023 <-oa_fetch(
 # saveRDS(org_works_2022, "../org_works_2022.rds")
  saveRDS(org_works_2023, "../org_works_2023.rds")
 
-org_works_2019 <- readRDS("../org_works_2019.rds")
+# org_works_2019 <- readRDS("../org_works_2019.rds")
 # org_works_2020 <- readRDS("../org_works_2020.rds")
 # org_works_2021 <- readRDS("../org_works_2021.rds")
 # org_works_2022 <- readRDS("../org_works_2022.rds")
-# org_works_2023 <- readRDS("../org_works_2023.rds")
+org_works_2023 <- readRDS("../org_works_2023.rds")
 
 # change working data here 
 org_works <- org_works_2023
@@ -249,6 +249,14 @@ indices_with_string <- which(sapply(org_works$referenced_works, function(x) sear
 print(indices_with_string)
 org_works[indices_with_string, ]$id
 
+# test case 2: cited 6 from microbiology
+# both final published version and pre-print existing: https://openalex.org/works/W4379795917 and https://openalex.org/W4319339791 
+search_string <- "https://openalex.org/W2128159409"
+indices_with_string <- which(sapply(org_works$referenced_works, function(x) search_string %in% x))
+print(indices_with_string)
+org_works[indices_with_string, ]$id
+
+
 ##### 3.34  Fetch time 
 # the number of works to fetch at a time has little influence the time to run oa_fetch
 # 2024-09: fetch_number = 1,000, reduced the total running time of 10% comparing to fetch_number 100
@@ -295,13 +303,6 @@ system.time({
                  options= list(sample=fetch_number, seed=1), 
                  output="list")
 })
-
-
-#
-
-########################################################################
-###################### End of Testing ##################################
-########################################################################
 
 
 
@@ -404,7 +405,7 @@ saveRDS(works_cited_final, "../works_cited_final_2023.rds")
 works_cited_final <- readRDS("../works_cited_final_2023.rds")
 
 
-### 
+
 
 ###################### Citation Analysis ####################################
 
@@ -427,6 +428,10 @@ articles_cited$issn_l <- trimws(articles_cited$issn_l)
 # Empty or NULL records
 count_null_empty_id <- sum(is.na(articles_cited$id) | trimws(articles_cited$id) == "")
 count_null_empty_id
+
+
+
+
 
 # publisher: host_organization
 unique_publishers <- unique(articles_cited$host_organization)
@@ -460,20 +465,52 @@ publisher_NA <- publisher_NA %>%
 publisher_NA <- publisher_NA %>%
   mutate(across(where(is.character), ~ ifelse(nchar(.) > 32767, substr(., 1, 32767), .)))
 
-# 2. Elsevier
-publisher_elsevier <- articles_cited[articles_cited$host_organization == "Elsevier BV", ]
-# 3. Springer
-publisher_springer <- articles_cited[articles_cited$host_organization == "Springer Science+Business Media", ]
+publisher_name <- "Microbiology society"
 
-# Some of open source publishers
-publisher_plos <-articles_cited[articles_cited$host_organization == "Public Library of Science", ]
-publisher_aaas <-articles_cited[articles_cited$host_organization == "American Association for the Advancement of Science", ]
-publisher_nature <-articles_cited[articles_cited$host_organization == "Nature Portfolio", ]
+publisher_microbiology <- articles_cited[tolower(articles_cited$host_organization) == tolower(publisher_name), ]
 
-publisher_cdc <- articles_cited[articles_cited$host_organization == "Centers for Disease Control and Prevention", ]
+publisher_elsevier <- articles_cited[tolower(articles_cited$host_organization) == "elsevier bv", ]
 
-publisher_ua <- articles_cited[articles_cited$host_organization == "University of Arizona", ]
-publisher_uap <- articles_cited[articles_cited$host_organization == "University of Arizona Press", ]
+publisher_springer <- articles_cited[tolower(articles_cited$host_organization) == tolower("Springer Science+Business Media"), ]
+
+publisher_plos <- articles_cited[tolower(articles_cited$host_organization) == tolower("Public Library of Science"), ]
+
+publisher_aaas <- articles_cited[tolower(articles_cited$host_organization) == tolower("American Association for the Advancement of Science"), ]
+
+publisher_nature <- articles_cited[tolower(articles_cited$host_organization) == tolower("Nature Portfolio"), ]
+
+publisher_cdc <- articles_cited[tolower(articles_cited$host_organization) == tolower("Centers for Disease Control and Prevention"), ]
+
+publisher_ua <- articles_cited[tolower(articles_cited$host_organization) == tolower("University of Arizona"), ]
+
+publisher_uap <- articles_cited[tolower(articles_cited$host_organization) == tolower("University of Arizona Press"), ]
+
+
+### origin works: test case: 
+# both final published version and pre-print existing: https://openalex.org/works/W4379795917 and https://openalex.org/W4319339791 
+# Org_works ids are: "https://openalex.org/W4379795917" "https://openalex.org/W4317888776" "https://openalex.org/W4385752148" "https://openalex.org/W4319339791" "https://openalex.org/W4323537660"
+# "https://openalex.org/W4323309440"
+search_string <- "https://openalex.org/W2128159409"
+indices_with_string <- which(sapply(org_works$referenced_works, function(x) search_string %in% x))
+print(indices_with_string)
+org_works[indices_with_string, ]$id
+
+### Article cited: test case 2: cited 6 from microbiology
+cited_article_indices <- which(sapply(articles_cited$id, function(x) search_string %in% x))
+print(cited_article_indices)
+
+# Publishers test case : cited 6 from microbiology
+# both final published version and pre-print existing: https://openalex.org/works/W4379795917 and https://openalex.org/W4319339791 
+publisher_article_indicies <- which(sapply(publisher_microbiology$id, function(x) search_string %in% x))
+print(publisher_article_indicies)
+publisher_microbiology[publisher_article_indicies, ]$id
+
+
+
+########################################################################
+###################### End of Testing ##################################
+########################################################################
+
 
 
 #### Find duplicates and frequencies #####
@@ -505,6 +542,7 @@ write_xlsx(publisher_aaas, "citations/publisher_aaas_2023.xlsx")
 write_xlsx(publisher_nature, "citations/publisher_nature_2023.xlsx")
 
 write_xlsx(publisher_plos, "citations/publisher_plos_2023.xlsx")
+write_xlsx(publisher_microbiology, "citations/publisher_microbiology_2023.xlsx")
 
 ######################################
 ######################################
@@ -523,11 +561,16 @@ count_journals_by_publisher <- function(articles_cited, publisher_name) {
   return(journal_counts_df)
 }
 
+
+
 publisher_name <- "Microbiology society"
+publisher1 <-  articles_cited[grepl(publisher_name, articles_cited$host_organization, ignore.case = TRUE), ]
 journal_counts_df <- count_journals_by_publisher(articles_cited, publisher_name)
 print(journal_counts_df)
 # Note: Errors
 # https://openalex.org/W2165027548 (1994 v44n3, Journal name changes and ISSN changed)
+
+
 
 publisher_name <- "Optica Publishing Group"
 publisher1 <-  articles_cited[grepl(publisher_name, articles_cited$host_organization, ignore.case = TRUE), ]
