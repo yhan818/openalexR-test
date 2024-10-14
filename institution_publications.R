@@ -93,14 +93,16 @@ org_works_2023 <-oa_fetch(
 # saveRDS(org_works_2022, "../org_works_2022.rds")
  saveRDS(org_works_2023, "../org_works_2023.rds")
 
-# org_works_2019 <- readRDS("../org_works_2019.rds")
+ org_works_2019 <- readRDS("../org_works_2019.rds")
 # org_works_2020 <- readRDS("../org_works_2020.rds")
 # org_works_2021 <- readRDS("../org_works_2021.rds")
 # org_works_2022 <- readRDS("../org_works_2022.rds")
 org_works_2023 <- readRDS("../org_works_2023.rds")
 
 # change working data here 
-org_works <- org_works_2023
+org_works <- org_works_2019
+#org_works <- org_works_2023
+
 
 ##### 2. Checking and verifying data
 ##### 2.1 Route 1: Getting citation data from $referenced_works
@@ -138,9 +140,9 @@ org_works_ref_unique <- org_works_ref_combined[!duplicated(org_works_ref_combine
 ### Method 2: there are different
 citation_counts <- table(org_works_ref_combined)
 head(citation_counts)
-# Extract citations that occur more than once (i.e., duplicates)
-org_works_ref_more_cited2 <- names(citation_counts[citation_counts > 1])
-
+# Extract citations that occur more than 80 times (i.e., duplicates)
+org_works_ref_more_cited2 <- names(citation_counts[citation_counts > 80])
+head(org_works_ref_more_cited2)
 
 ############################################################
 ### 2.23 For Testing purpose: Trace back from the cited article -> $referenced_works -> original published article
@@ -304,13 +306,9 @@ system.time({
                  output="list")
 })
 
-
-
 library(data.table)
 fetch_number <- 50
-# num_of_works <- 240000
 # num_of_works <- length (org_works_ref_unique)
-
 num_of_works <- length (org_works_ref_combined)
 
 range_i <- seq(1, num_of_works, by=fetch_number)
@@ -405,10 +403,7 @@ saveRDS(works_cited_final, "../works_cited_final_2023.rds")
 works_cited_final <- readRDS("../works_cited_final_2023.rds")
 
 
-
-
 ###################### Citation Analysis ####################################
-
 # 1. Analyse journal usage
 #  - remove any row whose col "issn_l" is empty or NULL 
 # 2023: 329,389 articles out of 352,509 works: 94%
@@ -428,9 +423,6 @@ articles_cited$issn_l <- trimws(articles_cited$issn_l)
 # Empty or NULL records
 count_null_empty_id <- sum(is.na(articles_cited$id) | trimws(articles_cited$id) == "")
 count_null_empty_id
-
-
-
 
 
 # publisher: host_organization
@@ -487,10 +479,35 @@ publisher_uap <- articles_cited[tolower(articles_cited$host_organization) == tol
 
 
 ### origin works: test case: 
+
+### Test cases for AAAS
+search_string <- "https://openalex.org/W2083070320"
+
+id_counts <-table(publisher_elsevier$id)
+duplicateds <- id_counts[id_counts > 60]
+print(duplicateds)
+
+id_counts <-table(publisher_aaas$id)
+duplicateds <- id_counts[id_counts > 10]
+print(duplicateds)
+
+### Test cases for PLOS
+search_string <- "https://openalex.org/W2125300654"
+id_counts <-table(publisher_plos$id)
+duplicateds <- id_counts[id_counts > 10]
+print(duplicateds)
+
+
+
+### Test cases for Microbiology
 # both final published version and pre-print existing: https://openalex.org/works/W4379795917 and https://openalex.org/W4319339791 
 # Org_works ids are: "https://openalex.org/W4379795917" "https://openalex.org/W4317888776" "https://openalex.org/W4385752148" "https://openalex.org/W4319339791" "https://openalex.org/W4323537660"
 # "https://openalex.org/W4323309440"
-search_string <- "https://openalex.org/W2128159409"
+search_string <- "https://openalex.org/W2128159409"  # Microbiology articles
+search_string <- "https://openalex.org/W2017185349" # Microbiology
+
+
+### Find test cases from original works ID
 indices_with_string <- which(sapply(org_works$referenced_works, function(x) search_string %in% x))
 print(indices_with_string)
 org_works[indices_with_string, ]$id
@@ -505,7 +522,21 @@ publisher_article_indicies <- which(sapply(publisher_microbiology$id, function(x
 print(publisher_article_indicies)
 publisher_microbiology[publisher_article_indicies, ]$id
 
+# Test case: cited 47 times in 2023. Verified! 
+# The Gaia mission
+search_string <- "https://openalex.org/W147232447"
+indices_with_string <- which(sapply(org_works$referenced_works, function(x) search_string %in% x))
+print(indices_with_string)
+org_works[1985,] $id
+org_works[5610,] $id
 
+# Test case: cited > 80 times in 2019. verified
+# https://openalex.org/W2066340221 cited > 80 times in 2019.
+search_string <- "https://openalex.org/W2066340221"
+indices_with_string <- which(sapply(org_works$referenced_works, function(x) search_string %in% x))
+print(indices_with_string)
+org_works[7679,] $id
+org_works[3540,] $id
 
 ########################################################################
 ###################### End of Testing ##################################
@@ -588,10 +619,28 @@ publisher_ranking <- articles_cited %>%
   summarise(article_count = n()) %>%
   arrange(desc(article_count))
 
+# Calculate the total number of articles across all publishers
+total_article_count <- sum(publisher_ranking$article_count)
+
+# Calculate the percentage for each publisher relative to the total article count
+publisher_ranking <- publisher_ranking %>%
+  mutate(percentage = (article_count / total_article_count) * 100)
+
 library(ggplot2)
 top_20_publishers <- publisher_ranking %>% slice(1:20)
-top_20_publishers$percentage <- (top_20_publishers$article_count / sum(top_20_publishers$article_count)) * 100
+top_20_publishers$percentage <- (top_20_publishers$article_count / total_article_count) * 100
 top_20_publishers$host_organization <- substr(top_20_publishers$host_organization, 1, 10)
+
+# top 50
+top_50_publishers <- publisher_ranking %>% slice(1:50)
+top_50_publishers$percentage <- (top_50_publishers$article_count / total_article_count) * 100
+top_50_publishers$host_organization <- substr(top_50_publishers$host_organization, 1, 10)
+
+# top 100
+top_100_publishers <- publisher_ranking %>% slice(1:100)
+top_100_publishers$percentage <- (top_100_publishers$article_count / total_article_count) * 100
+top_100_publishers$host_organization <- substr(top_100_publishers$host_organization, 1, 10)
+
 
 # Bar plot for top 20 publishers
 ggplot(top_20_publishers, aes(x = reorder(host_organization, -article_count), y = article_count)) +
@@ -607,11 +656,29 @@ ggplot(top_20_publishers, aes(x = reorder(host_organization, -article_count), y 
   theme_minimal() +
   theme(axis.text.y = element_text(size = 7))  # Reduce font size of publisher names
 
+# Calculate the percentage of the top 20, top 50, and top 100 publishers over the total
+total_article_count <- sum(publisher_ranking$article_count) # Total articles in all publishers
+top_20_total_count <- sum(top_20_publishers$article_count)  
+top_50_total_count <- sum(top_50_publishers$article_count)  
+top_100_total_count <- sum(top_100_publishers$article_count)  
+
+# Calculate the percentage
+# Top 20: 76%
+# Top 50: 90.4%
+# Top 100: 95.4%
+top_20_percentage_of_total <- (top_20_total_count / total_article_count) * 100
+top_50_percentage_of_total <- (top_50_total_count / total_article_count) * 100
+top_100_percentage_of_total <- (top_100_total_count / total_article_count) * 100
+
+# Print the result
+print(paste("Top 20 publishers represent", round(top_20_percentage_of_total, 2), "% of the total articles."))
+print(paste("Top 50 publishers represent", round(top_50_percentage_of_total, 2), "% of the total articles."))
+print(paste("Top 100 publishers represent", round(top_100_percentage_of_total, 2), "% of the total articles."))
 
 view(publisher_ranking)
 # View the top 50 publishers.  
-# Top 10: Elsevier (29%), Wiley (12%), Oxford University Press (9.2%), ICP (6.8%), Springer(6.3%), Nature,
-# IOP Publishing, Lippincott Williams & Wilkins, Taylor & Francis, SAGE Publishing (3%)
+# Top 10: Elsevier (20%), Wiley (9%), Oxford University Press (7%), ICP (5%), Springer(5%), Nature,
+# IOP Publishing, Lippincott Williams & Wilkins, Taylor & Francis, SAGE Publishing (2%)
 
 ################### Analyze top journals for each publisher ############
 # Function to rank top cited journals
