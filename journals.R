@@ -77,6 +77,48 @@ print(articles_cited_by_count)
 write_xlsx(articles_cited_by_count, "citations/JPE_articles_cited_by_count.xlsx")
 
 
+# Matching ISSN with publisher
+# Define the ISSN you want to search for
 
+data <- fromJSON(content(response, "text"))
+publisher <- data$message$publisher
+
+# Print the publisher
+print(publisher)
+
+# Define a list of ISSNs (replace with your actual list of 1000 ISSNs)
+issn_list <- unique(publisher_NA$'issn_l')
+
+# Initialize an empty data frame to store results
+results <- data.frame(issn = character(), publisher = character(), stringsAsFactors = FALSE)
+
+# Loop through each ISSN and make the API request
+for (issn in issn_list[1:200]) {
+  # Construct the CrossRef API URL for the ISSN
+  url <- paste0("https://api.crossref.org/journals/", issn)
+  response <- GET(url) # HTTP request
+  
+  # Check if the request was successful (status code 200)
+  if (status_code(response) == 200) {
+    # Parse the response from JSON
+    data <- fromJSON(content(response, "text", encoding = "UTF-8"))
+    
+    if (!is.null(data$message$publisher)) {
+      # Extract the publisher
+      publisher <- data$message$publisher
+    } else {
+      # If no publisher found, set it to "Publisher not found"
+      publisher <- "Publisher not found"
+    }
+  } else {
+    # Handle failed request, store status code as publisher
+    publisher <- paste("Failed - Status code:", status_code(response))
+  }
+  # Append the result to the data frame
+  results <- rbind(results, data.frame(issn = issn, publisher = publisher, stringsAsFactors = FALSE))
+}
+
+print(results)
+write.csv(results, "citations/issn_publishers.csv", row.names = FALSE)
 
 

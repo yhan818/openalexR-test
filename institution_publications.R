@@ -106,23 +106,36 @@ org_works <- org_works_2019
 
 ##### 2. Checking and verifying data
 ##### 2.1 Route 1: Getting citation data from $referenced_works
-##### Rout2: Getting author's data? 
+##### Route 2: Getting author's data? 
 ###### change this line only to update the right dataset.
 org_works_ref <- org_works$referenced_works
 #########################
 
-# Find "NA" indexes: 20-25% no references 
-# Questions for openAlex: is this normal? any plan to improve? 
-# Year 2023: 2245 / 9384 have "NA". 
+# Find "NA" indexes: 18- 25% no references 
+# Questions for openAlex: 
+# 1. Is this normal? any plan to improve? 
+# 2. I checked ~3500 records (1% ), Field “issn_l” has values, but “host_organization” field has no values. 
+# 3. 
+
+# Year 2019: 1575 / 8848 referenced works value="NA", while $type is "article". 18%
+# Year 2023: 2245 / 9384 referenced works value="NA", while $type is "article". 
+
+# Filter the rows where $reference_works is NA and $type is "article"
+works_na_referenced_works <- org_works %>%
+  filter(is.na(referenced_works) & type == "article")
+write_xlsx(works_na_referenced_works, "citations/works_na_referenced_works.xlsx")
 
 na_indices <- which(sapply(org_works_ref, function(x) is.logical(x) && is.na(x)))
 na_count <- sum(sapply(org_works_ref, function(x) is.logical(x) && is.na(x)))
 na_percent <- na_count/length(org_works_ref) * 100
 
+print (na_indices)
+
 ### 2.2 Combine all the references and do further data analysis
 # Avg # of references per article: ~50
 # Year 2023 total references: 351,479: unique 281,470 / 351,479: more cited: 70,0009
 # Year 2022 total references: 345,904
+# Year 2019 total references: 352,509: articles 329,000 
 
 # Remove NA, logical(0) from list (Meaning: no references) 
 org_works_ref <- Filter(function(x) length(x) > 0, org_works_ref)
@@ -437,10 +450,20 @@ num_na <- sum(is.na(articles_cited$host_organization))
 # Replace NA values and empty strings with "NA"
 articles_cited$host_organization[is.na(articles_cited$host_organization) | trimws(articles_cited$host_organization) == ""] <- "NA"
 
+# Dealing with "NA" data in "host_organization" field.
 # 1. First, showing all NA publisher: meaning publisher info is not available. 
 publisher_NA <- articles_cited[articles_cited$host_organization == "NA", ]
 
 publisher_NA_id <-unique(publisher_NA$id)
+# Check if any row in the df 'publisher_NA' contains a non-missing value in the "issn_l" column
+publisher_NA_with_issn <- publisher_NA[!is.na(publisher_NA$`issn_l`) & publisher_NA$`issn_l` != "", ]
+print(publisher_NA_with_issn)
+
+# Extract unique ISSNs from the 'issn_l' column: 1235 unique issns
+unique_issn <- unique(publisher_NA$`issn_l`)
+print(unique_issn)
+
+
 
 # Check if any 'id' values are duplicated
 any_duplicated_ids <- any(duplicated(publisher_NA$id))
