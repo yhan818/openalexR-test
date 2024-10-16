@@ -100,7 +100,7 @@ org_works_2023 <-oa_fetch(
 org_works_2023 <- readRDS("../org_works_2023.rds")
 
 # change working data here 
-org_works <- org_works_2019
+ org_works <- org_works_2019
 #org_works <- org_works_2023
 
 
@@ -118,22 +118,21 @@ org_works_ref <- org_works$referenced_works
 # 3. 
 
 # Year 2019: 1575 / 8848 referenced works value="NA", while $type is "article". 18%
-# Year 2023: 2245 / 9384 referenced works value="NA", while $type is "article". 
+# Year 2023: 1534 / 9384 referenced works value="NA", while $type is "article". 
 
 # Filter the rows where $reference_works is NA and $type is "article"
 works_na_referenced_works <- org_works %>%
   filter(is.na(referenced_works) & type == "article")
-write_xlsx(works_na_referenced_works, "citations/works_na_referenced_works.xlsx")
+write_xlsx(works_na_referenced_works, "citations/works_2019_na_referenced_works.xlsx")
 
-na_indices <- which(sapply(org_works_ref, function(x) is.logical(x) && is.na(x)))
+# this na_indices include type: article, books, errata, letter, and other types
+na_indices <- which(sapply(org_works_ref, function(x) is.logical(x) && is.na(x))) 
 na_count <- sum(sapply(org_works_ref, function(x) is.logical(x) && is.na(x)))
 na_percent <- na_count/length(org_works_ref) * 100
 
-print (na_indices)
-
 ### 2.2 Combine all the references and do further data analysis
 # Avg # of references per article: ~50
-# Year 2023 total references: 351,479: unique 281,470 / 351,479: more cited: 70,0009
+# Year 2023 total references: 364,304: unique 281,470 / 351,479: more cited: ~77,000 
 # Year 2022 total references: 345,904
 # Year 2019 total references: 352,509: articles 329,000 
 
@@ -259,7 +258,7 @@ for (i in indices) {
   cat("Element:\n", org_works_ref_combined[[i]], "\n\n")
 }
 # Find it from the original article
-search_string <- "https://openalex.org/W2594545996"  # this article was cited 81 times in 2019. 
+search_string <- "https://openalex.org/W2594545996"  # this article was cited 81 times in 2019, cited 16 times in 2023 
 indices_with_string <- which(sapply(org_works$referenced_works, function(x) search_string %in% x))
 print(indices_with_string)
 org_works[indices_with_string, ]$id
@@ -360,7 +359,7 @@ print(paste("time to run: ", time_taken["elapsed"] / 60, "minutes"))
 class(org_works_ref_more_cited)
 # Count the occurrences of each unique element in the vector
 #works_ref_more_cited_counts <- table(org_works_ref_more_cited)
-
+works_cited <- org_works_ref_combined
 #### Step 1: Re-generate a new row if it matches (meaning; cited multiple times.)
 works_cited_final <- works_cited
 
@@ -409,7 +408,7 @@ print(index)
 
 saveRDS(works_cited_final, "../works_cited_final_2023.rds")
 
-# works_cited_final <- readRDS("../works_cited_final_2019.rds")
+works_cited_final <- readRDS("../works_cited_final_2019.rds")
 # works_cited_final <- readRDS("../works_cited_final_2020.rds")
 # works_cited_final <- readRDS("../works_cited_final_2021.rds")
 # works_cited_final <- readRDS("../works_cited_final_2022.rds")
@@ -421,7 +420,7 @@ works_cited_final <- readRDS("../works_cited_final_2023.rds")
 #  - remove any row whose col "issn_l" is empty or NULL 
 # 2023: 329,389 articles out of 352,509 works: 94%
 # 2022: 382,495 articles out of 421,866 works: 91%
-# 2019: 
+# 2019: 291,705 articles out of 323,779 works: 90%
 
 articles_cited <- works_cited_final[!(is.na(works_cited_final$issn_l)), ]
 articles_cited <- articles_cited[!(is.na(articles_cited$issn_l) | articles_cited$issn_l == ""), ]
@@ -481,25 +480,27 @@ publisher_NA <- publisher_NA %>%
   mutate(across(where(is.character), ~ ifelse(nchar(.) > 32767, substr(., 1, 32767), .)))
 
 publisher_name <- "Microbiology society"
+publisher_microbiology <- articles_cited[grepl(publisher_name, articles_cited$host_organization, ignore.case = TRUE), ]
 
-publisher_microbiology <- articles_cited[tolower(articles_cited$host_organization) == tolower(publisher_name), ]
-
-publisher_elsevier <- articles_cited[tolower(articles_cited$host_organization) == "elsevier bv", ]
+publisher_elsevier <- articles_cited[grepl("Elsevier BV", articles_cited$host_organization, ignore.case = TRUE), ]
 
 publisher_springer <- articles_cited[tolower(articles_cited$host_organization) == tolower("Springer Science+Business Media"), ]
+#publisher_springer <- articles_cited[grepl("Springer Science+Business Media", articles_cited$host_organization, ignore.case = TRUE), ]
 
-publisher_plos <- articles_cited[tolower(articles_cited$host_organization) == tolower("Public Library of Science"), ]
+publisher_plos <- articles_cited[grepl("Public Library of Science", articles_cited$host_organization, ignore.case = TRUE), ]
 
-publisher_aaas <- articles_cited[tolower(articles_cited$host_organization) == tolower("American Association for the Advancement of Science"), ]
+publisher_aaas <- articles_cited[grepl("American Association for the Advancement of Science", articles_cited$host_organization, ignore.case = TRUE), ]
 
-publisher_nature <- articles_cited[tolower(articles_cited$host_organization) == tolower("Nature Portfolio"), ]
+publisher_nature <- articles_cited[grepl("Nature Portfolio", articles_cited$host_organization, ignore.case = TRUE), ]
 
-publisher_cdc <- articles_cited[tolower(articles_cited$host_organization) == tolower("Centers for Disease Control and Prevention"), ]
+publisher_cdc <- articles_cited[grepl("Centers for Disease Control and Prevention", articles_cited$host_organization, ignore.case = TRUE), ]
 
-publisher_ua <- articles_cited[tolower(articles_cited$host_organization) == tolower("University of Arizona"), ]
+# University of Arizona
+publisher_ua <- articles_cited[grepl("University of Arizona", articles_cited$host_organization, ignore.case = TRUE), ]
+publisher_uap <- articles_cited[grepl("University of Arizona Press", articles_cited$host_organization, ignore.case = TRUE), ]
 
-publisher_uap <- articles_cited[tolower(articles_cited$host_organization) == tolower("University of Arizona Press"), ]
-
+# Need to study more. 276 cited (2023), 2019
+publisher_emerald <- articles_cited[grepl("Emerald Publishing", articles_cited$host_organization, ignore.case = TRUE), ]
 
 ### origin works: test case: 
 
@@ -519,7 +520,6 @@ search_string <- "https://openalex.org/W2125300654"
 id_counts <-table(publisher_plos$id)
 duplicateds <- id_counts[id_counts > 10]
 print(duplicateds)
-
 
 
 ### Test cases for Microbiology
@@ -553,7 +553,7 @@ print(indices_with_string)
 org_works[1985,] $id
 org_works[5610,] $id
 
-# Test case: cited > 80 times in 2019. verified
+# Test case: cited > 80 times in 2019. verified. 18 times in 2023
 # https://openalex.org/W2066340221 cited > 80 times in 2019.
 search_string <- "https://openalex.org/W2066340221"
 indices_with_string <- which(sapply(org_works$referenced_works, function(x) search_string %in% x))
@@ -590,14 +590,15 @@ write_xlsx(duplicate_multi_cited_rows, "citations/duplicate_multi_cited_2023.xls
 write_xlsx(duplicate_multi_cited_rows_unique, "citations/duplicate_multi_cited_unique_2023.xlsx")
 
 # Save the modified dataset to Excel
-write_xlsx(publisher_NA, "citations/publisher_NA_2023.xlsx")
+write_xlsx(publisher_NA, "citations/publisher_NA_2019.xlsx")
 
-write_xlsx(publisher_aaas, "citations/publisher_aaas_2023.xlsx")
-write_xlsx(publisher_nature, "citations/publisher_nature_2023.xlsx")
+write_xlsx(publisher_aaas, "citations/publisher_aaas_2019.xlsx")
+write_xlsx(publisher_nature, "citations/publisher_nature_2019.xlsx")
 
-write_xlsx(publisher_plos, "citations/publisher_plos_2023.xlsx")
-write_xlsx(publisher_microbiology, "citations/publisher_microbiology_2023.xlsx")
+write_xlsx(publisher_plos, "citations/publisher_plos_2019.xlsx")
+write_xlsx(publisher_microbiology, "citations/publisher_microbiology_2019.xlsx")
 
+write_xlsx(publisher_emerald, "citations/publisher_emerald_2019.xlsx")
 ######################################
 ######################################
 ### Function: To count journal occurrences for a given publisher
@@ -635,6 +636,12 @@ publisher_name <- "Canadian Science Publishing"
 publisher1 <-  articles_cited[grepl(publisher_name, articles_cited$host_organization, ignore.case = TRUE), ]
 journal_counts_df <- count_journals_by_publisher(articles_cited, publisher_name)
 print(journal_counts_df)
+
+publisher_name <- "Emerald Publishing"
+publisher1 <-  articles_cited[grepl(publisher_name, articles_cited$host_organization, ignore.case = TRUE), ]
+journal_counts_df <- count_journals_by_publisher(articles_cited, publisher_name)
+print(journal_counts_df)
+
 
 # Group by 'host_organization' and count the number of articles for each publisher
 publisher_ranking <- articles_cited %>%
