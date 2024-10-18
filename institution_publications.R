@@ -50,8 +50,8 @@ UAUMC.df <-oa_fetch(
 UAworks_count <-oa_fetch(
   entity="works",
   institutions.ror=c("03m2x1q45"),
-  from_publication_date ="2020-01-01",
-  to_publication_date = "2020-12-31",
+  from_publication_date ="2021-01-01",
+  to_publication_date = "2021-12-31",
   count_only = TRUE
 )
 
@@ -95,13 +95,14 @@ org_works_2023 <-oa_fetch(
 
 org_works_2019 <- readRDS("../org_works_2019.rds")
 org_works_2020 <- readRDS("../org_works_2020.rds")
-# org_works_2021 <- readRDS("../org_works_2021.rds")
+org_works_2021 <- readRDS("../org_works_2021.rds")
 # org_works_2022 <- readRDS("../org_works_2022.rds")
 org_works_2023 <- readRDS("../org_works_2023.rds")
 
 # change working data here 
  org_works <- org_works_2019
  org_works <- org_works_2020
+ org_works <- org_works_2021
 #org_works <- org_works_2023
 
 
@@ -125,7 +126,7 @@ org_works_ref <- org_works$referenced_works
 # Filter the rows where $reference_works is NA and $type is "article"
 works_na_referenced_works <- org_works %>%
   filter(is.na(referenced_works) & type == "article")
-write_xlsx(works_na_referenced_works, "citations/works_2020_na_referenced_works.xlsx")
+write_xlsx(works_na_referenced_works, "citations/works_2021_na_referenced_works.xlsx")
 
 # this na_indices include type: article, books, errata, letter, and other types
 na_indices <- which(sapply(org_works_ref, function(x) is.logical(x) && is.na(x))) 
@@ -136,6 +137,7 @@ na_percent <- na_count/length(org_works_ref) * 100
 # Avg # of references per article: ~50
 # Year 2023 total references: 364,304: unique 281,470 / 351,479: more cited: ~77,000 
 # Year 2022 total references: 345,904
+# Year 2021 total references: 400,364
 # Year 2020 total references: 392,992: article 
 # Year 2019 total references: 352,509: articles 329,000 
 
@@ -394,21 +396,6 @@ difference_df2_df1 <- setdiff(org_works_ref_combined, works_cited_final$id)
 head(difference_df2_df1)
 head(works_cited_final$id)
 head(matching_rows$id)
-
-index <- which(works_cited_final$id == "https://openalex.org/W1927648166")
-print(index)
-works_cited_final$id[1]
-works_cited_final$id[328131]
-
-index <- which(matching_rows$id == "https://openalex.org/W1927648166")
-print(index)
-
-index <- which(matching_rows_expanded$id == "https://openalex.org/W1927648166")
-print(index)
-
-index <- which(works_ref_more_cited_counts == "https://openalex.org/W1927648166")
-print(index)
-
 ######################
 
 
@@ -416,7 +403,7 @@ saveRDS(works_cited_final, "../works_cited_final_2023.rds")
 
 works_cited_final <- readRDS("../works_cited_final_2019.rds")
 works_cited_final <- readRDS("../works_cited_final_2020.rds")
-# works_cited_final <- readRDS("../works_cited_final_2021.rds")
+works_cited_final <- readRDS("../works_cited_final_2021.rds")
 # works_cited_final <- readRDS("../works_cited_final_2022.rds")
 works_cited_final <- readRDS("../works_cited_final_2023.rds")
 
@@ -425,6 +412,7 @@ works_cited_final <- readRDS("../works_cited_final_2023.rds")
 # 1. Analyse journal usage
 #  - remove any row whose col "issn_l" is empty or NULL 
 # 2023: 329,389 articles out of 352,509 works: 94%
+# 2021: 379,441 articles out of 413,611 works: 
 # 2020: 382,495 articles out of 421,866 works: 91%
 # 2019: 291,705 articles out of 323,779 works: 90%
 
@@ -449,7 +437,8 @@ num_unique_publishers <- length(unique_publishers)
 # list top 50 publishers
 print(unique_publishers[1:50])
 # list NULL publishers ~ 1 %
-# Year 2020: 4,039 NA / 382,495
+# 2021: 3,886 NA / 379,441 
+# 2020: 4,039 NA / 382,495
 num_na <- sum(is.na(articles_cited$host_organization))
 
 # Replace NA values and empty strings with "NA"
@@ -465,6 +454,7 @@ publisher_NA_with_issn <- publisher_NA[!is.na(publisher_NA$`issn_l`) & publisher
 print(publisher_NA_with_issn)
 
 # Extract unique ISSNs from the 'issn_l' column: 1235 unique issns
+# 2021: 1920 / 3,886 NA
 # 2020: 1,737 / 4,039 NA 
 unique_issn <- unique(publisher_NA$`issn_l`)
 print(unique_issn)
@@ -504,16 +494,15 @@ publisher_cdc <- articles_cited[grepl("Centers for Disease Control and Preventio
 publisher_ua <- articles_cited[grepl("University of Arizona", articles_cited$host_organization, ignore.case = TRUE), ]
 publisher_uap <- articles_cited[grepl("University of Arizona Press", articles_cited$host_organization, ignore.case = TRUE), ]
 
-# Need to study more. 395 (2020), 276 cited (2023), 
+# Need to study more. 395 (2020), 257 (2021), 276 cited (2023), 
 publisher_emerald <- articles_cited[grepl("Emerald Publishing", articles_cited$host_organization, ignore.case = TRUE), ]
 
-# 34 cited (2020), 
+# IWA: 19 cited(2019), 34 cited (2020), 21 cited (2021) 
 publisher_iwa <- articles_cited[grepl("IWA Publishing", articles_cited$host_organization, ignore.case = TRUE), ]
 
 id_counts <-table(publisher_iwa$id)
 duplicateds <- id_counts[id_counts >= 1]
 print(id_counts)
-
 
 ### origin works: test case: 
 
@@ -601,7 +590,6 @@ search_references(search_string, org_works)
 search_string <- "https://openalex.org/W2128159409"  # Microbiology articles
 search_string <- "https://openalex.org/W2017185349" # Microbiology
 
-
 # Publishers test case : cited 6 from microbiology
 # both final published version and pre-print existing: https://openalex.org/works/W4379795917 and https://openalex.org/W4319339791 
 publisher_article_indicies <- which(sapply(publisher_microbiology$id, function(x) search_string %in% x))
@@ -622,9 +610,10 @@ search_string <- "https://openalex.org/W2066340221"
 search_string <- "https://openalex.org/W2045185088"
 
 search_publisher("nature", org_works)
-search_publisher("IWA", org_works) # UA author published in IWA in 2014. Test
+search_publisher("IWA", org_works) # UA author published in IWA in 2014. not in 2019, 2020, and 2021
 
 search_string <- "https://openalex.org/W2130109162"
+search_string <- "https://openalex.org/W1965549985"
 search_references(search_string, org_works)
 
 # https://openalex.org/W2130109162 same record, different publication date? 
@@ -661,17 +650,13 @@ write_xlsx(duplicate_multi_cited_rows, "citations/duplicate_multi_cited_2023.xls
 write_xlsx(duplicate_multi_cited_rows_unique, "citations/duplicate_multi_cited_unique_2023.xlsx")
 
 # Save the modified dataset to Excel
-write_xlsx(publisher_NA, "citations/publisher_NA_2020.xlsx")
-
-write_xlsx(publisher_aaas, "citations/publisher_aaas_2020.xlsx")
-write_xlsx(publisher_nature, "citations/publisher_nature_2020.xlsx")
-
-write_xlsx(publisher_plos, "citations/publisher_plos_2020.xlsx")
-write_xlsx(publisher_microbiology, "citations/publisher_microbiology_2020.xlsx")
-
-write_xlsx(publisher_emerald, "citations/publisher_emerald_2020.xlsx")
-
-write_xlsx(publisher_iwa, "citations/publisher_iwa_2020.xlsx")
+write_xlsx(publisher_NA, "citations/publisher_NA_2021.xlsx")
+write_xlsx(publisher_aaas, "citations/publisher_aaas_2021.xlsx")
+write_xlsx(publisher_nature, "citations/publisher_nature_2021.xlsx")
+write_xlsx(publisher_plos, "citations/publisher_plos_2021.xlsx")
+write_xlsx(publisher_microbiology, "citations/publisher_microbiology_2021.xlsx")
+write_xlsx(publisher_emerald, "citations/publisher_emerald_2021.xlsx")
+write_xlsx(publisher_iwa, "citations/publisher_iwa_2021.xlsx")
 
 ######################################
 ######################################
@@ -722,7 +707,7 @@ publisher_name <- "Emerald Publishing"
 publisher1 <-  articles_cited[grepl(publisher_name, articles_cited$host_organization, ignore.case = TRUE), ]
 journal_counts_df <- count_journals_by_publisher(articles_cited, publisher_name)
 print(journal_counts_df)
-write_xlsx(journal_counts_df, "citations/publisher_emerald_2020_counts.xlsx")
+write_xlsx(journal_counts_df, "citations/publisher_emerald_2021_counts.xlsx")
 
 search_string <- "https://openalex.org/W1484587278"
 search_references(search_string, org_works)
@@ -767,7 +752,7 @@ ggplot(top_20_publishers, aes(x = reorder(host_organization, -article_count), y 
   geom_text(aes(label = sprintf("(%.1f%%)", percentage)), vjust = 0.5, hjust = -0.2, size = 3) +  
   # Adjust hjust for positioning outside
   coord_flip() +  # Flip the axis for better readability
-  labs(x = "Publisher", y = "Number of Articles", title = "2020 UA Top 20 Publishers (Number of Articles Cited)") +
+  labs(x = "Publisher", y = "Number of Articles", title = "2021 UA Top 20 Publishers (Number of Articles Cited)") +
   theme_minimal() +
   theme(axis.text.y = element_text(size = 7))  # Reduce font size of publisher names
 
