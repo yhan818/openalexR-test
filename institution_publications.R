@@ -521,6 +521,24 @@ id_counts <-table(publisher_plos$id)
 duplicateds <- id_counts[id_counts > 10]
 print(duplicateds)
 
+###############################################################
+# Verify any cited work using the function search_references()
+# Define the function to search for a string in the referenced_works column and print the output
+##############################################3
+search_references <- function(search_string, df) {
+  indices_with_string <- which(sapply(df$referenced_works, function(x) search_string %in% x))
+  print(indices_with_string)
+  print(df[indices_with_string, ]$id)
+}
+
+# Example usage
+search_string <- "https://openalex.org/W1604958295" 
+# openAlex questions: type = "book-chapter", while it has ISSN
+
+search_string <- "https://openalex.org/W1607198972"
+indices_with_string <- which(sapply(org_works$referenced_works, function(x) search_string %in% x))
+
+search_references(search_string, org_works)
 
 ### Test cases for Microbiology
 # both final published version and pre-print existing: https://openalex.org/works/W4379795917 and https://openalex.org/W4319339791 
@@ -529,15 +547,6 @@ print(duplicateds)
 search_string <- "https://openalex.org/W2128159409"  # Microbiology articles
 search_string <- "https://openalex.org/W2017185349" # Microbiology
 
-
-### Find test cases from original works ID
-indices_with_string <- which(sapply(org_works$referenced_works, function(x) search_string %in% x))
-print(indices_with_string)
-org_works[indices_with_string, ]$id
-
-### Article cited: test case 2: cited 6 from microbiology
-cited_article_indices <- which(sapply(articles_cited$id, function(x) search_string %in% x))
-print(cited_article_indices)
 
 # Publishers test case : cited 6 from microbiology
 # both final published version and pre-print existing: https://openalex.org/works/W4379795917 and https://openalex.org/W4319339791 
@@ -548,24 +557,17 @@ publisher_microbiology[publisher_article_indicies, ]$id
 # Test case: cited 47 times in 2023. Verified! 
 # The Gaia mission
 search_string <- "https://openalex.org/W147232447"
-indices_with_string <- which(sapply(org_works$referenced_works, function(x) search_string %in% x))
-print(indices_with_string)
-org_works[1985,] $id
-org_works[5610,] $id
 
 # Test case: cited > 80 times in 2019. verified. 18 times in 2023
 # https://openalex.org/W2066340221 cited > 80 times in 2019.
 search_string <- "https://openalex.org/W2066340221"
-indices_with_string <- which(sapply(org_works$referenced_works, function(x) search_string %in% x))
-print(indices_with_string)
-org_works[7679,] $id
-org_works[3540,] $id
+
+
+search_references(search_string, org_works)
 
 ########################################################################
 ###################### End of Testing ##################################
 ########################################################################
-
-
 
 #### Find duplicates and frequencies #####
 # change DF here
@@ -626,7 +628,6 @@ print(journal_counts_df)
 # https://openalex.org/W2165027548 (1994 v44n3, Journal name changes and ISSN changed)
 
 
-
 publisher_name <- "Optica Publishing Group"
 publisher1 <-  articles_cited[grepl(publisher_name, articles_cited$host_organization, ignore.case = TRUE), ]
 journal_counts_df <- count_journals_by_publisher(articles_cited, publisher_name)
@@ -641,6 +642,9 @@ publisher_name <- "Emerald Publishing"
 publisher1 <-  articles_cited[grepl(publisher_name, articles_cited$host_organization, ignore.case = TRUE), ]
 journal_counts_df <- count_journals_by_publisher(articles_cited, publisher_name)
 print(journal_counts_df)
+write_xlsx(journal_counts_df, "citations/publisher_emerald_2019_counts.xlsx")
+
+search_references("https://openalex.org/W1584410718", org_works)
 
 
 # Group by 'host_organization' and count the number of articles for each publisher
