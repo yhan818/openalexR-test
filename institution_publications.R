@@ -36,6 +36,7 @@ UAUMC.df <-oa_fetch(
 # Retrieving all publications association with UArizona's ROR (Research Organization Registry) ID.
 # UA publications per year is ~9,000. For running 2 years data, need better computer or crashed R studio.
 # Year 2023: 9,384 works.
+# Year 2022: 8,833 works (2024-10-18) <- 8,674 works (2024-09-09)
 # Year 2021: 9,473 works
 # Year 2020: 
 # Year 2019: 8,847 
@@ -50,8 +51,8 @@ UAUMC.df <-oa_fetch(
 UAworks_count <-oa_fetch(
   entity="works",
   institutions.ror=c("03m2x1q45"),
-  from_publication_date ="2021-01-01",
-  to_publication_date = "2021-12-31",
+  from_publication_date ="2022-01-01",
+  to_publication_date = "2022-12-31",
   count_only = TRUE
 )
 
@@ -90,19 +91,21 @@ org_works_2023 <-oa_fetch(
 # saveRDS(org_works_2019, "../org_works_2019.rds")
 # saveRDS(org_works_2020, "../org_works_2020.rds")
 # saveRDS(org_works_2021, "../org_works_2021.rds")
-# saveRDS(org_works_2022, "../org_works_2022.rds")
- saveRDS(org_works_2023, "../org_works_2023.rds")
+saveRDS(org_works_2022, "../org_works_2022.rds")
+
+saveRDS(org_works_2023, "../org_works_2023.rds")
 
 org_works_2019 <- readRDS("../org_works_2019.rds")
 org_works_2020 <- readRDS("../org_works_2020.rds")
 org_works_2021 <- readRDS("../org_works_2021.rds")
-# org_works_2022 <- readRDS("../org_works_2022.rds")
+org_works_2022 <- readRDS("../org_works_2022.rds")
 org_works_2023 <- readRDS("../org_works_2023.rds")
 
 # change working data here 
  org_works <- org_works_2019
  org_works <- org_works_2020
  org_works <- org_works_2021
+ org_works <- org_works_2022
 #org_works <- org_works_2023
 
 
@@ -121,12 +124,13 @@ org_works_ref <- org_works$referenced_works
 
 # Year 2019: 1575 / 8848 referenced works value="NA", while $type is "article". 18%
 # Year 2020: 1868 / 10161 referenced works value="NA", while $type is "article". 
+# Year 2022: 1224 / 8674  referenced works value="NA", while $type is "article". 
 # Year 2023: 1534 / 9384 referenced works value="NA", while $type is "article". 
 
 # Filter the rows where $reference_works is NA and $type is "article"
 works_na_referenced_works <- org_works %>%
   filter(is.na(referenced_works) & type == "article")
-write_xlsx(works_na_referenced_works, "citations/works_2021_na_referenced_works.xlsx")
+write_xlsx(works_na_referenced_works, "citations/works_2022_na_referenced_works.xlsx")
 
 # this na_indices include type: article, books, errata, letter, and other types
 na_indices <- which(sapply(org_works_ref, function(x) is.logical(x) && is.na(x))) 
@@ -136,7 +140,7 @@ na_percent <- na_count/length(org_works_ref) * 100
 ### 2.2 Combine all the references and do further data analysis
 # Avg # of references per article: ~50
 # Year 2023 total references: 364,304: unique 281,470 / 351,479: more cited: ~77,000 
-# Year 2022 total references: 345,904
+# Year 2022 total references: 345,904: 
 # Year 2021 total references: 400,364
 # Year 2020 total references: 392,992: article 
 # Year 2019 total references: 352,509: articles 329,000 
@@ -265,12 +269,12 @@ for (i in indices) {
 }
 # Find it from the original article
 search_string <- "https://openalex.org/W2594545996"  
-# this article was cited 81 times in 2019, cited 130 times in 2020, cited 16 times in 2023,
+# this article was cited 81 times in 2019, cited 130 times in 2020, cited 26 times in 2022, cited 16 times in 2023,
 indices_with_string <- which(sapply(org_works$referenced_works, function(x) search_string %in% x))
 print(indices_with_string)
 org_works[indices_with_string, ]$id
 
-# test case 2: cited 6 from microbiology
+# test case 2: cited 6 from microbiology, multiple times for 2019, 2020, 2021
 # both final published version and pre-print existing: https://openalex.org/works/W4379795917 and https://openalex.org/W4319339791 
 search_string <- "https://openalex.org/W2128159409"
 indices_with_string <- which(sapply(org_works$referenced_works, function(x) search_string %in% x))
@@ -404,7 +408,7 @@ saveRDS(works_cited_final, "../works_cited_final_2023.rds")
 works_cited_final <- readRDS("../works_cited_final_2019.rds")
 works_cited_final <- readRDS("../works_cited_final_2020.rds")
 works_cited_final <- readRDS("../works_cited_final_2021.rds")
-# works_cited_final <- readRDS("../works_cited_final_2022.rds")
+works_cited_final <- readRDS("../works_cited_2022-1.rds")
 works_cited_final <- readRDS("../works_cited_final_2023.rds")
 
 
@@ -412,6 +416,7 @@ works_cited_final <- readRDS("../works_cited_final_2023.rds")
 # 1. Analyse journal usage
 #  - remove any row whose col "issn_l" is empty or NULL 
 # 2023: 329,389 articles out of 352,509 works: 94%
+# 2022: 343,452? articles out of 345,904 works: 
 # 2021: 379,441 articles out of 413,611 works: 
 # 2020: 382,495 articles out of 421,866 works: 91%
 # 2019: 291,705 articles out of 323,779 works: 90%
