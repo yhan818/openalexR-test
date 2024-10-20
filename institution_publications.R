@@ -140,7 +140,7 @@ na_percent <- na_count/length(org_works_ref) * 100
 ### 2.2 Combine all the references and do further data analysis
 # Avg # of references per article: ~50
 # Year 2023 total references: 364,304: unique 281,470 / 351,479: more cited: ~77,000 
-# Year 2022 total references: 345,904: 
+# Year 2022 total references: 356,445: 
 # Year 2021 total references: 400,364
 # Year 2020 total references: 392,992: article 
 # Year 2019 total references: 352,509: articles 329,000 
@@ -154,7 +154,7 @@ org_works_ref_combined <- org_works_ref_combined[!is.na(org_works_ref_combined)]
 
 ### 2.21 finding these duplicates, which mean the duplicates have been cited multiple times 
 # (probably more important to have these journals subscribed!)
-# cited more: ~20% - 25%  (2022, 2023 UArizona data)
+# cited more: ~20% - 25%  (2019, 2020, 2021, 2022, 2023 UArizona data)
 org_works_ref_more_cited <- org_works_ref_combined[duplicated(org_works_ref_combined)]
 org_works_ref_unique <- org_works_ref_combined[!duplicated(org_works_ref_combined)]
 
@@ -181,11 +181,11 @@ org_works[2, "id"]
 org_works[174, "id"]
 
 # Test to see how many times a work is cited. 
-# 2020: 21 times
+# 21 times (2020); 26 times(2022)
 index <- which(org_works_ref_more_cited == "https://openalex.org/W4247665917")
 print(index)
 
-# https://openalex.org/W4247665917 were cited in 2019, 2021 and 2023 data
+# https://openalex.org/W4247665917 were cited in 2019, 2021, 2022 and 2023 data
 index <- which(org_works_ref_unique == "https://openalex.org/W4247665917")
 print(index)
 org_works_ref_unique[136]
@@ -226,7 +226,7 @@ works_cited <-data.frame()
 # Warnings(). a work > 100 authors will be truncated 
 # 2024: 
 # 2023: 352,509 (checked) out of 364,304 
-# 2022: 249,629 (re-check), 174 min to fetch all the works; file size 438 M
+# 2022: 345,813 (checked) 
 # 2021: 
 # 2019: 331,657 (checked).
 
@@ -267,14 +267,15 @@ for (i in indices) {
   cat("Index:", i, "\n")
   cat("Element:\n", org_works_ref_combined[[i]], "\n\n")
 }
+
 # Find it from the original article
 search_string <- "https://openalex.org/W2594545996"  
-# this article was cited 81 times in 2019, cited 130 times in 2020, cited 26 times in 2022, cited 16 times in 2023,
+# this article was cited 81 times in 2019, cited 130 times in 2020, cited 26 times (2021), 52 times(2022) cited 16 times in 2023,
 indices_with_string <- which(sapply(org_works$referenced_works, function(x) search_string %in% x))
 print(indices_with_string)
 org_works[indices_with_string, ]$id
 
-# test case 2: cited 6 from microbiology, multiple times for 2019, 2020, 2021
+# test case 2: cited 6 from microbiology, multiple times for 2019, 2020, 2021, 2022
 # both final published version and pre-print existing: https://openalex.org/works/W4379795917 and https://openalex.org/W4319339791 
 search_string <- "https://openalex.org/W2128159409"
 indices_with_string <- which(sapply(org_works$referenced_works, function(x) search_string %in% x))
@@ -366,14 +367,18 @@ print(paste("time to run: ", time_taken["elapsed"] / 60, "minutes"))
 
 ########################
 
-### Count how many multiple cited. 
-class(org_works_ref_more_cited)
-# Count the occurrences of each unique element in the vector
-#works_ref_more_cited_counts <- table(org_works_ref_more_cited)
-works_cited <- org_works_ref_combined
-
 #### Step 1: Re-generate a new row if it matches (meaning; cited multiple times.)
 works_cited_final <- works_cited
+
+
+saveRDS(works_cited_final, "../works_cited_final_2022.rds")
+saveRDS(works_cited_final, "../works_cited_final_2023.rds")
+
+works_cited_final <- readRDS("../works_cited_final_2019.rds")
+works_cited_final <- readRDS("../works_cited_final_2020.rds")
+works_cited_final <- readRDS("../works_cited_final_2021.rds")
+works_cited_final <- readRDS("../works_cited_final_2022.rds")
+works_cited_final <- readRDS("../works_cited_final_2023.rds")
 
 #### need to recheck the numbers
 # Step 2: Add these matching rows as new rows 
@@ -393,6 +398,13 @@ works_cited_final <- works_cited
 # 1. I fetched 316,401 unique works, but returned 329,720 (about 2% more... )
 # 2. 
 
+
+### Count how many multiple cited. 
+class(org_works_ref_more_cited)
+# Count the occurrences of each unique element in the vector
+#works_ref_more_cited_counts <- table(org_works_ref_more_cited)
+# works_cited <- org_works_ref_combined
+
 ############# Testing
 
 difference_df1_df2 <- setdiff(works_cited_final$id, org_works_ref_combined)
@@ -403,20 +415,11 @@ head(matching_rows$id)
 ######################
 
 
-saveRDS(works_cited_final, "../works_cited_final_2023.rds")
-
-works_cited_final <- readRDS("../works_cited_final_2019.rds")
-works_cited_final <- readRDS("../works_cited_final_2020.rds")
-works_cited_final <- readRDS("../works_cited_final_2021.rds")
-works_cited_final <- readRDS("../works_cited_2022-1.rds")
-works_cited_final <- readRDS("../works_cited_final_2023.rds")
-
-
 ###################### Citation Analysis ####################################
 # 1. Analyse journal usage
 #  - remove any row whose col "issn_l" is empty or NULL 
 # 2023: 329,389 articles out of 352,509 works: 94%
-# 2022: 343,452? articles out of 345,904 works: 
+# 2022: 323,221 articles out of 345,813 works: 
 # 2021: 379,441 articles out of 413,611 works: 
 # 2020: 382,495 articles out of 421,866 works: 91%
 # 2019: 291,705 articles out of 323,779 works: 90%
@@ -442,6 +445,7 @@ num_unique_publishers <- length(unique_publishers)
 # list top 50 publishers
 print(unique_publishers[1:50])
 # list NULL publishers ~ 1 %
+# 2022: 3,312 NA / 323,221
 # 2021: 3,886 NA / 379,441 
 # 2020: 4,039 NA / 382,495
 num_na <- sum(is.na(articles_cited$host_organization))
@@ -459,7 +463,8 @@ publisher_NA_with_issn <- publisher_NA[!is.na(publisher_NA$`issn_l`) & publisher
 print(publisher_NA_with_issn)
 
 # Extract unique ISSNs from the 'issn_l' column: 1235 unique issns
-# 2021: 1920 / 3,886 NA
+# 2022: 1,110 / 3,312 NA
+# 2021: 1,920 / 3,886 NA
 # 2020: 1,737 / 4,039 NA 
 unique_issn <- unique(publisher_NA$`issn_l`)
 print(unique_issn)
@@ -499,10 +504,11 @@ publisher_cdc <- articles_cited[grepl("Centers for Disease Control and Preventio
 publisher_ua <- articles_cited[grepl("University of Arizona", articles_cited$host_organization, ignore.case = TRUE), ]
 publisher_uap <- articles_cited[grepl("University of Arizona Press", articles_cited$host_organization, ignore.case = TRUE), ]
 
-# Need to study more. 395 (2020), 257 (2021), 276 cited (2023), 
+# Need to study more. 
+# Emerald: cited (yyyy): 395 (2020), 257 (2021), 322 (2022), 276 (2023), 
 publisher_emerald <- articles_cited[grepl("Emerald Publishing", articles_cited$host_organization, ignore.case = TRUE), ]
 
-# IWA: 19 cited(2019), 34 cited (2020), 21 cited (2021) 
+# IWA: cited (yyyy): 19 (2019), 34 (2020), 21 (2021), 19 (2022),   
 publisher_iwa <- articles_cited[grepl("IWA Publishing", articles_cited$host_organization, ignore.case = TRUE), ]
 
 id_counts <-table(publisher_iwa$id)
@@ -602,16 +608,23 @@ print(publisher_article_indicies)
 publisher_microbiology[publisher_article_indicies, ]$id
 
 # Test case: cited 47 times in 2023. Verified! 
-# cited 32 times (2020)
+# cited 32 times (2020), 53(2022)
 # The Gaia mission
 search_string <- "https://openalex.org/W147232447"
 
 # Test case: cited > 80 times in 2019. verified. 18 times in 2023
-# cited 123 times (2020)
+# cited 123 times (2020), 40 (2022)
 # https://openalex.org/W2066340221 cited > 80 times in 2019.
 search_string <- "https://openalex.org/W2066340221"
+search_references(search_string, org_works)
 
-# Test case: IWA
+# Test case: Emerald (2022)
+search_string <- "https://openalex.org/W1998245073"
+search_string <- "https://openalex.org/W2508822998" # (3 times)
+search_references(search_string, org_works)
+
+
+# Test case: IWA. 1 (2022)
 search_string <- "https://openalex.org/W2045185088"
 
 search_publisher("nature", org_works)
@@ -619,13 +632,13 @@ search_publisher("IWA", org_works) # UA author published in IWA in 2014. not in 
 
 search_string <- "https://openalex.org/W2130109162"
 search_string <- "https://openalex.org/W1965549985"
+
 search_references(search_string, org_works)
 
 # https://openalex.org/W2130109162 same record, different publication date? 
 matches <- which(tolower(articles_cited$id) == tolower(search_string))
 view(articles_cited[matches, ])
 print(articles_cited$id[matches])
-
 
 
 ########################################################################
@@ -651,17 +664,17 @@ duplicate_multi_cited_rows <- duplicate_multi_cited_rows %>%
 # Remove duplicate rows from duplicate_multi_cited_rows
 duplicate_multi_cited_rows_unique <- duplicate_multi_cited_rows[!duplicated(duplicate_multi_cited_rows), ]
 
-write_xlsx(duplicate_multi_cited_rows, "citations/duplicate_multi_cited_2023.xlsx")
-write_xlsx(duplicate_multi_cited_rows_unique, "citations/duplicate_multi_cited_unique_2023.xlsx")
+# write_xlsx(duplicate_multi_cited_rows, "citations/duplicate_multi_cited_2023.xlsx")
+# write_xlsx(duplicate_multi_cited_rows_unique, "citations/duplicate_multi_cited_unique_2023.xlsx")
 
 # Save the modified dataset to Excel
-write_xlsx(publisher_NA, "citations/publisher_NA_2021.xlsx")
-write_xlsx(publisher_aaas, "citations/publisher_aaas_2021.xlsx")
-write_xlsx(publisher_nature, "citations/publisher_nature_2021.xlsx")
-write_xlsx(publisher_plos, "citations/publisher_plos_2021.xlsx")
-write_xlsx(publisher_microbiology, "citations/publisher_microbiology_2021.xlsx")
-write_xlsx(publisher_emerald, "citations/publisher_emerald_2021.xlsx")
-write_xlsx(publisher_iwa, "citations/publisher_iwa_2021.xlsx")
+write_xlsx(publisher_NA, "citations/publisher_NA_2022.xlsx")
+write_xlsx(publisher_aaas, "citations/publisher_aaas_2022.xlsx")
+write_xlsx(publisher_nature, "citations/publisher_nature_2022.xlsx")
+write_xlsx(publisher_plos, "citations/publisher_plos_2022.xlsx")
+write_xlsx(publisher_microbiology, "citations/publisher_microbiology_2022.xlsx")
+write_xlsx(publisher_emerald, "citations/publisher_emerald_2022.xlsx")
+write_xlsx(publisher_iwa, "citations/publisher_iwa_2022.xlsx")
 
 ######################################
 ######################################
@@ -712,7 +725,7 @@ publisher_name <- "Emerald Publishing"
 publisher1 <-  articles_cited[grepl(publisher_name, articles_cited$host_organization, ignore.case = TRUE), ]
 journal_counts_df <- count_journals_by_publisher(articles_cited, publisher_name)
 print(journal_counts_df)
-write_xlsx(journal_counts_df, "citations/publisher_emerald_2021_counts.xlsx")
+write_xlsx(journal_counts_df, "citations/publisher_emerald_2022_counts.xlsx")
 
 search_string <- "https://openalex.org/W1484587278"
 search_references(search_string, org_works)
@@ -757,7 +770,7 @@ ggplot(top_20_publishers, aes(x = reorder(host_organization, -article_count), y 
   geom_text(aes(label = sprintf("(%.1f%%)", percentage)), vjust = 0.5, hjust = -0.2, size = 3) +  
   # Adjust hjust for positioning outside
   coord_flip() +  # Flip the axis for better readability
-  labs(x = "Publisher", y = "Number of Articles", title = "2021 UA Top 20 Publishers (Number of Articles Cited)") +
+  labs(x = "Publisher", y = "Number of Articles", title = "2022 UA Top 20 Publishers (Number of Articles Cited)") +
   theme_minimal() +
   theme(axis.text.y = element_text(size = 7))  # Reduce font size of publisher names
 
