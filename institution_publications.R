@@ -37,7 +37,7 @@ UAUMC.df <-oa_fetch(
 # UA publications per year is ~9,000. For running 2 years data, need better computer or crashed R studio.
 # Year 2023: 9,384 works.
 # Year 2022: 8,833 works (2024-10-18) <- 8,674 works (2024-09-09)
-# Year 2021: 9,473 works
+# Year 2021: 9,337 works
 # Year 2020: 
 # Year 2019: 8,847 
 # 2023-current: 14,660 works : 5 min to get UAworks with 3 GB mem, 264 mins to pull 372,000 reference's data with 8.6 GB  
@@ -51,8 +51,8 @@ UAUMC.df <-oa_fetch(
 UAworks_count <-oa_fetch(
   entity="works",
   institutions.ror=c("03m2x1q45"),
-  from_publication_date ="2022-01-01",
-  to_publication_date = "2022-12-31",
+  from_publication_date ="2023-01-01",
+  to_publication_date = "2023-12-31",
   count_only = TRUE
 )
 
@@ -66,11 +66,11 @@ org_works_2019 <-oa_fetch(
   to_publication_date = "2020-12-31"
 )
 
-org_works_2020 <-oa_fetch(
+org_works_2021 <-oa_fetch(
   entity="works",
   institutions.ror=c("03m2x1q45"),
-  from_publication_date ="2020-01-01",
-  to_publication_date = "2020-12-31"
+  from_publication_date ="2021-01-01",
+  to_publication_date = "2021-12-31"
 )
 
 org_works_2022 <-oa_fetch(
@@ -87,14 +87,14 @@ org_works_2023 <-oa_fetch(
   to_publication_date = "2023-12-31"
 )
 
-
+# Save data
 # saveRDS(org_works_2019, "../org_works_2019.rds")
 # saveRDS(org_works_2020, "../org_works_2020.rds")
-# saveRDS(org_works_2021, "../org_works_2021.rds")
+saveRDS(org_works_2021, "../org_works_2021.rds")
 saveRDS(org_works_2022, "../org_works_2022.rds")
-
 saveRDS(org_works_2023, "../org_works_2023.rds")
 
+# Load data 
 org_works_2019 <- readRDS("../org_works_2019.rds")
 org_works_2020 <- readRDS("../org_works_2020.rds")
 org_works_2021 <- readRDS("../org_works_2021.rds")
@@ -106,7 +106,7 @@ org_works_2023 <- readRDS("../org_works_2023.rds")
  org_works <- org_works_2020
  org_works <- org_works_2021
  org_works <- org_works_2022
-#org_works <- org_works_2023
+ org_works <- org_works_2023
 
 
 ##### 2. Checking and verifying data
@@ -124,13 +124,14 @@ org_works_ref <- org_works$referenced_works
 
 # Year 2019: 1575 / 8848 referenced works value="NA", while $type is "article". 18%
 # Year 2020: 1868 / 10161 referenced works value="NA", while $type is "article". 
+# Year 2021: 1921 / 9336 referenced works value="NA", while $type is "article". 
 # Year 2022: 1224 / 8674  referenced works value="NA", while $type is "article". 
 # Year 2023: 1534 / 9384 referenced works value="NA", while $type is "article". 
 
 # Filter the rows where $reference_works is NA and $type is "article"
 works_na_referenced_works <- org_works %>%
   filter(is.na(referenced_works) & type == "article")
-write_xlsx(works_na_referenced_works, "citations/works_2022_na_referenced_works.xlsx")
+write_xlsx(works_na_referenced_works, "citations/works_2023_na_referenced_works.xlsx")
 
 # this na_indices include type: article, books, errata, letter, and other types
 na_indices <- which(sapply(org_works_ref, function(x) is.logical(x) && is.na(x))) 
@@ -141,7 +142,7 @@ na_percent <- na_count/length(org_works_ref) * 100
 # Avg # of references per article: ~50
 # Year 2023 total references: 364,304: unique 281,470 / 351,479: more cited: ~77,000 
 # Year 2022 total references: 356,445: 
-# Year 2021 total references: 400,364
+# Year 2021 total references: 382,965: 
 # Year 2020 total references: 392,992: article 
 # Year 2019 total references: 352,509: articles 329,000 
 
@@ -181,14 +182,13 @@ org_works[2, "id"]
 org_works[174, "id"]
 
 # Test to see how many times a work is cited. 
-# 21 times (2020); 26 times(2022)
+# 21 times (2020); 22 times(2021), 26 times(2022)
 index <- which(org_works_ref_more_cited == "https://openalex.org/W4247665917")
 print(index)
 
 # https://openalex.org/W4247665917 were cited in 2019, 2021, 2022 and 2023 data
-index <- which(org_works_ref_unique == "https://openalex.org/W4247665917")
+index <- which(org_works_ref_more_cited == "https://openalex.org/W4247665917")
 print(index)
-org_works_ref_unique[136]
 
 ###########################################################
 
@@ -219,16 +219,7 @@ UAauthors <-unique(org_works_authors)
 colnames(org_works)
 colnames(org_works_authors)
 
-#Creating an empty dataframe to store the results of the for loop.
-works_cited <-data.frame()
 
-# Getting these works' metadata. This takes long time to run. 
-# Warnings(). a work > 100 authors will be truncated 
-# 2024: 
-# 2023: 352,509 (checked) out of 364,304 
-# 2022: 345,813 (checked) 
-# 2021: 
-# 2019: 331,657 (checked).
 
 
 #####################################################
@@ -270,7 +261,7 @@ for (i in indices) {
 
 # Find it from the original article
 search_string <- "https://openalex.org/W2594545996"  
-# this article was cited 81 times in 2019, cited 130 times in 2020, cited 26 times (2021), 52 times(2022) cited 16 times in 2023,
+# this article was cited 81 (2019, 130 (2020), 90 (2021), 52 (2022), 16 (2023)
 indices_with_string <- which(sapply(org_works$referenced_works, function(x) search_string %in% x))
 print(indices_with_string)
 org_works[indices_with_string, ]$id
@@ -290,6 +281,16 @@ org_works[indices_with_string, ]$id
 # optimize code: ... <to do> 
 # 
 
+#Creating an empty dataframe to store the results of the for loop.
+works_cited <-data.frame()
+
+# Getting these works' metadata. This takes long time to run. 
+# Warnings(). a work > 100 authors will be truncated 
+# 2024: 
+# 2023: 352,509 (checked) out of 364,304 
+# 2022: 345,813 (checked) 
+# 2021: 384,886 (checked) out of 384,886
+# 2019: 331,657 (checked).
 ########################################
 ### Testing optimization of rbind and oa_fetch
 ### 2024-09-21: 10,000 works in R old version (4.1.2): 270 seconds
@@ -355,22 +356,39 @@ time_taken2 <- system.time ({
 print(paste("rbind time: ", time_taken2["elapsed"] / 60, "minutes"))
 
 #########################
+# Ensure oa_fetch() is receiving the correct input and create a new dataframe for results.
+works_cited <- data.frame()
+num_of_works <- length (org_works_ref_combined)
 
- time_taken <- system.time({ 
-  for(i in seq(1, num_of_works, by=fetch_number)){
-    batch_identifiers <-org_works_ref_combined[i:min(i+fetch_number-1, num_of_works)]
-    batch_data <-oa_fetch(identifier=batch_identifiers)
-    works_cited<-rbind(works_cited, batch_data)
+# Loop to fetch data in batches
+time_taken <- system.time({
+  for(i in seq(1, num_of_works, by = fetch_number)) {
+    batch_identifiers <- org_works_ref_combined[i:min(i + fetch_number - 1, num_of_works)]
+    
+    # Check if the batch_identifiers is a valid vector
+    if (length(batch_identifiers) > 0 && !all(is.na(batch_identifiers))) {
+      # Fetch data from OpenAlex using oa_fetch, ensure proper identifier input
+      batch_data <- tryCatch({
+        oa_fetch(identifier = batch_identifiers)
+      }, error = function(e) {
+        message("Error fetching data: ", e)
+        return(NULL)
+      })
+     # Only bind non-null data
+      if (!is.null(batch_data)) {
+        works_cited <- rbind(works_cited, batch_data)
+      }
+    }
   }
 })
-print(paste("time to run: ", time_taken["elapsed"] / 60, "minutes"))
+print(time_taken)
 
-########################
+######################################################
 
 #### Step 1: Re-generate a new row if it matches (meaning; cited multiple times.)
 works_cited_final <- works_cited
 
-
+saveRDS(works_cited_final, "../works_cited_final_2021.rds")
 saveRDS(works_cited_final, "../works_cited_final_2022.rds")
 saveRDS(works_cited_final, "../works_cited_final_2023.rds")
 
@@ -398,9 +416,6 @@ works_cited_final <- readRDS("../works_cited_final_2023.rds")
 # 1. I fetched 316,401 unique works, but returned 329,720 (about 2% more... )
 # 2. 
 
-
-### Count how many multiple cited. 
-class(org_works_ref_more_cited)
 # Count the occurrences of each unique element in the vector
 #works_ref_more_cited_counts <- table(org_works_ref_more_cited)
 # works_cited <- org_works_ref_combined
@@ -419,8 +434,8 @@ head(matching_rows$id)
 # 1. Analyse journal usage
 #  - remove any row whose col "issn_l" is empty or NULL 
 # 2023: 329,389 articles out of 352,509 works: 94%
-# 2022: 323,221 articles out of 345,813 works: 
-# 2021: 379,441 articles out of 413,611 works: 
+# 2022: 323,221 articles out of 345,813 works: 93%
+# 2021: 341,738 articles out of 374,067 works: 91%
 # 2020: 382,495 articles out of 421,866 works: 91%
 # 2019: 291,705 articles out of 323,779 works: 90%
 
@@ -440,13 +455,13 @@ count_null_empty_id
 
 # publisher: host_organization
 unique_publishers <- unique(articles_cited$host_organization)
-# number of publishers: ~1,600
+# number of publishers: ~1,650
 num_unique_publishers <- length(unique_publishers)
 # list top 50 publishers
 print(unique_publishers[1:50])
 # list NULL publishers ~ 1 %
 # 2022: 3,312 NA / 323,221
-# 2021: 3,886 NA / 379,441 
+# 2021: 3,687 NA / 341,738 
 # 2020: 4,039 NA / 382,495
 num_na <- sum(is.na(articles_cited$host_organization))
 
@@ -463,8 +478,9 @@ publisher_NA_with_issn <- publisher_NA[!is.na(publisher_NA$`issn_l`) & publisher
 print(publisher_NA_with_issn)
 
 # Extract unique ISSNs from the 'issn_l' column: 1235 unique issns
+# 2023: 1,236 / 3,489 NA
 # 2022: 1,110 / 3,312 NA
-# 2021: 1,920 / 3,886 NA
+# 2021: 1,204 / 3,687 NA
 # 2020: 1,737 / 4,039 NA 
 unique_issn <- unique(publisher_NA$`issn_l`)
 print(unique_issn)
@@ -607,31 +623,31 @@ publisher_article_indicies <- which(sapply(publisher_microbiology$id, function(x
 print(publisher_article_indicies)
 publisher_microbiology[publisher_article_indicies, ]$id
 
-# Test case: cited 47 times in 2023. Verified! 
-# cited 32 times (2020), 53(2022)
+# Test case: 
+# cited 32 times (2020), 53(2022), 47(2023)
 # The Gaia mission
 search_string <- "https://openalex.org/W147232447"
+search_references(search_string, org_works)
 
-# Test case: cited > 80 times in 2019. verified. 18 times in 2023
-# cited 123 times (2020), 40 (2022)
+# Test case: 
+# cited: >80 (2019), 123 times (2020), 40 (2022), 16 (2023)
 # https://openalex.org/W2066340221 cited > 80 times in 2019.
 search_string <- "https://openalex.org/W2066340221"
 search_references(search_string, org_works)
 
 # Test case: Emerald (2022)
 search_string <- "https://openalex.org/W1998245073"
-search_string <- "https://openalex.org/W2508822998" # (3 times)
+search_string <- "https://openalex.org/W2508822998" # (3 times), 2(2023)
 search_references(search_string, org_works)
 
 
 # Test case: IWA. 1 (2022)
 search_string <- "https://openalex.org/W2045185088"
-
-search_publisher("nature", org_works)
 search_publisher("IWA", org_works) # UA author published in IWA in 2014. not in 2019, 2020, and 2021
 
 search_string <- "https://openalex.org/W2130109162"
 search_string <- "https://openalex.org/W1965549985"
+search_string <- "https://openalex.org/W4385658409"
 
 search_references(search_string, org_works)
 
@@ -668,13 +684,13 @@ duplicate_multi_cited_rows_unique <- duplicate_multi_cited_rows[!duplicated(dupl
 # write_xlsx(duplicate_multi_cited_rows_unique, "citations/duplicate_multi_cited_unique_2023.xlsx")
 
 # Save the modified dataset to Excel
-write_xlsx(publisher_NA, "citations/publisher_NA_2022.xlsx")
-write_xlsx(publisher_aaas, "citations/publisher_aaas_2022.xlsx")
-write_xlsx(publisher_nature, "citations/publisher_nature_2022.xlsx")
-write_xlsx(publisher_plos, "citations/publisher_plos_2022.xlsx")
-write_xlsx(publisher_microbiology, "citations/publisher_microbiology_2022.xlsx")
-write_xlsx(publisher_emerald, "citations/publisher_emerald_2022.xlsx")
-write_xlsx(publisher_iwa, "citations/publisher_iwa_2022.xlsx")
+write_xlsx(publisher_NA, "citations/publisher_NA_2023.xlsx")
+write_xlsx(publisher_aaas, "citations/publisher_aaas_2023.xlsx")
+write_xlsx(publisher_nature, "citations/publisher_nature_2023.xlsx")
+write_xlsx(publisher_plos, "citations/publisher_plos_2023.xlsx")
+write_xlsx(publisher_microbiology, "citations/publisher_microbiology_2023.xlsx")
+write_xlsx(publisher_emerald, "citations/publisher_emerald_2023.xlsx")
+write_xlsx(publisher_iwa, "citations/publisher_iwa_2023.xlsx")
 
 ######################################
 ######################################
@@ -718,14 +734,11 @@ publisher1 <-  articles_cited[grepl(publisher_name, articles_cited$host_organiza
 journal_counts_df <- count_journals_by_publisher(articles_cited, publisher_name)
 print(journal_counts_df)
 
-
-
-
 publisher_name <- "Emerald Publishing"
 publisher1 <-  articles_cited[grepl(publisher_name, articles_cited$host_organization, ignore.case = TRUE), ]
 journal_counts_df <- count_journals_by_publisher(articles_cited, publisher_name)
 print(journal_counts_df)
-write_xlsx(journal_counts_df, "citations/publisher_emerald_2022_counts.xlsx")
+write_xlsx(journal_counts_df, "citations/publisher_emerald_2023_counts.xlsx")
 
 search_string <- "https://openalex.org/W1484587278"
 search_references(search_string, org_works)
@@ -770,7 +783,7 @@ ggplot(top_20_publishers, aes(x = reorder(host_organization, -article_count), y 
   geom_text(aes(label = sprintf("(%.1f%%)", percentage)), vjust = 0.5, hjust = -0.2, size = 3) +  
   # Adjust hjust for positioning outside
   coord_flip() +  # Flip the axis for better readability
-  labs(x = "Publisher", y = "Number of Articles", title = "2022 UA Top 20 Publishers (Number of Articles Cited)") +
+  labs(x = "Publisher", y = "Number of Articles", title = "2023 UA Top 20 Publishers (Number of Articles Cited)") +
   theme_minimal() +
   theme(axis.text.y = element_text(size = 7))  # Reduce font size of publisher names
 
@@ -781,7 +794,7 @@ top_50_total_count <- sum(top_50_publishers$article_count)
 top_100_total_count <- sum(top_100_publishers$article_count)  
 
 # Calculate the percentage for year 2019, 2020,
-# Top  20: ~75%
+# Top  20: ~74-76%
 # Top  50: ~90%
 # Top 100: ~95%
 top_20_percentage_of_total <- (top_20_total_count / total_article_count) * 100
