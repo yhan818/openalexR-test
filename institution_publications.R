@@ -103,7 +103,7 @@ org_works_2019 <- readRDS("../org_works_2019.rds")
 org_works_2020 <- readRDS("../org_works_2020.rds")
 org_works_2021 <- readRDS("../org_works_2021.rds")
 org_works_2022 <- readRDS("../org_works_2022.rds")
-org_works_2023 <- readRDS("../org_works_2023.rds")
+org_works_2023 <- readRDS("../org_works_journal_2023.rds")
 
 # change working data here 
  org_works <- org_works_2019
@@ -133,27 +133,29 @@ org_works_ref <- org_works$referenced_works
 # Year 2023: 1534 / 9384 referenced works value="NA", while $type is "article". 
 # 2023: 1217 / 6889 published article, primary_location_type = journal, $type = article: 17%
 
-# Filter the rows where $reference_works is NA and $type is "article"
-works_na_referenced_works <- org_works %>%
-  filter(is.na(referenced_works) & type == "article")
-write_xlsx(works_na_referenced_works, "citations/works_journal_2023_na_referenced_works.xlsx") # send this to OpenAlex
-
-# this na_indices include type: article, books, errata, letter, and other types
+# There are NA references. So we need to remove them. 
+# This na_indices include type: article, books, errata, letter, and other types
 na_indices <- which(sapply(org_works_ref, function(x) is.logical(x) && is.na(x))) 
 na_count <- sum(sapply(org_works_ref, function(x) is.logical(x) && is.na(x)))
 na_percent <- na_count/length(org_works_ref) * 100
 
+# Remove duplicate rows from the data frame
+unique_org_works <- unique(org_works)
+org_works_ref <- unique(org_works_ref) # this actually also remove NA lists.
+
+# Filter the rows where $reference_works is NA and $type is "article"
+works_na_referenced_works <- org_works %>%
+  filter(is.na(referenced_works) & type == "article")
+
+write_xlsx(works_na_referenced_works, "citations/works_journal_2022_na_referenced_works.xlsx") # send this to OpenAlex
+
 ### 2.2 Combine all the references and do further data analysis
 # Avg # of references per article: ~50
 # Year 2023 total references: 364,304: total journal article: 308,359:  unique 281,470 / 351,479: more cited: ~77,000 
-# Year 2022 total references: 356,445: 
+# Year 2022 total references: 354,355: 
 # Year 2021 total references: 382,965: 
 # Year 2020 total references: 392,992: article 
 # Year 2019 total references: 352,509: articles 329,000  
-
-# Remove NA, logical(0) from list (Meaning: no references) 
-org_works_ref <- Filter(function(x) length(x) > 0, org_works_ref)
-class(org_works_ref)
 
 # rm(org_works_ref_combined)
 org_works_ref_combined <- unlist(org_works_ref, use.names = FALSE)
@@ -294,7 +296,7 @@ rm(work_cited_final)
 # Getting these works' metadata. This takes long time to run. 
 # Warnings(). a work > 100 authors will be truncated 
 # 2024: 
-# 2023: 352,509 (checked) out of 364,304 
+# 2023: 352,509 (checked) out of 364,304 : article  / 308,359
 # 2022: 345,813 (checked) 
 # 2021: 384,886 (checked) out of 384,886
 # 2019: 331,657 (checked).
@@ -403,7 +405,7 @@ setdiff(works_cited2, works_cited)
 works_cited_final <- works_cited
 
 saveRDS(works_cited_final, "../works_cited_final_2021.rds")
-saveRDS(works_cited_final, "../works_cited_final_2022.rds")
+saveRDS(works_cited_final, "../works_cited_final_journal_2022.rds")
 saveRDS(works_cited_final, "../works_cited_final_2023.rds")
 saveRDS(works_cited_final, "../works_cited_final_journal_2023.rds")
 
@@ -448,8 +450,8 @@ head(matching_rows$id)
 ###################### Citation Analysis ####################################
 # 1. Analyse journal usage
 #  - remove any row whose col "issn_l" is empty or NULL 
-# 2023: 285,368 journal articles out of 327,201 (journal type)/ 352,509: 
-# 2023: 329,389 articles out of 352,509 works: 94%
+# 2023: 259,110 journal articles out of 327,201/ 352,509: 
+# 2023: 276,750 journal type out of 319,214 / 329,389 articles out of 352,509 works: 94%
 # 2022: 323,221 articles out of 345,813 works: 93%
 # 2021: 341,738 articles out of 374,067 works: 91%
 # 2020: 382,495 articles out of 421,866 works: 91%
@@ -467,7 +469,7 @@ nrow(articles_cited)
 articles_cited <- articles_cited[articles_cited$type == "article", ]
 
 
-# saveRDS(articles_cited, "../articles_cited_2019.rds")
+#saveRDS(articles_cited, "../articles_cited_2019.rds")
 
 # Trim and normalize the host_organization column
 articles_cited$host_organization <- trimws(articles_cited$host_organization)
