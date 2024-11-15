@@ -1,6 +1,6 @@
 ############# Institution authors publication analysis and Collection Management ##########
 ######## Author: Yan Han with help of ChatGPT 4
-######## Updated: Oct 1, 2024
+######## Updated: Nov 14, 2024
 ######## Updated: Fixed NA issue with host_organization
 ##### Search an institution authors' publication using openAlex data ####
 # OpenAlex R Documentation: https://github.com/ropensci/openalexR
@@ -88,7 +88,7 @@ org_works_2023 <-oa_fetch(
   institutions.ror=c("03m2x1q45"),
   from_publication_date ="2023-01-01",
   to_publication_date = "2023-12-31",
-  primary_location.source.type = "journal"
+  #primary_location.source.type = "journal"
 )
 
 # Save data
@@ -147,7 +147,7 @@ org_works_ref <- unique(org_works_ref) # this actually also remove NA lists.
 works_na_referenced_works <- org_works %>%
   filter(is.na(referenced_works) & type == "article")
 
-write_xlsx(works_na_referenced_works, "citations/works_journal_2022_na_referenced_works.xlsx") # send this to OpenAlex
+#write_xlsx(works_na_referenced_works, "citations/works_journal_2023_na_referenced_works.xlsx") # send this to OpenAlex
 
 ### 2.2 Combine all the references and do further data analysis
 # Avg # of references per article: ~50
@@ -190,7 +190,7 @@ org_works[2, "id"]
 org_works[174, "id"]
 
 # Test to see how many times a work is cited. 
-# 21 times (2020); 22 times(2021), 26 times(2022)
+# 21 times (2020); 22 times(2021), 26 times(2022), 18 times(2023)
 index <- which(org_works_ref_more_cited == "https://openalex.org/W4247665917")
 print(index)
 
@@ -228,8 +228,6 @@ colnames(org_works)
 colnames(org_works_authors)
 
 
-
-
 #####################################################
 #################### 3.3 TESTING!!!#################
 ####################################################
@@ -259,8 +257,8 @@ duplicates <- org_works_authors_ua[duplicated(org_works_authors_ua), ]
 search_string <- "https://openalex.org/W2919115771"
 result <- lapply(org_works_ref_combined, function(x) grep(search_string, x, value = TRUE))
 print(result)
+
 matches <- result[sapply(result, length) > 0]
-print(matches)
 indices <- which(sapply(org_works_ref_combined, function(x) any(grepl(search_string, x))))
 for (i in indices) {
   cat("Index:", i, "\n")
@@ -287,7 +285,6 @@ org_works[indices_with_string, ]$id
 # 2024-09: fetch_number = 1,000, reduced the total running time of 10% comparing to fetch_number 100
 # 2024-09: fetching 241,000 works took 188 minutes
 # optimize code: ... <to do> 
-# 
 
 #Creating an empty dataframe to store the results of the for loop.
 works_cited <-data.frame()
@@ -297,7 +294,7 @@ rm(work_cited_final)
 # Warnings(). a work > 100 authors will be truncated 
 # 2024: 
 # 2023: 352,509 (checked) out of 364,304 : article  / 308,359
-# 2022: 345,813 (checked) 
+# 2022: 345,813 (checked) : article / 325,520 (type = journal)
 # 2021: 384,886 (checked) out of 384,886
 # 2019: 331,657 (checked).
 ########################################
@@ -343,31 +340,36 @@ system.time({
 library(data.table)
 fetch_number <- 50
 # num_of_works <- length (org_works_ref_unique)
+# num_of_works <-20000
 num_of_works <- length (org_works_ref_combined)
 
 range_i <- seq(1, num_of_works, by=fetch_number)
 works_cited_ls <- vector("list", length = length(range_i))
+
+### Code has bugs??a lot of these have NA value???
 time_taken <-system.time({
   for (idx in seq_along(range_i)) {
     i <- range_i[idx]
-    batch_identifiers <-org_works_ref_unique[i:min(i+fetch_number-1, num_of_works)]
-    batch_data <-oa_fetch(entity="works", identifier=batch_identifiers, output="list")
+    batch_identifiers <-org_works_ref_combined[i:min(i+fetch_number-1, num_of_works)]
+    batch_data <-oa_fetch(identifier=batch_identifiers, primary_location.source.type = "journal", )
+                          #output="list", )
     works_cited_ls[[idx]] <- batch_data
   }
 })
 print(paste("fetch time: ", time_taken["elapsed"] / 60, "minutes"))
 
-### convert list to DF with measuring the performance  
-time_taken2 <- system.time ({
-  works_cited <- rbindlist(works_cited_ls, use.names=TRUE, fill=TRUE) 
-})
-print(paste("rbind time: ", time_taken2["elapsed"] / 60, "minutes"))
+tail(works_cited_ls)
+
+works_cited <- rbindlist(works_cited_ls, use.names=TRUE, fill=TRUE) 
+
+
+
 
 #########################
 # Ensure oa_fetch() is receiving the correct input and create a new dataframe for results.
 works_cited <- data.frame()
 works_cited2 <-data.frame()
-num_of_works <-100
+#num_of_works <-10000
 num_of_works <- length (org_works_ref_combined)
 
 # Loop to fetch data in batches
@@ -382,14 +384,15 @@ time_taken <- system.time({
         # Have to use "primary_location.source.type = journal" to filter out non-journal.
         # issn_l cannot be used alone (there are book chapters which have issn per OpenAlex)
         oa_fetch(identifier = batch_identifiers 
-                 , primary_location.source.type = "journal",)
+                 , primary_location.source.type = "journal")
       }, error = function(e) {
         message("Error fetching data: ", e)
         return(NULL)
       })
      # Only bind non-null data
       if (!is.null(batch_data)) {
-        works_cited <- rbind(works_cited, batch_data)
+        #works_cited <- rbind(works_cited, batch_data)
+        works_cited <- rbindlist(list(works_cited, batch_data), use.names = TRUE, fill = TRUE)
       }
     }
   }
@@ -405,7 +408,7 @@ setdiff(works_cited2, works_cited)
 works_cited_final <- works_cited
 
 saveRDS(works_cited_final, "../works_cited_final_2021.rds")
-saveRDS(works_cited_final, "../works_cited_final_journal_2022.rds")
+saveRDS(works_cited, "../2022_works_cited_type_journal.rds")
 saveRDS(works_cited_final, "../works_cited_final_2023.rds")
 saveRDS(works_cited_final, "../works_cited_final_journal_2023.rds")
 
@@ -413,7 +416,10 @@ works_cited_final <- readRDS("../works_cited_final_2019.rds")
 works_cited_final <- readRDS("../works_cited_final_2020.rds")
 works_cited_final <- readRDS("../works_cited_final_2021.rds")
 works_cited_final <- readRDS("../works_cited_final_2022.rds")
-works_cited_final <- readRDS("../works_cited_final_2023.rds")
+
+# One is primary.source.type = journal, the other (works_cited_final2) contains everything
+works_cited_final2 <- readRDS("../works_cited_final_2023.rds")
+works_cited_final <- readRDS("../works_cited_final_journal_2023.rds")
 
 #### need to recheck the numbers
 # Step 2: Add these matching rows as new rows 
@@ -430,7 +436,7 @@ works_cited_final <- readRDS("../works_cited_final_2023.rds")
 
 
 ### Questions: 
-# 1. I fetched 316,401 unique works, but returned 329,720 (about 2% more... )
+# 1. I fetched 354,355 unique works, returned 325,520 
 # 2. 
 
 # Count the occurrences of each unique element in the vector
@@ -453,6 +459,7 @@ head(matching_rows$id)
 # 2023: 259,110 journal articles out of 327,201/ 352,509: 
 # 2023: 276,750 journal type out of 319,214 / 329,389 articles out of 352,509 works: 94%
 # 2022: 323,221 articles out of 345,813 works: 93%
+# 2022: author_work=all_type, cited_source_type=journal 325,520 works: 324,239 (having issn, 900 no issn), 282,506 (type=article), 41,733 (type=non-article) 
 # 2021: 341,738 articles out of 374,067 works: 91%
 # 2020: 382,495 articles out of 421,866 works: 91%
 # 2019: 291,705 articles out of 323,779 works: 90%
@@ -464,12 +471,16 @@ head(matching_rows$id)
 articles_cited <- works_cited_final[!is.na(works_cited_final$issn_l) & works_cited_final$issn_l != "", ]
 nrow(articles_cited)
 
+### as a comparison
+articles_cited2 <- works_cited_final2[!is.na(works_cited_final2$issn_l) & works_cited_final2$issn_l != "", ]
+articles_cited2 <- articles_cited2[articles_cited2$type == "article", ]
+
 #############################
-# Filter records where type is "article". 329,000 reduced to  286,000
+# Filter records where type is "article" (excluding conference paper etc )
+# 2023: 226,947 
+non_articles_cited <- articles_cited[articles_cited$type != "article", ] # review, letter, editorial
 articles_cited <- articles_cited[articles_cited$type == "article", ]
 
-
-#saveRDS(articles_cited, "../articles_cited_2019.rds")
 
 # Trim and normalize the host_organization column
 articles_cited$host_organization <- trimws(articles_cited$host_organization)
@@ -481,12 +492,12 @@ count_null_empty_id
 
 # publisher: host_organization
 unique_publishers <- unique(articles_cited$host_organization)
-# number of publishers: ~1,650
+# number of publishers: ~1,600
 num_unique_publishers <- length(unique_publishers)
 # list top 50 publishers
 print(unique_publishers[1:50])
 # list NULL publishers ~ 1 %
-# 2023: 2,922 NA/
+# 2023: 2,227 (probably need ISSN matching) / 2,922 NA/
 
 # 2022: 3,312 NA / 323,221
 # 2021: 3,687 NA / 341,738 
@@ -551,6 +562,7 @@ publisher_uap <- articles_cited[grepl("University of Arizona Press", articles_ci
 # Need to study more. 
 # Emerald: cited (yyyy): 395 (2020), 257 (2021), 322 (2022), 276 (2023), 
 publisher_emerald <- articles_cited[grepl("Emerald Publishing", articles_cited$host_organization, ignore.case = TRUE), ]
+publisher_emerald2 <- articles_cited2[grepl("Emerald Publishing", articles_cited2$host_organization, ignore.case = TRUE), ]
 
 # IWA: cited (yyyy): 19 (2019), 34 (2020), 21 (2021), 19 (2022),   
 publisher_iwa <- articles_cited[grepl("IWA Publishing", articles_cited$host_organization, ignore.case = TRUE), ]
@@ -560,6 +572,28 @@ duplicateds <- id_counts[id_counts >= 1]
 print(id_counts)
 
 ### origin works: test case: 
+
+
+difference_df1_df2 <- setdiff(publisher_emerald$id, publisher_emerald2$id)
+head(difference_df1_df2)
+difference_df2_df1 <- setdiff(publisher_emerald2$id, publisher_emerald$id)
+head(difference_df2_df1)
+
+# Find IDs common to both publisher_emerald and publisher_emerald2. 225 
+common_ids <- intersect(publisher_emerald$id, publisher_emerald2$id)
+head(common_ids)
+
+
+
+
+
+
+
+
+
+
+
+
 
 ### Test cases for AAAS
 search_string <- "https://openalex.org/W2083070320"
@@ -634,6 +668,7 @@ search_string <- "https://openalex.org/W1604958295"
 # openAlex questions: type = "book-chapter", while it has ISSN
 
 search_string <- "https://openalex.org/W1607198972"
+#search_string <- "https://openalex.org/W3216054981"
 indices_with_string <- which(sapply(org_works$referenced_works, function(x) search_string %in% x))
 
 search_references(search_string, org_works)
@@ -719,8 +754,13 @@ write_xlsx(publisher_aaas, "citations/publisher_aaas_2023.xlsx")
 write_xlsx(publisher_nature, "citations/publisher_nature_2023.xlsx")
 write_xlsx(publisher_plos, "citations/publisher_plos_2023.xlsx")
 write_xlsx(publisher_microbiology, "citations/publisher_microbiology_2023.xlsx")
-write_xlsx(publisher_emerald, "citations/publisher_emerald_2023.xlsx")
+
+write_xlsx(publisher_emerald, "citations/publisher_journal_emerald_2023.xlsx")
+write_xlsx(publisher_emerald2, "citations/publisher_emerald_2023.xlsx")
+
 write_xlsx(publisher_iwa, "citations/publisher_iwa_2023.xlsx")
+
+
 
 ######################################
 ######################################
