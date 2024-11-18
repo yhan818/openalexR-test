@@ -540,10 +540,6 @@ print(publisher_NA_with_issn)
 unique_issn <- unique(publisher_NA$`issn_l`)
 print(unique_issn)
 
-# Check if any 'id' values are duplicated
-any_duplicated_ids <- any(duplicated(publisher_NA$id))
-
-
 # Not using unnect() because it flattens out every article per author, which creates a lot of duplicated info
 library(jsonlite)
 
@@ -587,6 +583,18 @@ id_counts <-table(publisher_iwa$id)
 duplicateds <- id_counts[id_counts >= 1]
 print(id_counts)
 
+
+### Cell press
+publisher_cell_press <- articles_cited[grepl("Cell Press", articles_cited$host_organization, ignore.case = TRUE), ]
+
+publisher_cell_press_unique <- unique(publisher_cell_press)
+df <-publisher_cell_press
+# Use table to count occurrences of each duplicated row
+row_counts <- as.data.frame(table(apply(df, 1, paste, collapse = "-")))
+duplicates_with_counts <- row_counts[row_counts$Freq > 1, ]
+
+
+
 ### origin works: test case: 
 
 
@@ -598,17 +606,6 @@ head(difference_df2_df1)
 # Find IDs common to both publisher_emerald and publisher_emerald2. 225 
 common_ids <- intersect(publisher_emerald$id, publisher_emerald2$id)
 head(common_ids)
-
-
-
-
-
-
-
-
-
-
-
 
 
 ### Test cases for AAAS
@@ -637,6 +634,7 @@ search_publisher <- function(publisher_string, df) {
   indices_with_string <- which(grepl(publisher_string, df$host_organization, ignore.case = TRUE))
   
   print(df[indices_with_string, ]$host_organization)
+  print(df[indices_with_string, ]$id)
   return(indices_with_string)
 }
 
@@ -662,7 +660,6 @@ search_work_publisher <- function(search_string, df) {
 # Example usage:
 search_string <- "https://openalex.org/W2963276645"
 result_indices <- search_work_publisher(search_string, org_works)
-
 
 ###############################################################
 # Verify any cited work using the function search_references()
@@ -729,13 +726,23 @@ search_publisher("IWA", org_works) # UA author published in IWA in 2014. not in 
 search_string <- "https://openalex.org/W2130109162"
 search_string <- "https://openalex.org/W1965549985"
 
-
 search_references(search_string, org_works)
 
 # https://openalex.org/W2130109162 same record, different publication date? 
 matches <- which(tolower(articles_cited$id) == tolower(search_string))
 view(articles_cited[matches, ])
 print(articles_cited$id[matches])
+
+# Test case: Cell Press(2023)
+# UA authors publish in Cell Press journals
+search_publisher("Cell Press", org_works)
+
+## search these cell press journals articles do UA authors cited.
+search_string <- "https://openalex.org/W2511428910"
+search_string <- "https://openalex.org/W2125987139"
+search_stirng <- "https://openalex.org/W2002490399"
+search_references(search_string, org_works)
+
 
 
 ########################################################################
@@ -776,6 +783,9 @@ write_xlsx(publisher_emerald2, "citations/publisher_emerald_2023.xlsx")
 
 write_xlsx(publisher_iwa, "citations/publisher_iwa_2023.xlsx")
 
+publisher_cell_press <- publisher_cell_press %>%
+  mutate(across(where(is.character), ~ ifelse(nchar(.) > 32767, substr(., 1, 32767), .)))
+write_xlsx(publisher_cell_press, "citations/publisher_journal_cell_press_2023.xlsx")
 
 
 ######################################
