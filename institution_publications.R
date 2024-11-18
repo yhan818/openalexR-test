@@ -5,13 +5,19 @@
 ##### Search an institution authors' publication using openAlex data ####
 # OpenAlex R Documentation: https://github.com/ropensci/openalexR
 
-install.packages("remotes")
-remotes::install_github("ropensci/openalexR", force=TRUE) 
 install.packages("dplyr")
 install.packages("tidyverse")
 install.packages("ggplot2")
 
+#install.packages("openalexR")
+install.packages("remotes")
+remotes::install_github("ropensci/openalexR", force=TRUE) 
+remotes::install_github("ropensci/openalexR", ref = "2bb285c")
+
+
 library(openalexR)
+packageVersion("openalexR")
+
 library(dplyr)
 library(tidyverse)
 library(writexl)
@@ -103,6 +109,10 @@ org_works_2019 <- readRDS("../org_works_2019.rds")
 org_works_2020 <- readRDS("../org_works_2020.rds")
 org_works_2021 <- readRDS("../org_works_2021.rds")
 org_works_2022 <- readRDS("../org_works_2022.rds")
+
+org_works_2023 <- readRDS("../org_works_2023.rds")
+
+# this file is to filter "journal" works only. I feel it shall not be this restrict. (other works like grey literature are good too)
 org_works_2023 <- readRDS("../org_works_journal_2023.rds")
 
 # change working data here 
@@ -191,11 +201,8 @@ org_works[174, "id"]
 
 # Test to see how many times a work is cited. 
 # 21 times (2020); 22 times(2021), 26 times(2022), 18 times(2023)
-index <- which(org_works_ref_more_cited == "https://openalex.org/W4247665917")
-print(index)
-
 # https://openalex.org/W4247665917 were cited in 2019, 2021, 2022 and 2023 data
-index <- which(org_works_ref_more_cited == "https://openalex.org/W4247665917")
+index <- which(org_works_ref_combined == "https://openalex.org/W4247665917")
 print(index)
 
 ###########################################################
@@ -210,7 +217,6 @@ org_works_since <- org_works
 # -- org_works_UAauthors: 16,432
 # -- org_works_ua_authors_ref_combined: 656,712
 # -- org_works_ua_authors_ref_cited: 249,629
-# 
 org_works_authors<-org_works_since%>%
   mutate(author=lapply(author, function(x){
     names(x) <-paste0(names(x), "author")
@@ -226,7 +232,6 @@ UAauthors <-unique(org_works_authors)
 # After flattening, authors' fields (e.g. au_idauthor, institution_rorauthor) are displayed
 colnames(org_works)
 colnames(org_works_authors)
-
 
 #####################################################
 #################### 3.3 TESTING!!!#################
@@ -415,11 +420,32 @@ saveRDS(works_cited_final, "../works_cited_final_journal_2023.rds")
 works_cited_final <- readRDS("../works_cited_final_2019.rds")
 works_cited_final <- readRDS("../works_cited_final_2020.rds")
 works_cited_final <- readRDS("../works_cited_final_2021.rds")
-works_cited_final <- readRDS("../works_cited_final_2022.rds")
+works_cited_final <- readRDS("../2022_works_cited_type_journal.rds")
+                             #works_cited_final_2022.rds")
+
+
+works_cited_final2 <- readRDS("../works_cited_final_2022.rds")
+
+works_cited_final <- readRDS("../works_cited_final_journal_2023.rds")
 
 # One is primary.source.type = journal, the other (works_cited_final2) contains everything
-works_cited_final2 <- readRDS("../works_cited_final_2023.rds")
-works_cited_final <- readRDS("../works_cited_final_journal_2023.rds")
+# For year 2022, 325,520 : 345,813. 
+
+### If not filtering by "primary_location:source=journal", there are more.
+# For example, https://api.openalex.org/works/W2984048300 (source = null)
+
+difference_df1_df2 <- setdiff(works_cited_final$id, works_cited_final2$id)
+difference_df2_df1 <- setdiff(works_cited_final2$id, works_cited_final$id)
+head(difference_df2_df1)
+
+############# Testing
+difference_df1_df2 <- setdiff(works_cited_final$id, org_works_ref_combined)
+difference_df2_df1 <- setdiff(org_works_ref_combined, works_cited_final$id)
+head(difference_df2_df1)
+head(works_cited_final$id)
+head(matching_rows$id)
+######################
+
 
 #### need to recheck the numbers
 # Step 2: Add these matching rows as new rows 
@@ -443,15 +469,6 @@ works_cited_final <- readRDS("../works_cited_final_journal_2023.rds")
 #works_ref_more_cited_counts <- table(org_works_ref_more_cited)
 # works_cited <- org_works_ref_combined
 
-############# Testing
-
-difference_df1_df2 <- setdiff(works_cited_final$id, org_works_ref_combined)
-difference_df2_df1 <- setdiff(org_works_ref_combined, works_cited_final$id)
-head(difference_df2_df1)
-head(works_cited_final$id)
-head(matching_rows$id)
-######################
-
 
 ###################### Citation Analysis ####################################
 # 1. Analyse journal usage
@@ -464,16 +481,9 @@ head(matching_rows$id)
 # 2020: 382,495 articles out of 421,866 works: 91%
 # 2019: 291,705 articles out of 323,779 works: 90%
 
-#articles_cited <- works_cited_final[!(is.na(works_cited_final$issn_l)), ]
-#articles_cited <- articles_cited[!(is.na(articles_cited$issn_l) | articles_cited$issn_l == ""), ]
-
 # Filter rows where issn_l is neither NA nor an empty string
 articles_cited <- works_cited_final[!is.na(works_cited_final$issn_l) & works_cited_final$issn_l != "", ]
 nrow(articles_cited)
-
-### as a comparison
-articles_cited2 <- works_cited_final2[!is.na(works_cited_final2$issn_l) & works_cited_final2$issn_l != "", ]
-articles_cited2 <- articles_cited2[articles_cited2$type == "article", ]
 
 #############################
 # Filter records where type is "article" (excluding conference paper etc )
@@ -482,9 +492,15 @@ non_articles_cited <- articles_cited[articles_cited$type != "article", ] # revie
 articles_cited <- articles_cited[articles_cited$type == "article", ]
 
 
+# Truncate strings in all character columns to 32,767 characters
+non_articles_cited <- non_articles_cited %>%
+  mutate(across(where(is.character), ~ ifelse(nchar(.) > 32767, substr(., 1, 32767), .)))
+
+write_xlsx(non_articles_cited, "citations/non_articles_cited_2023.xlsx")
+
 # Trim and normalize the host_organization column
-articles_cited$host_organization <- trimws(articles_cited$host_organization)
-articles_cited$issn_l <- trimws(articles_cited$issn_l)
+#articles_cited$host_organization <- trimws(articles_cited$host_organization)
+#articles_cited$issn_l <- trimws(articles_cited$issn_l)
 
 # Empty or NULL records
 count_null_empty_id <- sum(is.na(articles_cited$id) | trimws(articles_cited$id) == "")
