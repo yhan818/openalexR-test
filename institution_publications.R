@@ -609,12 +609,15 @@ publisher_emerald <- journal_articles_cited[grepl("Emerald Publishing", journal_
 
 # IWA: cited (yyyy): 19 (2019), 34 (2020), 21 (2021), 19 (2022),   
 publisher_iwa <- journal_articles_cited[grepl("IWA Publishing", journal_articles_cited$host_organization, ignore.case = TRUE), ]
+#publisher_iwa2 <- type_journal_works_cited[grepl("IWA Publishing", type_journal_works_cited$host_organization, ignore.case = TRUE), ]
 
 # APS: cited (YYY): 159 (2021). 
 # Articles
-publisher_aps <- journal_articles_cited[grepl("American Phytopathological Society", journal_articles_cited$host_organization, ignore.case = TRUE), ]
-
-# Books and other 
+#publisher_aps <- journal_articles_cited[grepl("American Phytopathological Society", journal_articles_cited$host_organization, ignore.case = TRUE), ]
+# All the journal type: aritlce and review. 
+publisher_aps <- type_journal_works_cited[grepl("American Phytopathological Society", type_journal_works_cited$host_organization, ignore.case = TRUE), ]
+# Non_journal: Books and other 
+publisher_aps2 <- type_non_journal_works_cited[grepl("American Phytopathological Society", type_non_journal_works_cited$host_organization, ignore.case = TRUE), ]
 
 
 id_counts <-table(publisher_iwa$id)
@@ -821,9 +824,21 @@ write_xlsx(publisher_emerald2, "citations/publisher_emerald_2023.xlsx")
 
 write_xlsx(publisher_iwa, "citations/publisher_iwa_2023.xlsx")
 
+
+
+
 publisher_cell_press <- publisher_cell_press %>%
   mutate(across(where(is.character), ~ ifelse(nchar(.) > 32767, substr(., 1, 32767), .)))
 write_xlsx(publisher_cell_press, "citations/publisher_journal_cell_press_2022.xlsx")
+
+
+publisher_aps <- publisher_aps %>%
+  mutate(across(where(is.character), ~ ifelse(nchar(.) > 32767, substr(., 1, 32767), .)))
+write_xlsx(publisher_aps, "citations/publisher_aps_journal_2021.xlsx")
+
+publisher_aps2 <- publisher_aps2 %>%
+  mutate(across(where(is.character), ~ ifelse(nchar(.) > 32767, substr(., 1, 32767), .)))
+write_xlsx(publisher_aps2, "citations/publisher_aps_non_journal_2021.xlsx")
 
 
 ######################################
