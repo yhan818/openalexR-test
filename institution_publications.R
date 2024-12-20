@@ -611,12 +611,11 @@ publisher_emerald <- journal_articles_cited[grepl("Emerald Publishing", journal_
 publisher_iwa <- journal_articles_cited[grepl("IWA Publishing", journal_articles_cited$host_organization, ignore.case = TRUE), ]
 #publisher_iwa2 <- type_journal_works_cited[grepl("IWA Publishing", type_journal_works_cited$host_organization, ignore.case = TRUE), ]
 
-# APS: cited (YYY): 159 (2021). 
-# Articles
-#publisher_aps <- journal_articles_cited[grepl("American Phytopathological Society", journal_articles_cited$host_organization, ignore.case = TRUE), ]
-# All the journal type: aritlce and review. 
-publisher_aps <- type_journal_works_cited[grepl("American Phytopathological Society", type_journal_works_cited$host_organization, ignore.case = TRUE), ]
-# Non_journal: Books and other 
+# APS: 
+# 2021: Type-journal (article, review) : 170
+# 2021: Type-Non-journal (book-chapter) : 2
+
+publisher_aps  <- type_journal_works_cited[grepl("American Phytopathological Society", type_journal_works_cited$host_organization, ignore.case = TRUE), ]
 publisher_aps2 <- type_non_journal_works_cited[grepl("American Phytopathological Society", type_non_journal_works_cited$host_organization, ignore.case = TRUE), ]
 
 
@@ -635,10 +634,7 @@ row_counts <- as.data.frame(table(apply(df, 1, paste, collapse = "-")))
 duplicates_with_counts <- row_counts[row_counts$Freq > 1, ]
 
 
-
 ### origin works: test case: 
-
-
 difference_df1_df2 <- setdiff(publisher_emerald$id, publisher_emerald2$id)
 head(difference_df1_df2)
 difference_df2_df1 <- setdiff(publisher_emerald2$id, publisher_emerald$id)
@@ -889,8 +885,14 @@ journal_counts_df <- count_journals_by_publisher(journal_articles_cited, publish
 print(journal_counts_df)
 write_xlsx(journal_counts_df, "citations/publisher_emerald_2023_counts.xlsx")
 
-search_string <- "https://openalex.org/W1484587278"
+publisher_name <- "American Phytopathological Society"
+publisher1 <-  journal_articles_cited[grepl(publisher_name, journal_articles_cited$host_organization, ignore.case = TRUE), ]
+journal_counts_df <- count_journals_by_publisher(journal_articles_cited, publisher_name)
+print(journal_counts_df)
+
+search_string <- "https://openalex.org/W2579739711"
 search_references(search_string, org_works)
+
 
 
 # Group by 'host_organization' and count the number of articles for each publisher
