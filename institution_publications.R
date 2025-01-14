@@ -122,7 +122,7 @@ org_works_2020 <- readRDS("../org_works_2020.rds")
 org_works <- org_works_2020
 
 org_works_2021 <- readRDS("../org_works_2021.rds")
-org_works_2021 <- readRDS("../org_works_journal_2021.rds")
+org_works_2021_journal <- readRDS("../org_works_journal_2021.rds")
 org_works <- org_works_2021
 
 org_works_2022 <- readRDS("../org_works_2022.rds")
@@ -512,8 +512,9 @@ head(matching_rows$id)
 # 2022: 354,355 works (author_work=all_type): 316,489 (primary_source_type=journal): 315,278 (type=article), 40,868 (type=non-article)
 # 2022: author_work=all_type, cited_source_type=journal 325,520 works: 324,239 (having issn, 900 no issn), 282,506 (type=article), 41,733 (type=non-article) 
 
-# 2021: 374,067(work cited)) = 32,329 (type_non_journal_works_cited) + 341,738(type_journal_works)  = 297,819 (journal_articles_cited) + 43,919 (journal_non_articles_cited)
-######: 32,329 (type_non_journal_works_cited) = 13,150(non_journal_articles_cited) + 19,179 (non_journal_non_articles_cited)
+# 2021: 374,067(work cited)) = 32,329 (type_non_journal_works_cited) + 341,738(type_journal_works)  
+######## 32,329 (type_non_journal_works_cited) = 13,150(non_journal_articles_cited) + 19,179 (non_journal_non_articles_cited)
+######## 341,738 (type_journal_works)  = 297,819 (journal_articles_cited) + 43,919 (journal_non_articles_cited)
 
 # 2020: 382,495 articles out of 421,866 works: 91%
 # 2019: 291,705 articles out of 323,779 works: 90%
@@ -619,7 +620,7 @@ publisher_nature <- journal_articles_cited[grepl("Nature Portfolio", journal_art
 publisher_cdc <- journal_articles_cited[grepl("Centers for Disease Control and Prevention", journal_articles_cited$host_organization_name, ignore.case = TRUE), ]
 
 # University of Arizona
-publisher_ua <- journal_articles_cited[grepl("University of Arizona", journal_articles_cited$host_organization_name_name, ignore.case = TRUE), ]
+publisher_ua <- journal_articles_cited[grepl("University of Arizona", journal_articles_cited$host_organization_name, ignore.case = TRUE), ]
 publisher_uap <- journal_articles_cited[grepl("University of Arizona Press", journal_articles_cited$host_organization_name, ignore.case = TRUE), ]
 
 # Need to study more. 
@@ -635,8 +636,8 @@ publisher_iwa <- journal_articles_cited[grepl("IWA Publishing", journal_articles
 # 2021: Type-journal (article, review) : 170
 # 2021: Type-Non-journal (book-chapter) : 2
 
-publisher_aps  <- type_journal_works_cited[grepl("American Phytopathological Society", type_journal_works_cited$host_organization_name, ignore.case = TRUE), ]
-publisher_aps2 <- type_non_journal_works_cited[grepl("American Phytopathological Society", type_non_journal_works_cited$host_organization_name, ignore.case = TRUE), ]
+publisher_aps  <- type_journal_works_cited[grepl("American Phytopathological Society", type_journal_works_cited$host_organization, ignore.case = TRUE), ]
+publisher_aps2 <- type_non_journal_works_cited[grepl("American Phytopathological Society", type_non_journal_works_cited$host_organization, ignore.case = TRUE), ]
 
 
 id_counts <-table(publisher_iwa$id)
@@ -800,6 +801,16 @@ search_string <- "https://openalex.org/W2125987139"
 search_stirng <- "https://openalex.org/W2002490399"
 search_references(search_string, org_works)
 
+# Test case: APS (2021)
+# UA authors publish the journals
+search_publisher("American Phytopathological Society", org_works)
+
+## search these cell press journals articles do UA authors cited.
+search_string <- "https://openalex.org/W2070851128"
+search_string <- "https://openalex.org/W2125987139"
+
+search_references(search_string, org_works)
+
 
 
 ########################################################################
@@ -853,11 +864,19 @@ write_xlsx(publisher_cell_press, "citations/publisher_journal_cell_press_2022.xl
 
 publisher_aps <- publisher_aps %>%
   mutate(across(where(is.character), ~ ifelse(nchar(.) > 32767, substr(., 1, 32767), .)))
-write_xlsx(publisher_aps, "citations/publisher_aps_journal_2023.xlsx")
+write_xlsx(publisher_aps, "citations/publisher_aps_journal_2021.xlsx")
 
 publisher_aps2 <- publisher_aps2 %>%
   mutate(across(where(is.character), ~ ifelse(nchar(.) > 32767, substr(., 1, 32767), .)))
-write_xlsx(publisher_aps2, "citations/publisher_aps_non_journal_2023.xlsx")
+write_xlsx(publisher_aps2, "citations/publisher_aps_non_journal_2021.xlsx")
+
+# Create a list to hold the data frames
+cited_all_types <- list(
+  APS_journal_type = publisher_aps, 
+  APS_non_journal_type = publisher_aps2  
+)
+# Write the list to an Excel file with each data frame as a separate sheet
+write_xlsx(cited_all_types, "citations/publisher_aps_cited_works_2021.xlsx")
 
 
 ######################################
@@ -913,7 +932,7 @@ publisher1 <-  journal_articles_cited[grepl(publisher_name, journal_articles_cit
 journal_counts_df <- count_journals_by_publisher(journal_articles_cited, publisher_name)
 print(journal_counts_df)
 
-search_string <- "https://openalex.org/W2579739711"
+search_string <- "https://openalex.org/W2070851128"
 search_references(search_string, org_works)
 
 
