@@ -830,9 +830,11 @@ search_string <- ""  # 3 times
 # 2023 
 search_string <- "https://openalex.org/W1967057044" # 4 times
 search_string <- "https://openalex.org/W2157823046" # 7 times 
+search_string <- "https://openalex.org/W2034673450" # 2 times
+
 search_references(search_string, org_works)
 #
-search_publisher("American Phytopathological Society", org_works)
+search_publisher("BMJ", org_works)
 
 
 
@@ -894,13 +896,18 @@ cited_all_types <- list(
 # Write the list to an Excel file with each data frame as a separate sheet
 write_xlsx(cited_all_types, "citations/publisher_aps_cited_works_2022.xlsx")
 
+# For BMJ 
+publisher_bmj <- publisher_bmj %>%
+  mutate(across(where(is.character), ~ ifelse(nchar(.) > 32767, substr(., 1, 32767), .)))
+write_xlsx(publisher_bmj, "citations/publisher_bmj_journal_2023.xlsx")
+
 
 ######################################
 ######################################
 ### Function: To count issns occurrences for a given publisher (note: issns count is more accurate)
 # @param: dataframe issns_articles_cited
 #          publisher_name
-# return: issns and counts cited 
+# return: issns and counts cited and sorted
 count_issns_by_publisher <- function(works_cited_issn, publisher_name) {
   # Filter rows where host_organization matches the specified publisher
   publisher1 <-  works_cited_issn[grepl(publisher_name, works_cited_issn$host_organization, ignore.case = TRUE), ]
@@ -908,6 +915,24 @@ count_issns_by_publisher <- function(works_cited_issn, publisher_name) {
   # Count the occurrences of each journal under the specified publisher
   issns_counts <- table(publisher1$so)
   issns_counts_df <- as.data.frame(issns_counts)
+  
+  return(issns_counts_df)
+}
+
+
+count_issns_by_publisher <- function(works_cited_issn, publisher_name) {
+  # Filter rows where host_organization matches the specified publisher
+  publisher1 <- works_cited_issn[grepl(publisher_name, works_cited_issn$host_organization, ignore.case = TRUE), ]
+  
+  # Count the occurrences of each ISSN under the specified publisher
+  issns_counts <- table(publisher1$so)
+  issns_counts_df <- as.data.frame(issns_counts)
+  
+  # Rename columns for clarity
+  colnames(issns_counts_df) <- c("Journal Title", "Count")
+  
+  # Sort the data frame by Count in descending order
+  issns_counts_df <- issns_counts_df[order(issns_counts_df$Count, decreasing = TRUE), ]
   
   return(issns_counts_df)
 }
@@ -944,9 +969,25 @@ write_xlsx(journal_counts_df, "citations/publisher_emerald_2023_counts.xlsx")
 
 publisher_name <- "American Phytopathological Society"
 publisher1 <-  works_cited_issn[grepl(publisher_name, works_cited_issn$host_organization, ignore.case = TRUE), ]
-
 issns_counts_df <- count_issns_by_publisher(works_cited_issn, publisher_name)
 print(issns_counts_df)
+
+
+publisher_name <- "BMJ"
+publisher1 <-  works_cited_issn[grepl(publisher_name, works_cited_issn$host_organization, ignore.case = TRUE), ]
+issns_counts_df <- count_issns_by_publisher(works_cited_issn, publisher_name)
+print(issns_counts_df)
+
+unique_issns <- unique(publisher1$`issn_l`)
+num_unique_issn<- length(unique_issns)
+print(unique_issns)
+
+unique_journals <- unique(publisher1$`so`)
+num_unique_issn<- length(unique_journals)
+print(unique_journals)
+
+
+
 
 search_string <- "https://openalex.org/W2070851128"
 search_references(search_string, org_works)
