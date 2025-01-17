@@ -499,7 +499,7 @@ head(matching_rows$id)
 
 
 # 2023: 353,424 (works_cited) = 330,005 (works_cited_issn) + 23,419 (works_cited_non_issn)
-##### 330,005 (works_cited) = 287,142 (works_cited_issn_article_cited = journal_articles_cited) + 42,863 (works_cited_issn_non_article_cited=journal_non_articles_cited) 
+##### 330,005 (works_cited_issn) = 287,142 (works_cited_issn_article_cited = journal_articles_cited) + 42,863 (works_cited_issn_non_article_cited=journal_non_articles_cited) 
 ##### 23,419 (work_cited_non_issn) = 9,335 (non_journal_articles_cited, e.g. arXiv, PubMed, proceedings) + 14,084 (non_journal_non_articles_cited, e.g. preprint, book, book-chapter)
 
 
@@ -624,18 +624,6 @@ id_counts <-table(publisher_iwa$id)
 duplicateds <- id_counts[id_counts >= 1]
 print(id_counts)
 
- 
-
-# APS: 
-# 2023: journal (article, review): 166; Non-journal (book-chapter): 0
-# 2022: journal (article, review): 230; Non-journal (book-chapter): 2
-# 2021: journal (article, review) : 170; Non-journal (book-chapter) : 2
-
-publisher_aps  <- works_cited_issn[grepl("American Phytopathological Society", works_cited_issn$host_organization, ignore.case = TRUE), ]
-publisher_aps2 <- works_cited_non_issn[grepl("American Phytopathological Society", works_cited_non_issn$host_organization, ignore.case = TRUE), ]
-
-
-
 ### Cell press
 publisher_cell_press <- works_cited_issn[grepl("Cell Press", works_cited_issn$host_organization, ignore.case = TRUE), ]
 
@@ -673,6 +661,25 @@ search_string <- "https://openalex.org/W2125300654"
 id_counts <-table(publisher_plos$id)
 duplicateds <- id_counts[id_counts > 10]
 print(duplicateds)
+ 
+
+# APS: 
+# 2023: journal (article, review): 166; Non-journal (book-chapter): 0
+# 2022: journal (article, review): 230; Non-journal (book-chapter): 2
+# 2021: journal (article, review) : 170; Non-journal (book-chapter) : 2
+
+publisher_aps  <- works_cited_issn[grepl("American Phytopathological Society", works_cited_issn$host_organization, ignore.case = TRUE), ]
+publisher_aps2 <- works_cited_non_issn[grepl("American Phytopathological Society", works_cited_non_issn$host_organization, ignore.case = TRUE), ]
+
+# BMJ:
+# 2023: journal (article, review): 1,694; Non-journal: 0
+# 2022: journal (article, review):    ; Non-journal: 0
+# 2021: journal (article, review):    ; Non-journal: 0
+
+publisher_bmj  <- works_cited_issn[grepl("BMJ", works_cited_issn$host_organization, ignore.case = TRUE), ]
+publisher_bmj2 <- works_cited_non_issn[grepl("BMJ", works_cited_non_issn$host_organization, ignore.case = TRUE), ]
+
+
 
 ###########################################
 ### Search if a publisher is in a DF
@@ -796,7 +803,7 @@ search_references(search_string, org_works)
 # UA authors publish the journals
 search_publisher("American Phytopathological Society", org_works)
 
-### Test data for APS 
+### Test data for APS: 2024-12
 ## 2021: search journals articles do UA authors cited.
 search_string <- "https://openalex.org/W2070851128"
 search_string <- "https://openalex.org/W2125987139"
@@ -809,6 +816,23 @@ search_string <- "https://openalex.org/W2057480435"  # 3 times
 search_string <- "https://openalex.org/W2802507504" # 3 times
 search_string <- "https://openalex.org/W4226087454" # 4 times 
 search_references(search_string, org_works)
+# UA authors publish the journals
+search_publisher("American Phytopathological Society", org_works)
+
+### Test data for BMJ: 2025-01
+## 2021: search journals articles do UA authors cited.
+search_string <- ""
+
+# 2022
+search_string <- ""
+search_string <- ""  # 3 times
+
+# 2023 
+search_string <- "https://openalex.org/W1967057044" # 4 times
+search_string <- "https://openalex.org/W2157823046" # 7 times 
+search_references(search_string, org_works)
+#
+search_publisher("American Phytopathological Society", org_works)
 
 
 
