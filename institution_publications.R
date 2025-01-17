@@ -35,8 +35,8 @@ setwd("/home/yhan/Documents/openalexR-test/")
 ##### 1. Getting data. (retrieved 2024-09-02)
 # Retrieving all publications association with UArizona's ROR (Research Organization Registry) ID.
 # UA publications per year is ~9,000. For running 2 years data, need better computer or crashed R studio.
-# Year 2023: 9,384 works.
-# Year 2022: 8,833 works (2024-10-18) <- 8,674 works (2024-09-09)
+# Year 2023: 10,559 works (2025-01) <<< 9,384 works (2024-10)
+# Year 2022: 8,833 works (2024-10-18) <<< 8,674 works (2024-09-09)
 # Year 2021: 9,323 works (7,048 type-journal articles and reviews)
 # Year 2020: 
 # Year 2019: 8,847 
@@ -55,8 +55,8 @@ setwd("/home/yhan/Documents/openalexR-test/")
 UAworks_count <-oa_fetch(
   entity="works",
   institutions.ror=c("03m2x1q45"),
-  from_publication_date ="2022-01-01",
-  to_publication_date = "2022-12-31",
+  from_publication_date ="2023-01-01",
+  to_publication_date = "2023-12-31",
   #primary_location.source.type = "journal",
   count_only = TRUE
 )
@@ -88,15 +88,16 @@ org_works_2022 <-oa_fetch(
 )
 
 # SHALL get all works, then filter them if needed. 
-# 2023: All works: 9,384 without type =journal
+# 2023: All works: 9,384 without type =journal (2024-09) 
+# 2023: All works: 10,559 (2025-01) 
 # 2023: journal only: 6,903 using primary_location.source.type = "journal" as a filter (not including type="repository")
-
+# 
 org_works_2023 <-oa_fetch(
   entity="works",
   institutions.ror=c("03m2x1q45"),
   from_publication_date ="2023-01-01",
   to_publication_date = "2023-12-31",
-  primary_location.source.type = "journal"
+  #primary_location.source.type = "journal"
 )
 
 # Save data
@@ -104,7 +105,7 @@ org_works_2023 <-oa_fetch(
 # saveRDS(org_works_2020, "../org_works_2020.rds")
 saveRDS(org_works_2021, "../org_works_2021.rds")
 # saveRDS(org_works_2022, "../org_works_journal_2022.rds")
-# saveRDS(org_works_2023, "../org_works_journal_2023.rds")
+saveRDS(org_works_2023, "../org_works_2023.rds")
 
 # Load data 
 org_works_2019 <- readRDS("../org_works_2019.rds")
@@ -121,8 +122,7 @@ org_works_2022 <- readRDS("../org_works_2022.rds")
 org_works <- org_works_2022
 
 org_works_2023 <- readRDS("../org_works_2023.rds")
-# this file is to filter "journal" works only. I feel it shall not be this restrict. (other works like grey literature are good too)
-org_works_2023 <- readRDS("../org_works_journal_2023.rds")
+# to filter "journal" works only. I feel it shall not be this restrict. (other works like grey literature are good too)
 org_works <- org_works_2023
 
 
@@ -429,7 +429,7 @@ saveRDS(works_cited_final, "../works_cited_final_2021.rds")
 saveRDS(works_cited, "../works_cited_type_journal_2023.rds")
 
 
-saveRDS(works_cited_final, "../works_cited_final_journal_2023.rds")
+saveRDS(works_cited_final, "../works_cited_2023.rds")
 
 works_cited_final <- readRDS("../works_cited_final_2019.rds")
 works_cited_final <- readRDS("../works_cited_final_2020.rds")
@@ -487,7 +487,7 @@ head(matching_rows$id)
 ###################### Citation Analysis ####################################
 # 1. Analyse journal usage
 #  - remove any row whose col "issn_l" is empty or NULL 
-# Date fetached: 2024-10 and 2024-12:
+# Date fetched: 2024-10 and 2024-12:
 
 ### Works consists of two main types: a) journal (from journals) and b) non-journals (book etc)
 ### (a) type = journal: the source is journal. Journal works consist of articles, reviews, conference papers.
@@ -497,12 +497,15 @@ head(matching_rows$id)
 ### type_journal_works (all works in journal) = journal_articles_cited + journal_non_articles_cited
 ### type_non_journal_works = non_journal_articles_cited + non_journal_non_articles_cited
 
-# 2023: 259,110 journal articles out of 327,201/ 352,509: 
-# 2023: 276,750 journal type out of 319,214 / 329,389 articles out of 352,509 works: 94%
+
+# 2023: 353,424 (works_cited) = 330,005 (works_cited_issn) + 23,419 (works_cited_non_issn)
+##### 330,005 (works_cited) = 287,142 (works_cited_issn_article_cited = journal_articles_cited) + 42,863 (works_cited_issn_non_article_cited=journal_non_articles_cited) 
+##### 23,419 (work_cited_non_issn) = 9,335 (non_journal_articles_cited, e.g. arXiv, PubMed, proceedings) + 14,084 (non_journal_non_articles_cited, e.g. preprint, book, book-chapter)
+
 
 # 2022: 345,813 (work cited) = 323,221 (works_cited_issn) + 22,592 (works_cited_non_issn)
-###### 323,221 (work_cited_issn) = 279,258 (works_cited_issn_article_cited = journal_articles_cited) + 43,963 (works_cited_issn_non_article_cited = journal_non_articles_cited)
-###### 22,592 (work_cited_non_issn) = 8,571 (non_journal_articles_cited, e.g. arXiv, PubMed, processdings) + 14,021 (non_journal_non_articles_cited, e.g. preprint, book, book-chapter)
+###### 323,221 (work_cited_issn) = 279,258 (works_cited_issn_article_cited = journal_articles_cited) + 43,963 (works_cited_issn_non_article_cited=journal_non_articles_cited)
+###### 22,592 (work_cited_non_issn) = 8,571 (non_journal_articles_cited, e.g. arXiv, PubMed, proceedings) + 14,021 (non_journal_non_articles_cited, e.g. preprint, book, book-chapter)
 
 
 # 2021: 374,067(work cited) = 341,738(works_with_issn) + 32,329 (non_issn)
@@ -541,7 +544,7 @@ head(difference_df1_df2)
 non_articles_cited <- non_articles_cited %>%
   mutate(across(where(is.character), ~ ifelse(nchar(.) > 32767, substr(., 1, 32767), .)))
 
-write_xlsx(non_articles_cited, "citations/non_articles_cited_2022.xlsx")
+write_xlsx(non_articles_cited, "citations/non_articles_cited_2023.xlsx")
 
 # Empty or NULL records
 count_null_empty_id <- sum(is.na(works_cited_issn$id) | trimws(works_cited_issn$id) == "")
@@ -624,6 +627,7 @@ print(id_counts)
  
 
 # APS: 
+# 2023: journal (article, review): 166; Non-journal (book-chapter): 0
 # 2022: journal (article, review): 230; Non-journal (book-chapter): 2
 # 2021: journal (article, review) : 170; Non-journal (book-chapter) : 2
 
@@ -792,10 +796,18 @@ search_references(search_string, org_works)
 # UA authors publish the journals
 search_publisher("American Phytopathological Society", org_works)
 
-## search these cell press journals articles do UA authors cited.
+### Test data for APS 
+## 2021: search journals articles do UA authors cited.
 search_string <- "https://openalex.org/W2070851128"
 search_string <- "https://openalex.org/W2125987139"
 
+# 2022
+search_string <- "https://openalex.org/W2088715433"  # 2 times
+search_string <- "https://openalex.org/W2057480435"  # 3 times
+
+# 2023 
+search_string <- "https://openalex.org/W2802507504" # 3 times
+search_string <- "https://openalex.org/W4226087454" # 4 times 
 search_references(search_string, org_works)
 
 
@@ -838,21 +850,13 @@ write_xlsx(publisher_emerald2, "citations/publisher_emerald_2023.xlsx")
 
 write_xlsx(publisher_iwa, "citations/publisher_iwa_2023.xlsx")
 
-
-
-
 publisher_cell_press <- publisher_cell_press %>%
   mutate(across(where(is.character), ~ ifelse(nchar(.) > 32767, substr(., 1, 32767), .)))
 write_xlsx(publisher_cell_press, "citations/publisher_journal_cell_press_2022.xlsx")
 
-
-# 2023: APS: journal citations: 154; non-journal: 0
-# 2022: 
-# 2021: 
-
 publisher_aps <- publisher_aps %>%
   mutate(across(where(is.character), ~ ifelse(nchar(.) > 32767, substr(., 1, 32767), .)))
-write_xlsx(publisher_aps, "citations/publisher_aps_journal_2022.xlsx")
+write_xlsx(publisher_aps, "citations/publisher_aps_journal_2023.xlsx")
 
 publisher_aps2 <- publisher_aps2 %>%
   mutate(across(where(is.character), ~ ifelse(nchar(.) > 32767, substr(., 1, 32767), .)))
