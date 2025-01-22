@@ -121,9 +121,57 @@ org_works <- org_works_2021
 org_works_2022 <- readRDS("../org_works_2022.rds")
 org_works <- org_works_2022
 
+
+org_works_2023_old <- readRDS("../org_works_2023_202410.rds")
 org_works_2023 <- readRDS("../org_works_2023.rds")
+
 # to filter "journal" works only. I feel it shall not be this restrict. (other works like grey literature are good too)
 org_works <- org_works_2023
+
+names(org_works_2023)
+print(class(org_works_2023$id))
+print(length(org_works_2023$id))
+str(org_works_2023_old)
+
+any(is.na(org_works_2023_old$id))
+any(is.na(org_works_2023$id))
+
+
+compare_id_columns <- function(df1, df2, id_column_name) {
+  # Check if the ID column exists in both data frames
+  if (!(id_column_name %in% names(df1)) || !(id_column_name %in% names(df2))) {
+    stop("ID column not found in one or both data frames.")
+  }
+  
+  # Get the ID vectors
+  ids_df1 <- df1[[id_column_name]]
+  ids_df2 <- df2[[id_column_name]]
+  
+  # Find unique IDs
+  unique_to_df1 <- setdiff(ids_df1, ids_df2)
+  unique_to_df2 <- setdiff(ids_df2, ids_df1)
+  
+  # Print the results
+  cat("IDs unique to df1:\n")
+  print(unique_to_df1)
+  
+  cat("\nIDs unique to df2:\n")
+  print(unique_to_df2)
+  
+  # Return the results as a list
+  return(list(
+    unique_to_df1 = unique_to_df1,
+    unique_to_df2 = unique_to_df2
+  ))
+}
+  
+
+id_column <- "id"  # Set the ID column name
+comparison_result <- compare_id_columns(org_works_2023_old, org_works_2023, id_column)
+
+# Access the unique IDs from the returned list:
+unique_to_df1 <- comparison_result$unique_to_df1
+unique_to_df2 <- comparison_result$unique_to_df2
 
 
 ##### 2. Checking and verifying data
