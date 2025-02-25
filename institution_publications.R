@@ -34,10 +34,10 @@ setwd("/home/yhan/Documents/openalexR-test/")
 
 ##### 1. Getting data. (retrieved 2024-09-02)
 # Retrieving all publications association with UArizona's ROR (Research Organization Registry) ID.
-# UA publications per year is ~9,000. For running 2 years data, need better computer or crashed R studio.
-# Year 2023: 10,559 works (2025-01) <<< 9,384 works (2024-10)
-# Year 2022: 8,833 works (2024-10-18) <<< 8,674 works (2024-09-09)
-# Year 2021: 9,336 works (7,048 type-journal articles and reviews)
+# UA works_published per year is ~9,000. For running 2 years data, need better computer or crashed R studio.
+# Year 2023: 10,561 (2025-02) <<< 10,559 (2025-01) <<< 9,384 (2024-10)
+# Year 2022: 8,825 (2025-02-24) <<< 8,833 (2024-10-18) <<< 8,674 (2024-09-09)
+# Year 2021: 9,336 (7,048 type-journal articles and reviews)
 # Year 2020: 
 # Year 2019: 8,847 
 # 2023-current: 14,660 works : 5 min to get UAworks with 3 GB mem, 264 mins to pull 372,000 reference's data with 8.6 GB  
@@ -55,8 +55,8 @@ setwd("/home/yhan/Documents/openalexR-test/")
 UAworks_count <-oa_fetch(
   entity="works",
   institutions.ror=c("03m2x1q45"),
-  from_publication_date ="2021-01-01",
-  to_publication_date = "2021-12-31",
+  from_publication_date ="2022-01-01",
+  to_publication_date = "2022-12-31",
   #primary_location.source.type = "journal",
   count_only = TRUE
 )
@@ -64,14 +64,14 @@ UAworks_count <-oa_fetch(
 ### 1.2 Getting all the works based on the institution ROR and publication date. It takes longer time. 
 # see above for the running time
 # 2019 
-org_works_2019 <-oa_fetch(
+works_published_2019 <-oa_fetch(
   entity="works",
   institutions.ror=c("03m2x1q45"),
   from_publication_date ="2020-01-01",
   to_publication_date = "2020-01-01"
 )
 
-org_works_2021 <-oa_fetch(
+works_published_2021 <-oa_fetch(
   entity="works",
   institutions.ror=c("03m2x1q45"),
   from_publication_date ="2021-01-01",
@@ -79,7 +79,7 @@ org_works_2021 <-oa_fetch(
   # primary_location.source.type = "journal"
 )
 
-org_works_2022 <-oa_fetch(
+works_published_2022 <-oa_fetch(
   entity="works",
   institutions.ror=c("03m2x1q45"),
   from_publication_date ="2022-01-01",
@@ -92,7 +92,7 @@ org_works_2022 <-oa_fetch(
 # 2023: All works: 10,559 (2025-01) 
 # 2023: journal only: 6,903 using primary_location.source.type = "journal" as a filter (not including type="repository")
 # 
-org_works_2023 <-oa_fetch(
+works_published_2023 <-oa_fetch(
   entity="works",
   institutions.ror=c("03m2x1q45"),
   from_publication_date ="2023-01-01",
@@ -101,42 +101,39 @@ org_works_2023 <-oa_fetch(
 )
 
 # Save data
-# saveRDS(org_works_2019, "../org_works_2019.rds")
-# saveRDS(org_works_2020, "../org_works_2020.rds")
-saveRDS(org_works_2021, "../org_works_2021.rds")
-# saveRDS(org_works_2022, "../org_works_journal_2022.rds")
-saveRDS(org_works_2023, "../org_works_2023.rds")
+# saveRDS(works_published_2019, "../works_published_2019.rds")
+# saveRDS(works_published_2020, "../works_published_2020.rds")
+saveRDS(works_published_2021, "../works_published_2021.rds")
+saveRDS(works_published_2022, "../works_published_2022.rds")
+saveRDS(works_published_2023, "../works_published_2023.rds")
 
 # Load data 
-org_works_2019 <- readRDS("../org_works_2019.rds")
-org_works <- org_works_2019
+works_published_2019 <- readRDS("../works_published_2019.rds")
+works_published <- works_published_2019
 
-org_works_2020 <- readRDS("../org_works_2020.rds")
-org_works <- org_works_2020
+works_published_2020 <- readRDS("../works_published_2020.rds")
+works_published <- works_published_2020
 
-org_works_2021 <- readRDS("../org_works_2021.rds")
-org_works_2021_journal <- readRDS("../org_works_journal_2021.rds")
-org_works <- org_works_2021
+works_published_2021 <- readRDS("../works_published_2021.rds")
+works_published_2021_journal <- readRDS("../works_published_journal_2021.rds")
+works_published <- works_published_2021
 
-org_works_2022 <- readRDS("../org_works_2022.rds")
-org_works <- org_works_2022
+works_published_2022 <- readRDS("../works_published_2022.rds")
+works_published <- works_published_2022
 
 
-org_works_2023_old <- readRDS("../org_works_2023_202410.rds")
-org_works_2023 <- readRDS("../org_works_2023.rds")
-
+works_published_2023_old <- readRDS("../works_published_2023_202410.rds")
+works_published_2023 <- readRDS("../works_published_2023.rds")
 # to filter "journal" works only. I feel it shall not be this restrict. (other works like grey literature are good too)
-org_works <- org_works_2023
+works_published <- works_published_2023
 
 ##########################################################################################
 #### Testing the later fetched dataset and comparing it with the previous fetched data
-names(org_works_2023)
-print(class(org_works_2023$id))
-print(length(org_works_2023$id))
-str(org_works_2023_old)
-
-any(is.na(org_works_2023_old$id))
-any(is.na(org_works_2023$id))
+names(works_published)
+print(class(works_published$id))
+print(length(works_published$id))
+str(works_published_old)
+any(is.na(works_published$id))
 
 compare_id_columns <- function(df1, df2, id_column_name) {
   # Check if the ID column exists in both data frames
@@ -168,7 +165,7 @@ compare_id_columns <- function(df1, df2, id_column_name) {
   
 
 id_column <- "id"  # Set the ID column name
-comparison_result <- compare_id_columns(org_works_2023_old, org_works_2023, id_column)
+comparison_result <- compare_id_columns(works_published_2023_old, works_published_2023, id_column)
 
 # Access the unique IDs from the returned list:
 unique_to_df1 <- comparison_result$unique_to_df1
@@ -180,7 +177,7 @@ unique_to_df2 <- comparison_result$unique_to_df2
 ##### 2.1 Route 1: Getting citation data from $referenced_works
 ##### Route 2: Getting author's data? 
 ###### change this line only to update the right dataset.
-org_works_ref <- org_works$referenced_works
+works_published_ref <- works_published$referenced_works
 #########################
 
 # Find "NA" indexes: 18- 25% no references 
@@ -197,18 +194,18 @@ org_works_ref <- org_works$referenced_works
 # 2023: 1217 / 6889 published article, primary_location_type = journal, $type = article: 17%
 
 # There are NA references. So we need to remove them. 
-# ~14% works have no references (2021)
+# No references: 20% (2022), 14% (2021)
 # This na_indices include type: article, books, errata, letter, and other types
-na_indices <- which(sapply(org_works_ref, function(x) is.logical(x) && is.na(x))) 
-na_count <- sum(sapply(org_works_ref, function(x) is.logical(x) && is.na(x)))
-na_percent <- na_count/length(org_works_ref) * 100
+na_indices <- which(sapply(works_published_ref, function(x) is.logical(x) && is.na(x))) 
+na_count <- sum(sapply(works_published_ref, function(x) is.logical(x) && is.na(x)))
+na_percent <- na_count/length(works_published_ref) * 100
 
 # Remove duplicate rows from the data frame
-unique_org_works <- unique(org_works)
-org_works_ref <- unique(org_works_ref) # this actually also remove NA lists.
+unique_works_published <- unique(works_published)
+works_published_ref <- unique(works_published_ref) # this actually also remove NA lists.
 
 # Filter the rows where $reference_works is NA and $type is "article"
-works_na_referenced_works <- org_works %>%
+works_na_referenced_works <- works_published %>%
   filter(is.na(referenced_works) & type == "article")
 
 #write_xlsx(works_na_referenced_works, "citations/works_journal_2023_na_referenced_works.xlsx") # send this to OpenAlex
@@ -221,42 +218,42 @@ works_na_referenced_works <- org_works %>%
 # Year 2020 total references: 392,992: article 
 # Year 2019 total references: 352,509: articles 329,000  
 
-# rm(org_works_ref_combined)
-org_works_ref_combined <- unlist(org_works_ref, use.names = FALSE)
-org_works_ref_combined <- org_works_ref_combined[!is.na(org_works_ref_combined)]  # Remove NA values
+# rm(works_published_ref_combined)
+works_published_ref_combined <- unlist(works_published_ref, use.names = FALSE)
+works_published_ref_combined <- works_published_ref_combined[!is.na(works_published_ref_combined)]  # Remove NA values
 
 ### 2.21 finding these duplicates, which mean the duplicates have been cited multiple times 
 # (probably more important to have these journals subscribed!)
 # cited more: ~20% - 25%  (2019, 2020, 2021, 2022, 2023 UArizona data)
-org_works_ref_more_cited <- org_works_ref_combined[duplicated(org_works_ref_combined)]
-org_works_ref_unique <- org_works_ref_combined[!duplicated(org_works_ref_combined)]
+works_published_ref_more_cited <- works_published_ref_combined[duplicated(works_published_ref_combined)]
+works_published_ref_unique <- works_published_ref_combined[!duplicated(works_published_ref_combined)]
 
 ### Method 2: there are different
-citation_counts <- table(org_works_ref_combined)
+citation_counts <- table(works_published_ref_combined)
 head(citation_counts)
 # Extract citations that occur more than 80 times (i.e., duplicates)
-org_works_ref_more_cited2 <- names(citation_counts[citation_counts > 80])
-head(org_works_ref_more_cited2)
+works_published_ref_more_cited2 <- names(citation_counts[citation_counts > 80])
+head(works_published_ref_more_cited2)
 
 ############################################################
 ### 2.23 For Testing purpose: Trace back from the cited article -> $referenced_works -> original published article
 # Find the index of multiple samples
-head(org_works$referenced_works)
-head(org_works_ref_unique)
+head(works_published$referenced_works)
+head(works_published_ref_unique)
 
-# Use sapply to find matching elements in the org_works_ref for testing. 
-matching_indices <- which(sapply(org_works_ref, function(x) 
+# Use sapply to find matching elements in the works_published_ref for testing. 
+matching_indices <- which(sapply(works_published_ref_combined, function(x) 
   any(x %in% c("https://openalex.org/W1624352668", "https://openalex.org/W1548779692")))) # https://openalex.org/W1624352668 were cited on 2021 and 2023 data
 print(matching_indices)
 
 # We can see the original works for samples
-org_works[2, "id"]
-org_works[174, "id"]
+works_published[2, "id"]
+works_published[174, "id"]
 
 # Test to see how many times a work is cited. 
 # 21 times (2020); 22 times(2021), 26 times(2022), 18 times(2023)
 # https://openalex.org/W4247665917 were cited in 2019, 2021, 2022 and 2023 data
-index <- which(org_works_ref_combined == "https://openalex.org/W4247665917")
+index <- which(works_published_ref_combined == "https://openalex.org/W4247665917")
 print(index)
 
 ###########################################################
@@ -264,28 +261,28 @@ print(index)
 ##### 3. From authors' DF. 
 # Flattening authors fields from the DF (multiple authors per work). 
 # 426,000 obs (multiple authors) from 50,400 obs (works)
-org_works_since <- org_works
+works_published_since <- works_published
 
 #### Year 2022: 
-# -- org_works_authors: 75,222
-# -- org_works_UAauthors: 16,432
-# -- org_works_ua_authors_ref_combined: 656,712
-# -- org_works_ua_authors_ref_cited: 249,629
-org_works_authors<-org_works_since%>%
+# -- works_published_authors: 75,222
+# -- works_published_UAauthors: 16,432
+# -- works_published_ua_authors_ref_combined: 656,712
+# -- works_published_ua_authors_ref_cited: 249,629
+works_published_authors<-works_published_since%>%
   mutate(author=lapply(author, function(x){
     names(x) <-paste0(names(x), "author")
     return(x)
   }))%>%
   unnest(author)
 
-rm(list = c("org_works_authors", "na_percent" ))
+rm(list = c("works_published_authors", "na_percent" ))
 
-UAauthors <-unique(org_works_authors)
+UAauthors <-unique(works_published_authors)
 #write_xlsx(UAauthors2, "UAauthors.xlsx")
 
 # After flattening, authors' fields (e.g. au_idauthor, institution_rorauthor) are displayed
-colnames(org_works)
-colnames(org_works_authors)
+colnames(works_published)
+colnames(works_published_authors)
 
 #####################################################
 #################### 3.3 TESTING!!!#################
@@ -303,9 +300,9 @@ oa_fetch_test2 <-oa_fetch( entity="authors",  id="https://openalex.org/A50039335
 #### This is not 100% accurate because UArizona has child organization whose ROR is associated with an article. By filtering institution_rorauthor
 # to UArizona's ROR, certain articles are left out!!! 
 # 2024-09: I am currently working with openAlexR developers to fix this. 
-org_works_authors_ua <- org_works_authors%>%filter(institution_rorauthor== "https://ror.org/03m2x1q45")
-org_works_authors_ua_unique <- unique (org_works_authors_ua)
-duplicates <- org_works_authors_ua[duplicated(org_works_authors_ua), ]
+works_published_authors_ua <- works_published_authors%>%filter(institution_rorauthor== "https://ror.org/03m2x1q45")
+works_published_authors_ua_unique <- unique (works_published_authors_ua)
+duplicates <- works_published_authors_ua[duplicated(works_published_authors_ua), ]
 
 # 3.32 
 ### Note: one article can be authored by multiple UA authors. However, the references cited are the same. 
@@ -314,28 +311,28 @@ duplicates <- org_works_authors_ua[duplicated(org_works_authors_ua), ]
 ### 3.33 Testing if a cited work is found. 
 # Deep Learning, Nature, by Yann LeCun, Yoshua Bengio, Geoffrey Hinton. Cited by: 62,210
 search_string <- "https://openalex.org/W2919115771"
-result <- lapply(org_works_ref_combined, function(x) grep(search_string, x, value = TRUE))
+result <- lapply(works_published_ref_combined, function(x) grep(search_string, x, value = TRUE))
 
 matches <- result[sapply(result, length) > 0]
-indices <- which(sapply(org_works_ref_combined, function(x) any(grepl(search_string, x))))
+indices <- which(sapply(works_published_ref_combined, function(x) any(grepl(search_string, x))))
 for (i in indices) {
   cat("Index:", i, "\n")
-  cat("Element:\n", org_works_ref_combined[[i]], "\n\n")
+  cat("Element:\n", works_published_ref_combined[[i]], "\n\n")
 }
 
 # Find it from the original article
 search_string <- "https://openalex.org/W2594545996"  
 # this article was cited 81 (2019, 130 (2020), 90 (2021), 52 (2022), 16 (2023)
-indices_with_string <- which(sapply(org_works$referenced_works, function(x) search_string %in% x))
+indices_with_string <- which(sapply(works_published$referenced_works, function(x) search_string %in% x))
 print(indices_with_string)
-org_works[indices_with_string, ]$id
+works_published[indices_with_string, ]$id
 
 # test case 2: cited 6 from microbiology, multiple times for 2019, 2020, 2021, 2022
 # both final published version and pre-print existing: https://openalex.org/works/W4379795917 and https://openalex.org/W4319339791 
 search_string <- "https://openalex.org/W2128159409"
-indices_with_string <- which(sapply(org_works$referenced_works, function(x) search_string %in% x))
+indices_with_string <- which(sapply(works_published$referenced_works, function(x) search_string %in% x))
 print(indices_with_string)
-org_works[indices_with_string, ]$id
+works_published[indices_with_string, ]$id
 
 
 ##### 3.34  Fetch time 
@@ -346,7 +343,6 @@ org_works[indices_with_string, ]$id
 
 #Creating an empty dataframe to store the results of the for loop.
 works_cited <-data.frame()
-#rm(work_cited_final)
 
 # Getting these works' metadata. This takes long time to run. 
 # Warnings(). a work > 100 authors will be truncated 
@@ -388,7 +384,7 @@ num_of_works <- 10000
 res <-list()
 #profvis({
 system.time({
-  batch_identifiers <-org_works_ref_unique[1:num_of_works]
+  batch_identifiers <-works_published_ref_unique[1:num_of_works]
   res <-oa_fetch(identifier=batch_identifiers, 
                  entity = "works",
                  options= list(sample=fetch_number, seed=1), 
@@ -397,7 +393,7 @@ system.time({
 
 
 fetch_number <- 50
-num_of_works <- length (org_works_ref_combined)
+num_of_works <- length (works_published_ref_combined)
 
 range_i <- seq(1, num_of_works, by=fetch_number)
 works_cited_ls <- vector("list", length = length(range_i))
@@ -406,7 +402,7 @@ works_cited_ls <- vector("list", length = length(range_i))
 time_taken <-system.time({
   for (idx in seq_along(range_i)) {
     i <- range_i[idx]
-    batch_identifiers <-org_works_ref_combined[i:min(i+fetch_number-1, num_of_works)]
+    batch_identifiers <-works_published_ref_combined[i:min(i+fetch_number-1, num_of_works)]
     batch_data <-oa_fetch(identifier=batch_identifiers, primary_location.source.type = "journal", )
                           #output="list", )
     works_cited_ls[[idx]] <- batch_data
@@ -428,12 +424,12 @@ works_cited2 <-data.frame()
 
 fetch_number <- 50
 #num_of_works <-1000
-num_of_works <- length (org_works_ref_combined)
+num_of_works <- length (works_published_ref_combined)
 
 # Loop to fetch data in batches
 time_taken <- system.time({
   for(i in seq(1, num_of_works, by = fetch_number)) {
-    batch_identifiers <- org_works_ref_combined[i:min(i + fetch_number - 1, num_of_works)]
+    batch_identifiers <- works_published_ref_combined[i:min(i + fetch_number - 1, num_of_works)]
     
     # Check if the batch_identifiers is a valid vector
     if (length(batch_identifiers) > 0 && !all(is.na(batch_identifiers))) {
@@ -466,45 +462,48 @@ setdiff(works_cited2, works_cited)
 ######################################################
 ### There are two types of citations 
 #
-# 1. works_cited_final_2022.rds --> work cited by UA authors of any type publications (e.g. journal articles, journal reviews, reports, repository items)
+# 1. works_cited_2022.rds --> work cited by UA authors of any type publications (e.g. journal articles, journal reviews, reports, repository items)
 ############################################
 
-# 2. works_cited_type_journal_2022.rds --> type = journal (work cited by UA authors of only journal type such as articles and reviews.  
+# 2. works_cited_source_journal_2022.rds --> source.type = journal (work cited by UA authors of only journal type such as articles and reviews.  
 # 
 
 #### Step 1: Re-generate a new row if it matches (meaning; cited multiple times.)
-works_cited_final <- works_cited
 
-saveRDS(works_cited_final, "../works_cited_final_2021.rds")
+saveRDS(works_cited, "../works_cited_2022.rds")
+
+saveRDS(works_cited, "../works_cited_2023.rds")
+
+#works_cited_final <- works_cited
+
+saveRDS(works_cited, "../works_cited_2021.rds")
 saveRDS(works_cited, "../works_cited_type_journal_2023.rds")
 
 
-saveRDS(works_cited_final, "../works_cited_2023.rds")
+works_cited <- readRDS("../works_cited_2019.rds")
+works_cited <- readRDS("../works_cited_2020.rds")
+works_cited <- readRDS("../works_cited_2021.rds")
 
-works_cited_final <- readRDS("../works_cited_2019.rds")
-works_cited_final <- readRDS("../works_cited_2020.rds")
-works_cited_final <- readRDS("../works_cited_2021.rds")
-
-works_cited_final <- readRDS("../works_cited_2022.rds")
+works_cited <- readRDS("../works_cited_2022.rds")
                              #works_cited_source_journal_2022.rds")
                           
-#works_cited_final <- readRDS("../works_cited_final_journal_2023.rds")
+#works_cited <- readRDS("../works_cited_2023.rds")
 
-# One is primary.source.type = journal, the other (works_cited_final2) contains everything
+# One is primary.source.type = journal, the other (works_cited_2) contains everything
 # For year 2022, 325,520 : 345,813. 
 
 ### If not filtering by "primary_location:source=journal", there are more.
 # For example, https://api.openalex.org/works/W2984048300 (source = null)
 
-difference_df1_df2 <- setdiff(works_cited_final$id, works_cited_final2$id)
-difference_df2_df1 <- setdiff(works_cited_final2$id, works_cited_final$id)
+difference_df1_df2 <- setdiff(works_cited$id, works_cited_2$id)
+difference_df2_df1 <- setdiff(works_cited_2$id, works_cited$id)
 head(difference_df2_df1)
 
 ############# Testing
-difference_df1_df2 <- setdiff(works_cited_final$id, org_works_ref_combined)
-difference_df2_df1 <- setdiff(org_works_ref_combined, works_cited_final$id)
+difference_df1_df2 <- setdiff(works_cited$id, works_published_ref_combined)
+difference_df2_df1 <- setdiff(works_published_ref_combined, works_cited$id)
 head(difference_df2_df1)
-head(works_cited_final$id)
+head(works_cited$id)
 head(matching_rows$id)
 ######################
 
@@ -512,15 +511,15 @@ head(matching_rows$id)
 #### need to recheck the numbers
 # Step 2: Add these matching rows as new rows 
 # matching_rows <- works_cited[works_cited$id %in% names(works_ref_more_cited_counts), ]
-# Step 3: Repeat each row in the DataFrame based on the count in org_works_ref_more_cited
+# Step 3: Repeat each row in the DataFrame based on the count in works_published_ref_more_cited
 # matching_rows_expanded <- matching_rows[rep(1:nrow(matching_rows), times = works_ref_more_cited_counts[matching_rows$id]), ]
 
 #matching_rows <- works_cited[works_cited$id %in% names(citation_counts), ]
-# Step 3: Repeat each row in the DataFrame based on the count in org_works_ref_more_cited
+# Step 3: Repeat each row in the DataFrame based on the count in works_published_ref_more_cited
 #matching_rows_expanded <- matching_rows[rep(1:nrow(matching_rows), times = citation_counts[matching_rows$id]), ]
 
 # Step4: We have the final works cited, including multiple occurances of a work
-# works_cited_final <- rbind(works_cited_final, matching_rows_expanded)
+# works_cited <- rbind(works_cited, matching_rows_expanded)
 
 
 ### Questions: 
@@ -528,97 +527,95 @@ head(matching_rows$id)
 # 2. 
 
 # Count the occurrences of each unique element in the vector
-#works_ref_more_cited_counts <- table(org_works_ref_more_cited)
-# works_cited <- org_works_ref_combined
+#works_ref_more_cited_counts <- table(works_published_ref_more_cited)
+# works_cited <- works_published_ref_combined
 
+#### Naming Convention ###
+### Within each of these categories, we further classify works based on two criteria: 
+##### 1. Source Type: We distinguish between works originating from sources with an ISSN, and those from non-ISSN sources.
+##### 2. Work Type: Within each source type, we differentiate between articles (traditional research papers) and other types of works (e.g., books, book chapters, preprints).
+
+### This hierarchical classification system enables us to examine patterns in both the types of 
+### publications produced by UA authors and the sources they cite, allowing for a deeper understanding of 
+### research trends and influences within the UA. This system can easily expand if you need further categorization (e.g.,by discipline, college, department).
+
+### We follow a hierarchical and descriptive approach with the following general naming structure:  
+##### category_subcategory_sub-subcategory
+##### Where: 
+######### Category = works_published or works_cited (differentiates between UA’s output and what they reference)
+#########   Subcategory = source_issn or source_nonissn (indicates the type of source)
+#########     Sub-subcategory: either type or publisher 
+###########     type = defined above (e.g. articles or other)
+###########     publisher = defined above.
 
 ###################### Citation Analysis ####################################
 # 1. Analyse journal usage
 #  - remove any row whose col "issn_l" is empty or NULL 
 # Date fetched: 2024-10 and 2024-12:
 
-### Works consists of two main types: a) journal (from journals) and b) non-journals (book etc)
-### (a) source.type  = journal: the source is journal. Journal works consist of articles, reviews, conference papers.
-### (b) source.type != journal: the source is non-journal. Non-journal works consist of articles, books, etc from other sources such as repositories (arXiv, PubMed) 
 
-### works_cited (everything) = source_issn_works + source_non_issn_works
-### “source_issn_works" = "source_issn_articles_cited" + "source_issn_non_articles_cited”
+###  # of works_cited = # of works_cited_source_issn + # of works_cited_source_nonissn
 
-### source_issn_works (all works in journal) = issn_works_cited_article_cited + issn_works_cited_non_article_cited
-### source_non_issn_works = non_issn_works_cited_articles + non_issn_works_cited_non_article_cited
+### works_cited_source_issn_articles
+##### # of works_cited_source_issn = # of works_cited_source_issn_articles + # of source_issn_non_articles_cited.
+##### Example: 330,005 (works_cited_source_issn) = 287,142 (works_cited_source_issn_articles) + 42,863 (works_cited_source_issn_nonarticle)
 
+# 2023 data: 353,424 (works_cited) = 330,005 (works_cited_source_issn) + 23,419 (works_cited_source_nonissn)
+### 330,005 (works_cited_source_issn) = 287,142 (works_cited_source_issn_articles) + 42,863 (works_cited_source_issn_nonarticle)
+### 23,419 (works_cited_source_noissn) = 9,335 (works_cited_source_nonissn_articles, e.g. arXiv/PubMed) + 14,084 (works_cited_nonissn_nonarticles, e.g. preprint, book, book-chapter)
 
-# 2023: 353,424 (works_cited) = 330,005 (issn_works_cited) + 23,419 (non_issn_works_cited)
-##### 330,005 (issn_works_cited) = 287,142 (issn_works_cited_article_cited) + 42,863 (issn_works_cited_non_article_cited) 
-##### 23,419 (non_issn_works_cited) = 9,335 (non_issn_works_cited_articles, e.g. arXiv, PubMed, proceedings) + 14,084 (non_issn_works_cited_non_articles, e.g. preprint, book, book-chapter)
+# 2022: 342,900 (works_cited) =  320,227 (works_cited_source_issn) + 22,673 (works_cited_nonissn)
+###### 320,227 = 276,684 + 43,543
+######  22,673 =  8,700 + 13,973
 
-
-# 2022: 345,813 (work cited) = 323,221 (issn_works_cited) + 22,592 (non_issn_works_cited)
-###### 323,221 (issn_works_cited) = 279,258 (issn_works_cited_article_cited) + 43,963 (issn_works_cited_non_article_cited)
-###### 22,592 (non_issn_works_cited) = 8,571 (non_issn_works_cited_articles, e.g. arXiv, PubMed, proceedings) + 14,021 (non_issn_works_cited_non_articles, e.g. preprint, book, book-chapter)
-
-# 2021: (2025-01-23)
-# 2021: 379,609 = 329,720 + 
-
-######## 329,720 = 301,775 + 27,945
-################## 301,775 = 259,182 + 42,593
-################## 27,945 = 11,614 + 16,331
-
-# 2021: 374,067(work cited) = 341,738(issn_works_cited) + 32,329 (non_issn_works_cited)
-######## 341,738 (issn_works_cited)  = 297,819 (issn_works_cited_article_cited) + 43,919 (issn_works_cited_non_article_cited)
-######## 32,329 (non_issn_works_cited) = 13,150(non_issn_works_cited_articles) + 19,179 (non_issn_works_cited_non_articles)
+# 2021: 374,067 (works_cited) = 341,738(works_cited_source_issn) + 32,329 (works_cited_source_nonissn)
+######## 341,738 = 297,819 + 43,919
+########  32,329 = 13,150 + 19,179
 
 # 2020: 382,495 articles out of 421,866 works: 91%
 # 2019: 291,705 articles out of 323,779 works: 90%
 
 # Filter rows where issn_l is neither NA nor an empty string
-issn_works_cited_index <- !is.na(works_cited_final$issn_l) & works_cited_final$issn_l != ""
-# Subset 
-issn_works_cited <- works_cited_final[issn_works_cited_index, ]
-
-# Subset non_articles_cited (the rest)
-non_issn_works_cited <- works_cited_final[!issn_works_cited_index, ]
+works_cited_source_issn_index <- !is.na(works_cited$issn_l) & works_cited$issn_l != ""
+# Subset "articles"
+works_cited_source_issn <- works_cited[works_cited_source_issn_index, ]
+# Subset nonarticles (the rest)
+works_cited_source_nonissn <- works_cited[!works_cited_source_issn_index, ]
 
 
 #############################
 # Filter records where type is "article" (excluding conference paper etc )
 
+works_cited_source_issn_articles    <- works_cited_source_issn[works_cited_source_issn$type == "article", ]
+works_cited_source_issn_nonarticles <- works_cited_source_issn[works_cited_source_issn$type != "article", ]
 
-issn_works_cited_article_cited <-     issn_works_cited[issn_works_cited$type == "article", ]
-issn_works_cited_non_article_cited <- issn_works_cited[issn_works_cited$type != "article", ]
-
-non_issn_works_cited_articles <-     non_issn_works_cited[non_issn_works_cited$type == "article", ]
-non_issn_works_cited_non_articles <- non_issn_works_cited[non_issn_works_cited$type != "article", ]
-
-difference_df1_df2 <- setdiff(articles_cited$id, articles_cited2$id)
-difference_df2_df1 <- setdiff(works_cited_final2$id, works_cited_final$id)
-head(difference_df1_df2)
-
+works_cited_source_nonissn_articles    <- works_cited_source_nonissn[works_cited_source_nonissn$type == "article", ]
+works_cited_source_nonissn_nonarticles <- works_cited_source_nonissn[works_cited_source_nonissn$type != "article", ]
 
 # Empty or NULL records
-count_null_empty_id <- sum(is.na(issn_works_cited$id) | trimws(issn_works_cited$id) == "")
+count_null_empty_id <- sum(is.na(works_cited_source_issn$id) | trimws(works_cited_source_issn$id) == "")
 count_null_empty_id
 
 # publisher: host_organization
-unique_publishers <- unique(issn_works_cited$host_organization)
+unique_publishers <- unique(works_cited_source_issn$host_organization)
 # number of publishers: ~1,600
 num_unique_publishers <- length(unique_publishers)
 # list top 50 publishers
 print(unique_publishers[1:50])
+
 # list NULL publishers ~ 1 %
 # 2023: 2,227 (probably need ISSN matching) / 2,922 NA/
-
 # 2022: 3,312 NA / 323,221
 # 2021: 3,687 NA / 341,738 
 # 2020: 4,039 NA / 382,495
-num_na <- sum(is.na(issn_works_cited$host_organization))
+num_na <- sum(is.na(works_cited_source_issn$host_organization))
 
 # Replace NA values and empty strings with "NA"
-issn_works_cited$host_organization[is.na(issn_works_cited$host_organization) | trimws(issn_works_cited$host_organization) == ""] <- "NA"
+works_cited_source_issn$host_organization[is.na(works_cited_source_issn$host_organization) | trimws(works_cited_source_issn$host_organization) == ""] <- "NA"
 
 # Dealing with "NA" data in "host_organization" field.
 # 1. First, showing all NA publisher: meaning publisher info is not available. 
-publisher_NA <- issn_works_cited[issn_works_cited$host_organization == "NA", ]
+publisher_NA <- works_cited_source_issn[works_cited_source_issn$host_organization == "NA", ]
 
 publisher_NA_id <-unique(publisher_NA$id)
 # Check if any row in the df 'publisher_NA' contains a non-missing value in the "issn_l" column
@@ -645,36 +642,35 @@ publisher_NA <- publisher_NA %>%
   mutate(across(where(is.character), ~ ifelse(nchar(.) > 32767, substr(., 1, 32767), .)))
 
 publisher_name <- "Microbiology society"
-publisher_microbiology <- issn_works_cited[grepl(publisher_name, issn_works_cited$host_organization_name, ignore.case = TRUE), ]
+publisher_microbiology <- works_cited_source_issn[grepl(publisher_name, works_cited_source_issn$host_organization, ignore.case = TRUE), ]
 
-publisher_elsevier <- issn_works_cited[grepl("Elsevier BV", issn_works_cited$host_organization_name, ignore.case = TRUE), ]
+publisher_elsevier <- works_cited_source_issn[grepl("Elsevier BV", works_cited_source_issn$host_organization, ignore.case = TRUE), ]
 
-publisher_springer <- issn_works_cited[tolower(issn_works_cited$host_organization_name) == tolower("Springer Science+Business Media"), ]
-#publisher_springer <- issn_works_cited[grepl("Springer Science+Business Media", issn_works_cited$host_organization, ignore.case = TRUE), ]
+publisher_springer <- works_cited_source_issn[tolower(works_cited_source_issn$host_organization_name) == tolower("Springer Science+Business Media"), ]
+#publisher_springer <- works_cited_source_issn[grepl("Springer Science+Business Media", works_cited_source_issn$host_organization, ignore.case = TRUE), ]
 
-publisher_plos <- issn_works_cited[grepl("Public Library of Science", issn_works_cited$host_organization_name, ignore.case = TRUE), ]
+publisher_plos <- works_cited_source_issn[grepl("Public Library of Science", works_cited_source_issn$host_organization_name, ignore.case = TRUE), ]
 
-publisher_aaas <- issn_works_cited[grepl("American Association for the Advancement of Science", issn_works_cited$host_organization_name, ignore.case = TRUE), ]
+publisher_aaas <- works_cited_source_issn[grepl("American Association for the Advancement of Science", works_cited_source_issn$host_organization_name, ignore.case = TRUE), ]
 
-publisher_nature <- issn_works_cited[grepl("Nature Portfolio", issn_works_cited$host_organization_name, ignore.case = TRUE), ]
+publisher_nature <- works_cited_source_issn[grepl("Nature Portfolio", works_cited_source_issn$host_organization_name, ignore.case = TRUE), ]
 
 # University of Arizona
-publisher_ua  <- issn_works_cited[grepl("University of Arizona",       issn_works_cited$host_organization, ignore.case = TRUE), ]
-publisher_uap <- issn_works_cited[grepl("University of Arizona Press", issn_works_cited$host_organization, ignore.case = TRUE), ]
+publisher_ua  <- works_cited_source_issn[grepl("University of Arizona",       works_cited_source_issn$host_organization, ignore.case = TRUE), ]
+publisher_uap <- works_cited_source_issn[grepl("University of Arizona Press", works_cited_source_issn$host_organization, ignore.case = TRUE), ]
 
-# Need to study more. 
 # Emerald: cited (yyyy): 395 (2020), 257 (2021), 322 (2022), 276 (2023), 
-publisher_emerald <- issn_works_cited[grepl("Emerald Publishing", issn_works_cited$host_organization, ignore.case = TRUE), ]
+publisher_emerald <- works_cited_source_issn[grepl("Emerald Publishing", works_cited_source_issn$host_organization, ignore.case = TRUE), ]
 
 # IWA: cited (yyyy): 19 (2019), 34 (2020), 21 (2021), 19 (2022),   
-publisher_iwa <- issn_works_cited[grepl("IWA Publishing", issn_works_cited$host_organization_name, ignore.case = TRUE), ]
+publisher_iwa <- works_cited_source_issn[grepl("IWA Publishing", works_cited_source_issn$host_organization_name, ignore.case = TRUE), ]
 
 id_counts <-table(publisher_iwa$id)
 duplicateds <- id_counts[id_counts >= 1]
 print(id_counts)
 
 ### Cell press
-publisher_cell_press <- issn_works_cited[grepl("Cell Press", issn_works_cited$host_organization, ignore.case = TRUE), ]
+publisher_cell_press <- works_cited_source_issn[grepl("Cell Press", works_cited_source_issn$host_organization, ignore.case = TRUE), ]
 
 publisher_cell_press_unique <- unique(publisher_cell_press)
 df <-publisher_cell_press
@@ -717,18 +713,28 @@ print(duplicateds)
 # 2022: journal (article, review): 230; Non-journal (book-chapter): 2
 # 2021: journal (article, review) : 170; Non-journal (book-chapter) : 2
 
-publisher_aps  <- issn_works_cited[grepl("American Phytopathological Society", issn_works_cited$host_organization, ignore.case = TRUE), ]
-publisher_aps2 <- non_issn_works_cited[grepl("American Phytopathological Society", non_issn_works_cited$host_organization, ignore.case = TRUE), ]
+publisher_aps  <- works_cited_source_issn[grepl("American Phytopathological Society", works_cited_source_issn$host_organization, ignore.case = TRUE), ]
+publisher_aps2 <- works_cited_source_nonissn[grepl("American Phytopathological Society", works_cited_source_nonissn$host_organization, ignore.case = TRUE), ]
 
-# BMJ:
-# 2023: journal (article, review): 1,694; Non-journal: 0
-# 2022: journal (article, review):    ; Non-journal: 0
-# 2021: journal (article, review): 1,815  ; Non-journal: 0
+# 2025-01: BMJ:
+# 2023: journal (article, review): 1,694 ; Non-journal: 0
+# 2022: journal (article, review): 1,914 ; Non-journal: 0
+# 2021: journal (article, review): 1,815 ; Non-journal: 0
 
-publisher_bmj  <- issn_works_cited[grepl("BMJ", issn_works_cited$host_organization, ignore.case = TRUE), ]
-publisher_bmj2 <- non_issn_works_cited[grepl("BMJ", non_issn_works_cited$host_organization, ignore.case = TRUE), ]
+publisher_bmj  <- works_cited_source_issn[grepl("BMJ", works_cited_source_issn$host_organization, ignore.case = TRUE), ]
+publisher_bmj2 <- works_cited_source_nonissn[grepl("BMJ", works_cited_source_nonissn$host_organization, ignore.case = TRUE), ]
 
+publisher_bmj <- publisher_bmj %>%
+  mutate(across(where(is.character), ~ ifelse(nchar(.) > 32767, substr(., 1, 32767), .)))
+write_xlsx(publisher_bmj, "citations/publisher_bmj_issn_cited_2022.xlsx")
 
+# 2025-02:  Brill (https://openalex.org/publishers/p4310320561)
+publisher_brill  <- works_cited_source_issn[grepl("Brill", works_cited_source_issn$host_organization, ignore.case = TRUE), ]
+publisher_brill2 <- works_cited_source_nonissn[grepl("Brill", works_cited_source_nonissn$host_organization, ignore.case = TRUE), ]
+
+publisher_brill <- publisher_brill %>%
+  mutate(across(where(is.character), ~ ifelse(nchar(.) > 32767, substr(., 1, 32767), .)))
+write_xlsx(publisher_brill, "citations/works_cited_source_issn_brill_2022.xlsx")
 
 ###########################################
 ### Search if a publisher is in a DF
@@ -745,7 +751,7 @@ search_publisher <- function(publisher_string, df) {
 
 # Example usage:
 publisher_string <- "Emerald Publishing"
-result_indices <- search_publisher(publisher_string, issn_works_cited)
+result_indices <- search_publisher(publisher_string, works_cited_source_issn)
 
 # Print the indices
 print(result_indices)
@@ -764,7 +770,7 @@ search_work_publisher <- function(search_string, df) {
 
 # Example usage:
 search_string <- "https://openalex.org/W2963276645"
-result_indices <- search_work_publisher(search_string, org_works)
+result_indices <- search_work_publisher(search_string, works_published)
 
 ###############################################################
 # Verify any cited work using the function search_references()
@@ -778,7 +784,7 @@ search_references <- function(search_string, df) {
 
 # Example usage:
 search_string <- "Emerald Publishing"
-result_indices <- search_publisher(search_string, org_works)
+result_indices <- search_publisher(search_string, works_published)
 print(result_indices)
 
 # Example usage
@@ -787,13 +793,13 @@ search_string <- "https://openalex.org/W1604958295"
 
 search_string <- "https://openalex.org/W1607198972"
 #search_string <- "https://openalex.org/W3216054981"
-indices_with_string <- which(sapply(org_works$referenced_works, function(x) search_string %in% x))
+indices_with_string <- which(sapply(works_published$referenced_works, function(x) search_string %in% x))
 
-search_references(search_string, org_works)
+search_references(search_string, works_published)
 
 ### Test cases for Microbiology
 # both final published version and pre-print existing: https://openalex.org/works/W4379795917 and https://openalex.org/W4319339791 
-# Org_works ids are: "https://openalex.org/W4379795917" "https://openalex.org/W4317888776" "https://openalex.org/W4385752148" "https://openalex.org/W4319339791" "https://openalex.org/W4323537660"
+# works_published ids are: "https://openalex.org/W4379795917" "https://openalex.org/W4317888776" "https://openalex.org/W4385752148" "https://openalex.org/W4319339791" "https://openalex.org/W4323537660"
 # "https://openalex.org/W4323309440"
 search_string <- "https://openalex.org/W2128159409"  # Microbiology articles
 search_string <- "https://openalex.org/W2017185349" # Microbiology
@@ -808,49 +814,49 @@ publisher_microbiology[publisher_article_indicies, ]$id
 # cited 32 times (2020), 53(2022), 47(2023)
 # The Gaia mission
 search_string <- "https://openalex.org/W147232447"
-search_references(search_string, org_works)
+search_references(search_string, works_published)
 
 # Test case: 
 # cited: >80 (2019), 123 times (2020), 40 (2022), 16 (2023)
 # https://openalex.org/W2066340221 cited > 80 times in 2019.
 search_string <- "https://openalex.org/W2066340221"
-search_references(search_string, org_works)
+search_references(search_string, works_published)
 
 # Test case: Emerald (2022)
 search_string <- "https://openalex.org/W1998245073"
 search_string <- "https://openalex.org/W2508822998" # (3 times), 2(2023)
 search_string <- "https://openalex.org/W1607198972"
 search_string <- "https://openalex.org/W2011490204"
-search_references(search_string, org_works)
+search_references(search_string, works_published)
 
 
 # Test case: IWA. 1 (2022)
 search_string <- "https://openalex.org/W2045185088"
-search_publisher("IWA", org_works) # UA author published in IWA in 2014. not in 2019, 2020, and 2021
+search_publisher("IWA", works_published) # UA author published in IWA in 2014. not in 2019, 2020, and 2021
 
 search_string <- "https://openalex.org/W2130109162"
 search_string <- "https://openalex.org/W1965549985"
 
-search_references(search_string, org_works)
+search_references(search_string, works_published)
 
 # https://openalex.org/W2130109162 same record, different publication date? 
-matches <- which(tolower(issn_works_cited$id) == tolower(search_string))
-view(issn_works_cited[matches, ])
-print(issn_works_cited$id[matches])
+matches <- which(tolower(works_cited_source_issn$id) == tolower(search_string))
+view(works_cited_source_issn[matches, ])
+print(works_cited_source_issn$id[matches])
 
 # Test case: Cell Press(2023)
 # UA authors publish in Cell Press journals
-search_publisher("Cell Press", org_works)
+search_publisher("Cell Press", works_published)
 
 ## search these cell press journals articles do UA authors cited.
 search_string <- "https://openalex.org/W2511428910"
 search_string <- "https://openalex.org/W2125987139"
 search_stirng <- "https://openalex.org/W2002490399"
-search_references(search_string, org_works)
+search_references(search_string, works_published)
 
 # Test case: APS (2021)
 # UA authors publish the journals
-search_publisher("American Phytopathological Society", org_works)
+search_publisher("American Phytopathological Society", works_published)
 
 ### Test data for APS: 2024-12
 ## 2021: search journals articles do UA authors cited.
@@ -864,26 +870,26 @@ search_string <- "https://openalex.org/W2057480435"  # 3 times
 # 2023 
 search_string <- "https://openalex.org/W2802507504" # 3 times
 search_string <- "https://openalex.org/W4226087454" # 4 times 
-search_references(search_string, org_works)
+search_references(search_string, works_published)
 # UA authors publish the journals
-search_publisher("American Phytopathological Society", org_works)
+search_publisher("American Phytopathological Society", works_published)
 
 ### Test data for BMJ: 2025-01
 ## 2021: search journals articles do UA authors cited.
 search_string <- ""
 
 # 2022
-search_string <- ""
-search_string <- ""  # 3 times
+search_string <- "https://openalex.org/W1965622788" # 1 time
+search_string <- "https://openalex.org/W1964153922"  #2 times
 
 # 2023 
 search_string <- "https://openalex.org/W1967057044" # 4 times
 search_string <- "https://openalex.org/W2157823046" # 7 times 
 search_string <- "https://openalex.org/W2034673450" # 2 times
 
-search_references(search_string, org_works)
+search_references(search_string, works_published)
 #
-search_publisher("BMJ", org_works)
+search_publisher("BMJ", works_published)
 
 
 
@@ -893,7 +899,7 @@ search_publisher("BMJ", org_works)
 
 #### Find duplicates and frequencies #####
 # change DF here
-df <-issn_works_cited
+df <-works_cited_source_issn
 # Find the rows that are duplicated
 duplicate_rows <- df[duplicated(df) | duplicated(df, fromLast = TRUE), ]
 # Create a table to count the frequency of duplicated rows
@@ -945,10 +951,7 @@ cited_all_types <- list(
 # Write the list to an Excel file with each data frame as a separate sheet
 write_xlsx(cited_all_types, "citations/publisher_aps_cited_works_2022.xlsx")
 
-# For BMJ 
-publisher_bmj <- publisher_bmj %>%
-  mutate(across(where(is.character), ~ ifelse(nchar(.) > 32767, substr(., 1, 32767), .)))
-write_xlsx(publisher_bmj, "citations/publisher_bmj_issn_cited_2021.xlsx")
+
 
 
 ######################################
@@ -957,29 +960,17 @@ write_xlsx(publisher_bmj, "citations/publisher_bmj_issn_cited_2021.xlsx")
 # @param: dataframe issns_articles_cited
 #          publisher_name
 # return: issns and counts cited and sorted
-count_issns_by_publisher <- function(issn_works_cited, publisher_name) {
-  # Filter rows where host_organization matches the specified publisher
-  publisher1 <-  issn_works_cited[grepl(publisher_name, issn_works_cited$host_organization, ignore.case = TRUE), ]
-  
-  # Count the occurrences of each journal under the specified publisher
-  issns_counts <- table(publisher1$so)
-  issns_counts_df <- as.data.frame(issns_counts)
-  
-  return(issns_counts_df)
-}
 
 
-count_issns_by_publisher <- function(issn_works_cited, publisher_name) {
+count_issns_by_publisher <- function(works_cited_source_issn, publisher_name) {
   # Filter rows where host_organization matches the specified publisher
-  publisher1 <- issn_works_cited[grepl(publisher_name, issn_works_cited$host_organization, ignore.case = TRUE), ]
+  publisher1 <- works_cited_source_issn[grepl(publisher_name, works_cited_source_issn$host_organization, ignore.case = TRUE), ]
   
   # Count the occurrences of each ISSN under the specified publisher
   issns_counts <- table(publisher1$so)
   issns_counts_df <- as.data.frame(issns_counts)
   
-  # Rename columns for clarity
   colnames(issns_counts_df) <- c("Journal Title", "Count")
-  
   # Sort the data frame by Count in descending order
   issns_counts_df <- issns_counts_df[order(issns_counts_df$Count, decreasing = TRUE), ]
   
@@ -987,45 +978,57 @@ count_issns_by_publisher <- function(issn_works_cited, publisher_name) {
 }
 
 
+library(dplyr)
+# Use dplyr for the function
+count_issns_by_publisher <- function(works_cited_source_issn, publisher_name) {
+  works_cited_source_issn %>%
+    filter(grepl(publisher_name, host_organization, ignore.case = TRUE)) %>%
+    group_by(so) %>%
+    summarize(Count = n()) %>%
+    rename(`Journal Title` = so) %>%
+    arrange(desc(Count))
+}
+
 publisher_name <- "Microbiology society"
-publisher1 <-  issn_works_cited[grepl(publisher_name, issn_works_cited$host_organization, ignore.case = TRUE), ]
-journal_counts_df <- count_issns_by_publisher(issn_works_cited, publisher_name)
+publisher1 <-  works_cited_source_issn[grepl(publisher_name, works_cited_source_issn$host_organization, ignore.case = TRUE), ]
+journal_counts_df <- count_issns_by_publisher(works_cited_source_issn, publisher_name)
 print(journal_counts_df)
 # Note: Errors
 # https://openalex.org/W2165027548 (1994 v44n3, Journal name changes and ISSN changed)
 
 
 publisher_name <- "Optica Publishing Group"
-publisher1 <-  issn_works_cited[grepl(publisher_name, issn_works_cited$host_organization, ignore.case = TRUE), ]
-journal_counts_df <- count_issns_by_publisher(issn_works_cited, publisher_name)
+publisher1 <-  works_cited_source_issn[grepl(publisher_name, works_cited_source_issn$host_organization, ignore.case = TRUE), ]
+journal_counts_df <- count_issns_by_publisher(works_cited_source_issn, publisher_name)
 print(journal_counts_df)
 
 publisher_name <- "Canadian Science Publishing"
-publisher1 <-  issn_works_cited[grepl(publisher_name, issn_works_cited$host_organization, ignore.case = TRUE), ]
-journal_counts_df <- count_issns_by_publisher(issn_works_cited, publisher_name)
+publisher1 <-  works_cited_source_issn[grepl(publisher_name, works_cited_source_issn$host_organization, ignore.case = TRUE), ]
+journal_counts_df <- count_issns_by_publisher(works_cited_source_issn, publisher_name)
 print(journal_counts_df)
 
 publisher_name <- "IWA publishing"
-publisher1 <-  issn_works_cited[grepl(publisher_name, issn_works_cited$host_organization, ignore.case = TRUE), ]
-journal_counts_df <- count_issns_by_publisher(issn_works_cited, publisher_name)
+publisher1 <-  works_cited_source_issn[grepl(publisher_name, works_cited_source_issn$host_organization, ignore.case = TRUE), ]
+journal_counts_df <- count_issns_by_publisher(works_cited_source_issn, publisher_name)
 print(journal_counts_df)
 
 publisher_name <- "Emerald Publishing"
-publisher1 <-  issn_works_cited[grepl(publisher_name, issn_works_cited$host_organization, ignore.case = TRUE), ]
-journal_counts_df <- count_issns_by_publisher(issn_works_cited, publisher_name)
+publisher1 <-  works_cited_source_issn[grepl(publisher_name, works_cited_source_issn$host_organization, ignore.case = TRUE), ]
+journal_counts_df <- count_issns_by_publisher(works_cited_source_issn, publisher_name)
 print(journal_counts_df)
 write_xlsx(journal_counts_df, "citations/publisher_emerald_2023_counts.xlsx")
 
 publisher_name <- "American Phytopathological Society"
-publisher1 <-  issn_works_cited[grepl(publisher_name, issn_works_cited$host_organization, ignore.case = TRUE), ]
-issns_counts_df <- count_issns_by_publisher(issn_works_cited, publisher_name)
+publisher1 <-  works_cited_source_issn[grepl(publisher_name, works_cited_source_issn$host_organization, ignore.case = TRUE), ]
+issns_counts_df <- count_issns_by_publisher(works_cited_source_issn, publisher_name)
 print(issns_counts_df)
 
 
 publisher_name <- "BMJ"
-publisher1 <-  issn_works_cited[grepl(publisher_name, issn_works_cited$host_organization, ignore.case = TRUE), ]
-issns_counts_df <- count_issns_by_publisher(issn_works_cited, publisher_name)
-print(issns_counts_df)
+publisher1 <-  works_cited_source_issn[grepl(publisher_name, works_cited_source_issn$host_organization, ignore.case = TRUE), ]
+issns_counts_df <- count_issns_by_publisher(works_cited_source_issn, publisher_name)
+print(issns_counts_df, n= Inf)
+view(issns_counts_df)
 
 unique_issns <- unique(publisher1$`issn_l`)
 num_unique_issn<- length(unique_issns)
@@ -1039,12 +1042,12 @@ print(unique_journals)
 
 
 search_string <- "https://openalex.org/W2070851128"
-search_references(search_string, org_works)
+search_references(search_string, works_published)
 
 
 
 # Group by 'host_organization' and count the number of articles for each publisher
-publisher_ranking <- issn_works_cited %>%
+publisher_ranking <- works_cited_source_issn %>%
   group_by(host_organization) %>%
   summarise(article_count = n()) %>%
   arrange(desc(article_count))
