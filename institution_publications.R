@@ -598,6 +598,87 @@ works_cited_source_nonissn_nonarticles <- works_cited_source_nonissn[works_cited
 count_null_empty_id <- sum(is.na(works_cited_source_issn$id) | trimws(works_cited_source_issn$id) == "")
 count_null_empty_id
 
+
+
+
+
+##########################################
+############# Search Functions #######################
+### Search if a publisher is in a DF
+# Output the publisher 
+# @ return: the indices of the publisher
+search_publisher <- function(publisher_string, df) {
+  # Find indices where the host_organization contains the publisher string (case insensitive)
+  indices_with_string <- which(grepl(publisher_string, df$host_organization, ignore.case = TRUE))
+  
+  print(df[indices_with_string, ]$host_organization)
+  print(df[indices_with_string, ]$id)
+  return(indices_with_string)
+}
+
+# Example usage:
+publisher_string <- "Brill"
+result_indices <- search_publisher(publisher_string, works_cited_source_issn)
+
+# Print the indices
+print(result_indices)
+
+#### Function: search_work_publisher(): 
+## Search a work's publisher and output the publisher
+# @return: index of the DF
+search_work_publisher <- function(search_string, df) {
+  # Find indices where the host_organization contains the search string (case insensitive)
+  indices_with_string <- which(sapply(df$id, function(x) !is.na(x) && search_string %in% x))
+  
+  print(df[indices_with_string, ]$host_organization)
+  print(indices_with_string)
+  return(indices_with_string)
+}
+
+# Example usage:
+search_string <- "https://openalex.org/W2944198613"
+result_indices <- search_work_publisher(search_string, works_published)
+
+###############################################################
+# Verify any cited work using the function search_references()
+# Define the function to search for a string in the referenced_works column and print the output
+##############################################3
+search_references <- function(search_string, df) {
+  indices_with_string <- which(sapply(df$referenced_works, function(x) search_string %in% x))
+  print(indices_with_string)
+  print(df[indices_with_string, ]$id)
+}
+
+# Example usage:
+search_string <- "Emerald Publishing"
+search_string <- "Brill"
+result_indices <- search_publisher(search_string, works_published)
+print(result_indices)
+
+# Example usage
+search_string <- "https://openalex.org/W1604958295" 
+search_string <- "https://openalex.org/W2944198613"
+search_string <- "https://openalex.org/W2465933872"
+indices_with_string <- which(sapply(works_published$referenced_works, function(x) search_string %in% x))
+
+search_references(search_string, works_published)
+
+
+truncate_and_write <- function(data, file_path_prefix = "citations/") {
+  data_name <- deparse(substitute(data))
+  file_path <- paste0(file_path_prefix, data_name, ".xlsx")
+  
+  truncated_data <- data %>%
+    mutate(across(where(is.character), ~ ifelse(nchar(.) > 32767, substr(., 1, 32767), .)))
+  
+  write_xlsx(truncated_data, file_path)
+}
+
+# Usage:
+truncate_and_write(publisher_brill)
+#######################################################################
+
+
 # publisher: host_organization
 unique_publishers <- unique(works_cited_source_issn$host_organization)
 # number of publishers: ~1,600
@@ -664,6 +745,9 @@ publisher_uap <- works_cited_source_issn[grepl("University of Arizona Press", wo
 # Emerald: cited (yyyy): 395 (2020), 257 (2021), 322 (2022), 276 (2023), 
 publisher_emerald <- works_cited_source_issn[grepl("Emerald Publishing", works_cited_source_issn$host_organization, ignore.case = TRUE), ]
 
+### Cell press
+publisher_cell_press <- works_cited_source_issn[grepl("Cell Press", works_cited_source_issn$host_organization, ignore.case = TRUE), ]
+
 # IWA: cited (yyyy): 19 (2019), 34 (2020), 21 (2021), 19 (2022),   
 publisher_iwa <- works_cited_source_issn[grepl("IWA Publishing", works_cited_source_issn$host_organization_name, ignore.case = TRUE), ]
 
@@ -671,8 +755,43 @@ id_counts <-table(publisher_iwa$id)
 duplicateds <- id_counts[id_counts >= 1]
 print(id_counts)
 
-### Cell press
-publisher_cell_press <- works_cited_source_issn[grepl("Cell Press", works_cited_source_issn$host_organization, ignore.case = TRUE), ]
+# APS: 
+# 2023: journal (article, review): 166; Non-journal (book-chapter): 0
+# 2022: journal (article, review): 230; Non-journal (book-chapter): 2
+# 2021: journal (article, review) : 170; Non-journal (book-chapter) : 2
+publisher_aps  <- works_cited_source_issn[grepl("American Phytopathological Society", works_cited_source_issn$host_organization, ignore.case = TRUE), ]
+publisher_aps2 <- works_cited_source_nonissn[grepl("American Phytopathological Society", works_cited_source_nonissn$host_organization, ignore.case = TRUE), ]
+
+publisher_aps  <- publisher_aps %>%  mutate(across(where(is.character), ~ ifelse(nchar(.) > 32767, substr(., 1, 32767), .)))
+write_xlsx(publisher_aps, "citations/works_cited_source_issn_aps_2022.xlsx")
+
+# 2025-01: BMJ:
+# 2023: journal (article, review): 1,694 ; Non-journal: 0
+# 2022: journal (article, review): 1,914 ; Non-journal: 0
+# 2021: journal (article, review): 1,815 ; Non-journal: 0
+publisher_bmj  <- works_cited_source_issn[grepl("BMJ", works_cited_source_issn$host_organization, ignore.case = TRUE), ]
+publisher_bmj2 <- works_cited_source_nonissn[grepl("BMJ", works_cited_source_nonissn$host_organization, ignore.case = TRUE), ]
+
+publisher_bmj <- publisher_bmj %>% mutate(across(where(is.character), ~ ifelse(nchar(.) > 32767, substr(., 1, 32767), .)))
+write_xlsx(publisher_bmj, "citations/works_cited_source_issn_bmj_2022.xlsx")
+
+
+# 2025-02: Brill (https://openalex.org/publishers/p4310320561)
+# 2023: 
+works_cited_source_issn_brill  <- works_cited_source_issn[grepl("Brill", works_cited_source_issn$host_organization, ignore.case = TRUE), ]
+works_cited_source_nonissn_brill <- works_cited_source_nonissn[grepl("Brill", works_cited_source_nonissn$host_organization, ignore.case = TRUE), ]
+
+truncate_and_write(works_cited_source_issn_brill)
+truncate_and_write(works_cited_source_nonissn_brill)
+
+works_published_brill <- works_published[grepl("Brill", works_published$host_organization, ignore.case = TRUE), ]
+truncate_and_write(works_published_brill)
+
+id_counts <-table(publisher_brill$id)
+duplicateds <- id_counts[id_counts >= 1]
+print(id_counts)
+
+
 
 publisher_cell_press_unique <- unique(publisher_cell_press)
 df <-publisher_cell_press
@@ -710,95 +829,8 @@ duplicateds <- id_counts[id_counts > 10]
 print(duplicateds)
  
 
-# APS: 
-# 2023: journal (article, review): 166; Non-journal (book-chapter): 0
-# 2022: journal (article, review): 230; Non-journal (book-chapter): 2
-# 2021: journal (article, review) : 170; Non-journal (book-chapter) : 2
 
-publisher_aps  <- works_cited_source_issn[grepl("American Phytopathological Society", works_cited_source_issn$host_organization, ignore.case = TRUE), ]
-publisher_aps2 <- works_cited_source_nonissn[grepl("American Phytopathological Society", works_cited_source_nonissn$host_organization, ignore.case = TRUE), ]
 
-# 2025-01: BMJ:
-# 2023: journal (article, review): 1,694 ; Non-journal: 0
-# 2022: journal (article, review): 1,914 ; Non-journal: 0
-# 2021: journal (article, review): 1,815 ; Non-journal: 0
-
-publisher_bmj  <- works_cited_source_issn[grepl("BMJ", works_cited_source_issn$host_organization, ignore.case = TRUE), ]
-publisher_bmj2 <- works_cited_source_nonissn[grepl("BMJ", works_cited_source_nonissn$host_organization, ignore.case = TRUE), ]
-
-publisher_bmj <- publisher_bmj %>%
-  mutate(across(where(is.character), ~ ifelse(nchar(.) > 32767, substr(., 1, 32767), .)))
-write_xlsx(publisher_bmj, "citations/works_cited_source_issn_bmj_2022.xlsx")
-
-# 2025-02:  Brill (https://openalex.org/publishers/p4310320561)
-publisher_brill  <- works_cited_source_issn[grepl("Brill", works_cited_source_issn$host_organization, ignore.case = TRUE), ]
-publisher_brill2 <- works_cited_source_nonissn[grepl("Brill", works_cited_source_nonissn$host_organization, ignore.case = TRUE), ]
-
-publisher_brill <- publisher_brill %>%
-  mutate(across(where(is.character), ~ ifelse(nchar(.) > 32767, substr(., 1, 32767), .)))
-write_xlsx(publisher_brill, "citations/works_cited_source_issn_brill_2022.xlsx")
-
-###########################################
-### Search if a publisher is in a DF
-# Output the publisher 
-# @ return: the indices of the publisher
-search_publisher <- function(publisher_string, df) {
-  # Find indices where the host_organization contains the publisher string (case insensitive)
-  indices_with_string <- which(grepl(publisher_string, df$host_organization, ignore.case = TRUE))
-  
-  print(df[indices_with_string, ]$host_organization)
-  print(df[indices_with_string, ]$id)
-  return(indices_with_string)
-}
-
-# Example usage:
-publisher_string <- "Brill"
-result_indices <- search_publisher(publisher_string, works_cited_source_issn)
-
-# Print the indices
-print(result_indices)
-
-#### Function: search_work_publisher(): 
-## Search a work's publisher and output the publisher
-# @return: index of the DF
-search_work_publisher <- function(search_string, df) {
-  # Find indices where the host_organization contains the search string (case insensitive)
-  indices_with_string <- which(sapply(df$id, function(x) !is.na(x) && search_string %in% x))
-  
-  print(df[indices_with_string, ]$host_organization)
-  print(indices_with_string)
-  return(indices_with_string)
-}
-
-# Example usage:
-search_string <- "https://openalex.org/W2944198613"
-result_indices <- search_work_publisher(search_string, works_published)
-
-###############################################################
-# Verify any cited work using the function search_references()
-# Define the function to search for a string in the referenced_works column and print the output
-##############################################3
-search_references <- function(search_string, df) {
-  indices_with_string <- which(sapply(df$referenced_works, function(x) search_string %in% x))
-  print(indices_with_string)
-  print(df[indices_with_string, ]$id)
-}
-
-# Example usage:
-search_string <- "Emerald Publishing"
-search_string <- "Brill"
-result_indices <- search_publisher(search_string, works_published)
-print(result_indices)
-
-# Example usage
-search_string <- "https://openalex.org/W1604958295" 
-# openAlex questions: type = "book-chapter", while it has ISSN
-
-search_string <- "https://openalex.org/W2944198613"
-search_string <- "https://openalex.org/W2465933872"
-indices_with_string <- which(sapply(works_published$referenced_works, function(x) search_string %in% x))
-
-search_references(search_string, works_published)
 
 ### Test cases for Microbiology
 # both final published version and pre-print existing: https://openalex.org/works/W4379795917 and https://openalex.org/W4319339791 
@@ -1050,8 +1082,6 @@ print(unique_issns)
 unique_journals <- unique(publisher1$`so`)
 num_unique_issn<- length(unique_journals)
 print(unique_journals)
-
-
 
 
 search_string <- "https://openalex.org/W2070851128"
