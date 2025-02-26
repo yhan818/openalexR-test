@@ -459,6 +459,8 @@ head(works_cited)
 setdiff(works_cited, works_cited2)
 setdiff(works_cited2, works_cited)
 
+### For 2022 data pulled from 2025-01 and 2025-02, there is 18 / 3
+
 ######################################################
 ### There are two types of citations 
 #
@@ -726,7 +728,7 @@ publisher_bmj2 <- works_cited_source_nonissn[grepl("BMJ", works_cited_source_non
 
 publisher_bmj <- publisher_bmj %>%
   mutate(across(where(is.character), ~ ifelse(nchar(.) > 32767, substr(., 1, 32767), .)))
-write_xlsx(publisher_bmj, "citations/publisher_bmj_issn_cited_2022.xlsx")
+write_xlsx(publisher_bmj, "citations/works_cited_source_issn_bmj_2022.xlsx")
 
 # 2025-02:  Brill (https://openalex.org/publishers/p4310320561)
 publisher_brill  <- works_cited_source_issn[grepl("Brill", works_cited_source_issn$host_organization, ignore.case = TRUE), ]
@@ -750,7 +752,7 @@ search_publisher <- function(publisher_string, df) {
 }
 
 # Example usage:
-publisher_string <- "Emerald Publishing"
+publisher_string <- "Brill"
 result_indices <- search_publisher(publisher_string, works_cited_source_issn)
 
 # Print the indices
@@ -769,7 +771,7 @@ search_work_publisher <- function(search_string, df) {
 }
 
 # Example usage:
-search_string <- "https://openalex.org/W2963276645"
+search_string <- "https://openalex.org/W2944198613"
 result_indices <- search_work_publisher(search_string, works_published)
 
 ###############################################################
@@ -784,6 +786,7 @@ search_references <- function(search_string, df) {
 
 # Example usage:
 search_string <- "Emerald Publishing"
+search_string <- "Brill"
 result_indices <- search_publisher(search_string, works_published)
 print(result_indices)
 
@@ -791,8 +794,8 @@ print(result_indices)
 search_string <- "https://openalex.org/W1604958295" 
 # openAlex questions: type = "book-chapter", while it has ISSN
 
-search_string <- "https://openalex.org/W1607198972"
-#search_string <- "https://openalex.org/W3216054981"
+search_string <- "https://openalex.org/W2944198613"
+search_string <- "https://openalex.org/W2465933872"
 indices_with_string <- which(sapply(works_published$referenced_works, function(x) search_string %in% x))
 
 search_references(search_string, works_published)
@@ -890,6 +893,16 @@ search_string <- "https://openalex.org/W2034673450" # 2 times
 search_references(search_string, works_published)
 #
 search_publisher("BMJ", works_published)
+
+
+### Test data for Brill: 2025-02
+## 2022: search journals articles do UA authors cited.
+search_string <- ""
+
+# 2022
+search_string <- "https://openalex.org/W2465933872" # 3 times
+search_string <- "https://openalex.org/"  #2 times
+
 
 
 
