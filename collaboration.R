@@ -97,28 +97,35 @@ country_code_counts <- table(all_country_codes$country_code)
 country_ranking <- as.data.frame(country_code_counts)
 names(country_ranking) <- c("country_code", "count")
 
-# Sort and add rank
-country_ranking <- country_ranking %>%
-  arrange(count) %>%
-  mutate(rank = row_number())
-
 library(countrycode)
 country_ranking <- country_ranking %>%
   mutate(
     country_name = countrycode(country_code, origin = "iso2c", destination = "country.name")
   ) %>%
-  select(country_code, country_name, rank, count) # Rearrange columns
-
-
+  select(country_code, country_name, count) # Rearrange columns
 
 # We know that the df at least containing one UA author. So just need to find out a specific country
 # Example: Find publications with authors from Canada
-us_ca_collaborations <- works_published_multi_authors_nonus %>%
+ua_ca <- works_published_multi_authors_nonus %>%
   filter(
     map_lgl(author, function(author_df) {
       "US" %in% author_df$institution_country_code & "CA" %in% author_df$institution_country_code
     })
   )
+
+ua_in <- works_published_multi_authors_nonus %>%
+  filter(
+    map_lgl(author, function(author_df) {
+      "CA" %in% author_df$institution_country_code
+    })
+  )
+
+diff <- setdiff(ua_ca,ua_in)
+diff <- setdiff(ua_in, ua_ca)
+
+### NEED CHECK>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+###################################
+
 
 ### Step 5: Topics 
 all_topics <- works_published_multi_authors_nonus %>%
