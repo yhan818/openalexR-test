@@ -17,9 +17,11 @@ install.packages("remotes")
 library(openalexR)
 packageVersion("openalexR")
 
+library(jsonlite)
 library(dplyr)
 library(tidyverse)
 library(data.table)
+library(openxlsx)
 library(writexl)
 # free unused obj to manage memory
 gc()
@@ -55,8 +57,8 @@ setwd("/home/yhan/Documents/openalexR-test/")
 UAworks_count <-oa_fetch(
   entity="works",
   institutions.ror=c("03m2x1q45"),
-  from_publication_date ="2022-01-01",
-  to_publication_date = "2022-12-31",
+  from_publication_date ="2023-01-01",
+  to_publication_date = "2023-12-31",
   #primary_location.source.type = "journal",
   count_only = TRUE
 )
@@ -457,7 +459,8 @@ print(time_taken)
 
 head(works_cited)
 setdiff(works_cited, works_cited2)
-setdiff(works_cited2, works_cited)
+dfdiff_2023<-setdiff(works_cited2, works_cited)
+works_cited <- works_cited2
 
 ### For 2022 data pulled from 2025-01 and 2025-02, there is 18 / 3
 
@@ -473,11 +476,7 @@ setdiff(works_cited2, works_cited)
 #### Step 1: Re-generate a new row if it matches (meaning; cited multiple times.)
 
 saveRDS(works_cited, "../works_cited_2022.rds")
-
 saveRDS(works_cited, "../works_cited_2023.rds")
-
-#works_cited_final <- works_cited
-
 saveRDS(works_cited, "../works_cited_2021.rds")
 saveRDS(works_cited, "../works_cited_type_journal_2023.rds")
 
@@ -485,11 +484,10 @@ saveRDS(works_cited, "../works_cited_type_journal_2023.rds")
 works_cited <- readRDS("../works_cited_2019.rds")
 works_cited <- readRDS("../works_cited_2020.rds")
 works_cited <- readRDS("../works_cited_2021.rds")
-
 works_cited <- readRDS("../works_cited_2022.rds")
                              #works_cited_source_journal_2022.rds")
                           
-#works_cited <- readRDS("../works_cited_2023.rds")
+works_cited <- readRDS("../works_cited_2023.rds")
 
 # One is primary.source.type = journal, the other (works_cited_2) contains everything
 # For year 2022, 325,520 : 345,813. 
@@ -601,7 +599,6 @@ count_null_empty_id
 
 
 
-
 ##########################################
 ############# Search Functions #######################
 ### Search if a publisher is in a DF
@@ -664,6 +661,25 @@ indices_with_string <- which(sapply(works_published$referenced_works, function(x
 search_references(search_string, works_published)
 
 
+################### Analyze top journals for each publisher ############
+# Function to rank top cited journals
+# Usage example:
+#rank_top_cited_journals(publisher_nature, "so", 10)  # Top 10 cited journals
+
+rank_top_cited_journals <- function(data, journal_col, top_n = 10) {
+  top_cited_journals <- data %>%
+    group_by(!!sym(journal_col)) %>%      # Group by the journal names (column provided by the user)
+    summarise(citation_count = n()) %>%   # Count the number of articles per journal
+    arrange(desc(citation_count)) %>%     # Sort by citation count in descending order
+    slice(1:top_n)                        # Select top 'n' journals
+  
+  print(top_cited_journals, n = top_n)
+}
+
+rank_top_cited_journals(publisher_nature, "so")
+
+
+
 truncate_and_write <- function(data, file_path_prefix = "citations/") {
   data_name <- deparse(substitute(data))
   file_path <- paste0(file_path_prefix, data_name, ".xlsx")
@@ -674,8 +690,141 @@ truncate_and_write <- function(data, file_path_prefix = "citations/") {
   write_xlsx(truncated_data, file_path)
 }
 
-# Usage:
-truncate_and_write(publisher_brill)
+### Somethis wrong. need debug
+truncate_and_write <- function(df1, df2, df3, file_path_prefix = "citations/", file_name = "combined_data.xlsx") {
+  file_path <- paste0(file_path_prefix, file_name)
+  
+  truncate_data <- function(data) {
+    data %>% 
+      mutate(across(where(is.character), ~ ifelse(nchar(.) > 32767, substr(., 1, 32767), .)))
+    #  mutate(across(where(is.character), ~ ifelse(is.na(.), "", .))) %>%
+    #  mutate(across(where(is.character), ~ ifelse(nchar(.) > 32767, substr(., 1, 32767), .)))
+  }
+  
+  tryCatch({
+    truncated_df1 <- truncate_data(df1)
+    truncated_df2 <- truncate_data(df2)
+    truncated_df3 <- truncate_data(df3)
+    
+    data_list <- list(
+      deparse(substitute(df1)) = truncated_df1,
+      deparse(substitute(df2)) = truncated_df2,
+      deparse(substitute(df3)) = truncated_df3
+    )
+    
+    write_xlsx(data_list, file_path)
+    
+  }, error = function(e) {
+    message("An error occurred: ", e)
+    print(e)
+  })
+}
+
+#usage
+truncate_and_write(works_cited_source_issn_brill, works_cited_source_nonissn_brill, works_published_brill)
+
+
+write_df_to_excel <- function(df, file_path_prefix = "citations/") {
+  df_name <- deparse(substitute(df))
+  file_name <- paste0(df_name, ".xlsx")
+  file_path <- paste0(file_path_prefix, file_name)
+  
+  tryCatch({
+    write_xlsx(df, file_path)
+    message(paste("Successfully wrote", df_name, "to", file_path))
+  }, error = function(e) {
+    message(paste("Error writing", df_name, "to Excel:", e))
+    print(e)
+  })
+}
+
+# 1. Write Individual Excel Files
+write_xlsx(works_cited_source_issn_brill, "citations/issn_brill.xlsx")
+write_xlsx(works_cited_source_nonissn_brill, "citations/nonissn_brill.xlsx")
+write_xlsx(works_published_brill, "citations/published_brill.xlsx")
+
+
+
+write_df_to_excel(works_cited_source_issn_brill)
+write_df_to_excel(works_cited_source_nonissn_brill)
+write_df_to_excel(works_published_brill)
+
+# 2. Combine Excel Files
+excel_files <- c("citations/issn_brill.xlsx", "citations/nonissn_brill.xlsx", "citations/published_brill.xlsx")
+
+tryCatch({
+  wb <- createWorkbook()
+  
+  for (i in seq_along(excel_files)) {
+    df <- read.xlsx(excel_files[i])
+    sheet_name <- gsub("citations/(.*)\\.xlsx", "\\1", excel_files[i]) # Extract sheet name from file name
+    addWorksheet(wb, sheetName = sheet_name)
+    writeData(wb, sheet = sheet_name, x = df)
+  }
+  
+  saveWorkbook(wb, "citations/combined_brill.xlsx", overwrite = TRUE)
+  message("Combination successful!")
+  
+}, error = function(e) {
+  message("Combination failed: ", e)
+  print(e)
+})
+
+combine_3dfs <- function(df1, df2, df3, file_path_prefix = "citations/", combined_file_name = "combined_brill.xlsx") {
+  library(writexl)
+  library(openxlsx)
+  
+  # 1. Write Individual Excel Files
+  write_df_to_excel <- function(df, file_path_prefix) {
+    df_name <- deparse(substitute(df))
+    file_name <- paste0(df_name, ".xlsx")
+    file_path <- paste0(file_path_prefix, file_name)
+    
+    tryCatch({
+      write_xlsx(df, file_path)
+      message(paste("Successfully wrote", df_name, "to", file_path))
+    }, error = function(e) {
+      message(paste("Error writing", df_name, "to Excel:", e))
+      print(e)
+    })
+  }
+  
+  write_df_to_excel(df1, file_path_prefix)
+  write_df_to_excel(df2, file_path_prefix)
+  write_df_to_excel(df3, file_path_prefix)
+  
+  # 2. Combine Excel Files (Read the SAME dfs back)
+  excel_files <- c(
+    paste0(file_path_prefix, deparse(substitute(df1)), ".xlsx"),
+    paste0(file_path_prefix, deparse(substitute(df2)), ".xlsx"),
+    paste0(file_path_prefix, deparse(substitute(df3)), ".xlsx")
+  )
+  
+  tryCatch({
+    wb <- createWorkbook()
+    
+    for (i in seq_along(excel_files)) {
+      df <- read.xlsx(excel_files[i])
+      sheet_name <- gsub(paste0(file_path_prefix, "(.*)\\.xlsx"), "\\1", excel_files[i])
+      sheet_name <- substr(sheet_name, 1, 31) # Truncate to 31 characters
+      
+      addWorksheet(wb, sheetName = sheet_name)
+      writeData(wb, sheet = sheet_name, x = df)
+    }
+    
+    saveWorkbook(wb, paste0(file_path_prefix, combined_file_name), overwrite = TRUE)
+    message("Combination successful!")
+    
+  }, error = function(e) {
+    message("Combination failed: ", e)
+    print(e)
+  })
+}
+
+combine_3dfs(works_cited_source_issn_brill, works_cited_source_nonissn_brill, works_published_brill)
+
+
+
 #######################################################################
 
 
@@ -714,7 +863,7 @@ unique_issn <- unique(publisher_NA$`issn_l`)
 print(unique_issn)
 
 # Not using unnect() because it flattens out every article per author, which creates a lot of duplicated info
-library(jsonlite)
+
 
 # Convert the 'author' dataframe to JSON for each row
 publisher_NA <- publisher_NA %>%
@@ -743,13 +892,22 @@ publisher_ua  <- works_cited_source_issn[grepl("University of Arizona",       wo
 publisher_uap <- works_cited_source_issn[grepl("University of Arizona Press", works_cited_source_issn$host_organization, ignore.case = TRUE), ]
 
 # Emerald: cited (yyyy): 395 (2020), 257 (2021), 322 (2022), 276 (2023), 
-publisher_emerald <- works_cited_source_issn[grepl("Emerald Publishing", works_cited_source_issn$host_organization, ignore.case = TRUE), ]
+works_cited_source_issn_emerald <- works_cited_source_issn[grepl("Emerald Publishing", works_cited_source_issn$host_organization, ignore.case = TRUE), ]
 
 ### Cell press
-publisher_cell_press <- works_cited_source_issn[grepl("Cell Press", works_cited_source_issn$host_organization, ignore.case = TRUE), ]
+works_cited_source_issn_cell <- works_cited_source_issn[grepl("Cell Press", works_cited_source_issn$host_organization, ignore.case = TRUE), ]
+#truncate_and_write(works_cited_source_issn_cell)
+
+publisher_cell_press_unique <- unique(publisher_cell_press)
+df <-publisher_cell_press
+# Use table to count occurrences of each duplicated row
+row_counts <- as.data.frame(table(apply(df, 1, paste, collapse = "-")))
+duplicates_with_counts <- row_counts[row_counts$Freq > 1, ]
+
 
 # IWA: cited (yyyy): 19 (2019), 34 (2020), 21 (2021), 19 (2022),   
-publisher_iwa <- works_cited_source_issn[grepl("IWA Publishing", works_cited_source_issn$host_organization_name, ignore.case = TRUE), ]
+works_cited_source_issn_iwa <- works_cited_source_issn[grepl("IWA Publishing", works_cited_source_issn$host_organization_name, ignore.case = TRUE), ]
+truncate_and_write(works_cited_source_issn_iwa)
 
 id_counts <-table(publisher_iwa$id)
 duplicateds <- id_counts[id_counts >= 1]
@@ -759,45 +917,48 @@ print(id_counts)
 # 2023: journal (article, review): 166; Non-journal (book-chapter): 0
 # 2022: journal (article, review): 230; Non-journal (book-chapter): 2
 # 2021: journal (article, review) : 170; Non-journal (book-chapter) : 2
-publisher_aps  <- works_cited_source_issn[grepl("American Phytopathological Society", works_cited_source_issn$host_organization, ignore.case = TRUE), ]
-publisher_aps2 <- works_cited_source_nonissn[grepl("American Phytopathological Society", works_cited_source_nonissn$host_organization, ignore.case = TRUE), ]
+works_cited_source_issn_aps  <- works_cited_source_issn[grepl("American Phytopathological Society", works_cited_source_issn$host_organization, ignore.case = TRUE), ]
+works_cited_source_nonissn_aps <- works_cited_source_nonissn[grepl("American Phytopathological Society", works_cited_source_nonissn$host_organization, ignore.case = TRUE), ]
 
-publisher_aps  <- publisher_aps %>%  mutate(across(where(is.character), ~ ifelse(nchar(.) > 32767, substr(., 1, 32767), .)))
-write_xlsx(publisher_aps, "citations/works_cited_source_issn_aps_2022.xlsx")
+#truncate_and_write(works_cited_source_issn_aps,works_cited_source_nonissn_aps, )
+
+# Create a list to hold the data frames
+cited_all_types <- list(
+  APS_journal_type = publisher_aps, 
+  APS_non_journal_type = publisher_aps2  
+)
+# Write the list to an Excel file with each data frame as a separate sheet
+write_xlsx(cited_all_types, "citations/publisher_aps_cited_works_2022.xlsx")
+
+
 
 # 2025-01: BMJ:
 # 2023: journal (article, review): 1,694 ; Non-journal: 0
 # 2022: journal (article, review): 1,914 ; Non-journal: 0
 # 2021: journal (article, review): 1,815 ; Non-journal: 0
-publisher_bmj  <- works_cited_source_issn[grepl("BMJ", works_cited_source_issn$host_organization, ignore.case = TRUE), ]
-publisher_bmj2 <- works_cited_source_nonissn[grepl("BMJ", works_cited_source_nonissn$host_organization, ignore.case = TRUE), ]
+works_cited_source_issn_bmj  <- works_cited_source_issn[grepl("BMJ", works_cited_source_issn$host_organization, ignore.case = TRUE), ]
+works_cited_source_nonissn_bmj <- works_cited_source_nonissn[grepl("BMJ", works_cited_source_nonissn$host_organization, ignore.case = TRUE), ]
 
-publisher_bmj <- publisher_bmj %>% mutate(across(where(is.character), ~ ifelse(nchar(.) > 32767, substr(., 1, 32767), .)))
-write_xlsx(publisher_bmj, "citations/works_cited_source_issn_bmj_2022.xlsx")
+truncate_and_write(works_cited_source_issn_bmj)
 
 
 # 2025-02: Brill (https://openalex.org/publishers/p4310320561)
 # 2023: 
+# 2022: 110 (ISSN), 37 (Nonissn)
 works_cited_source_issn_brill  <- works_cited_source_issn[grepl("Brill", works_cited_source_issn$host_organization, ignore.case = TRUE), ]
 works_cited_source_nonissn_brill <- works_cited_source_nonissn[grepl("Brill", works_cited_source_nonissn$host_organization, ignore.case = TRUE), ]
-
-truncate_and_write(works_cited_source_issn_brill)
-truncate_and_write(works_cited_source_nonissn_brill)
-
 works_published_brill <- works_published[grepl("Brill", works_published$host_organization, ignore.case = TRUE), ]
-truncate_and_write(works_published_brill)
 
-id_counts <-table(publisher_brill$id)
+# Combine all the above 3 dfs into one Excel
+combine_3dfs(works_cited_source_issn_brill, works_cited_source_nonissn_brill, works_published_brill)
+rank_top_cited_journals(works_cited_source_issn_brill, "so")
+
+
+
+id_counts <-table(works_cited_source_issn_brill$id)
 duplicateds <- id_counts[id_counts >= 1]
 print(id_counts)
 
-
-
-publisher_cell_press_unique <- unique(publisher_cell_press)
-df <-publisher_cell_press
-# Use table to count occurrences of each duplicated row
-row_counts <- as.data.frame(table(apply(df, 1, paste, collapse = "-")))
-duplicates_with_counts <- row_counts[row_counts$Freq > 1, ]
 
 
 ### origin works: test case: 
@@ -964,38 +1125,6 @@ duplicate_multi_cited_rows_unique <- duplicate_multi_cited_rows[!duplicated(dupl
 # write_xlsx(duplicate_multi_cited_rows, "citations/duplicate_multi_cited_2023.xlsx")
 # write_xlsx(duplicate_multi_cited_rows_unique, "citations/duplicate_multi_cited_unique_2023.xlsx")
 
-# Save the modified dataset to Excel
-write_xlsx(publisher_NA, "citations/publisher_jouranl_NA_2023.xlsx")
-write_xlsx(publisher_aaas, "citations/publisher_aaas_2023.xlsx")
-write_xlsx(publisher_nature, "citations/publisher_nature_2023.xlsx")
-write_xlsx(publisher_plos, "citations/publisher_plos_2023.xlsx")
-write_xlsx(publisher_microbiology, "citations/publisher_microbiology_2023.xlsx")
-
-write_xlsx(publisher_emerald, "citations/publisher_journal_emerald_2023.xlsx")
-write_xlsx(publisher_emerald2, "citations/publisher_emerald_2023.xlsx")
-
-write_xlsx(publisher_iwa, "citations/publisher_iwa_2023.xlsx")
-
-publisher_cell_press <- publisher_cell_press %>%
-  mutate(across(where(is.character), ~ ifelse(nchar(.) > 32767, substr(., 1, 32767), .)))
-write_xlsx(publisher_cell_press, "citations/publisher_journal_cell_press_2022.xlsx")
-
-publisher_aps <- publisher_aps %>%
-  mutate(across(where(is.character), ~ ifelse(nchar(.) > 32767, substr(., 1, 32767), .)))
-write_xlsx(publisher_aps, "citations/publisher_aps_journal_2023.xlsx")
-
-publisher_aps2 <- publisher_aps2 %>%
-  mutate(across(where(is.character), ~ ifelse(nchar(.) > 32767, substr(., 1, 32767), .)))
-write_xlsx(publisher_aps2, "citations/publisher_aps_non_journal_2022.xlsx")
-
-# Create a list to hold the data frames
-cited_all_types <- list(
-  APS_journal_type = publisher_aps, 
-  APS_non_journal_type = publisher_aps2  
-)
-# Write the list to an Excel file with each data frame as a separate sheet
-write_xlsx(cited_all_types, "citations/publisher_aps_cited_works_2022.xlsx")
-
 
 
 
@@ -1154,23 +1283,4 @@ view(publisher_ranking)
 # View the top 50 publishers.  
 # Top 10: Elsevier (20%), Wiley (9%), Oxford University Press (7%), ICP (5%), Springer(5%), Nature,
 # IOP Publishing, Lippincott Williams & Wilkins, Taylor & Francis, SAGE Publishing (2%)
-
-################### Analyze top journals for each publisher ############
-# Function to rank top cited journals
-# Usage example:
-#rank_top_cited_journals(publisher_nature, "so", 10)  # Top 10 cited journals
-
-rank_top_cited_journals <- function(data, journal_col, top_n = 10) {
-  top_cited_journals <- data %>%
-    group_by(!!sym(journal_col)) %>%      # Group by the journal names (column provided by the user)
-    summarise(citation_count = n()) %>%   # Count the number of articles per journal
-    arrange(desc(citation_count)) %>%     # Sort by citation count in descending order
-    slice(1:top_n)                        # Select top 'n' journals
-  
-  print(top_cited_journals, n = top_n)
-}
-
-rank_top_cited_journals(publisher_plos, "so")
-rank_top_cited_journals(publisher_aaas, "so")
-rank_top_cited_journals(publisher_nature, "so")
 
