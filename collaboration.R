@@ -166,3 +166,62 @@ topic_counts <- all_topics %>%
   arrange(desc(count))
 
 print(topic_counts)
+
+### Step 6: Unique institutions at that country
+nrow(ua_country_collaboration)
+names(ua_country_collaboration$author[[1]])
+
+ua_country_unnested <- ua_country_collaboration %>%
+  unnest(cols = c(author))
+
+# Get all the institutions from the specific country
+ua_country_institutions <- ua_country_unnested %>%
+  filter(institution_country_code == "IN") %>% # Filter the country using the country code
+  select(id, title, au_id, au_display_name, institution_display_name, institution_country_code, topics) # Get the institutions
+
+# Sort these institutions by number of times appearing 
+ua_country_institutions_sorted <- ua_country_institutions %>%
+  group_by(institution_display_name) %>% # Group by institution name
+  summarise(count = n()) %>% # Count occurrences
+  arrange(desc(count)) # Sort in descending order
+
+# Within the specific institutions to find out the topics. 
+# Get the top institution name (the one with the highest count)
+top_institution <- ua_country_institutions_sorted$institution_display_name[1]
+print(top_institution)
+
+# Find the topics for the top institutions
+top_institution_topics <- ua_country_institutions %>%
+  filter(institution_display_name == top_institution) %>%
+  pull(topics) %>%
+  map_dfr(function(topic_df) {
+    if ("display_name" %in% names(topic_df)) {
+      return(data.frame(topic = topic_df$display_name))
+    } else {
+      return(data.frame(topic = character(0)))
+    }
+  }) %>%
+  distinct(topic) %>%
+  count()
+
+print(top_institution_topics)
+
+#To list the topics instead of the count
+top_institution_topics_list <- ua_country_institutions %>%
+  filter(institution_display_name == top_institution) %>%
+  pull(topics) %>%
+  map_dfr(function(topic_df) {
+    if ("display_name" %in% names(topic_df)) {
+      return(data.frame(topic = topic_df$display_name))
+    } else {
+      return(data.frame(topic = character(0)))
+    }
+  }) %>%
+  distinct(topic)
+
+print(top_institution_topics_list)
+
+
+# output in multipel worksheets with Excel
+# 1. Details . 2. sorting results. 3. Topics. 
+
