@@ -76,6 +76,9 @@ works_published_multi_authors_us <- works_published_multi_authors %>%
   ) %>% 
   filter(!nonus_author)
 
+ua_other_nations_collaboration_percent <- (nrow(works_published_multi_authors_nonus) / nrow(works_published)) * 100
+print(ua_other_nations_collaboration_percent)
+
 ### Step 4: Use NonUS author works to figure out collaboration.
 head(works_published_multi_authors_nonus)
 
@@ -90,35 +93,52 @@ all_country_codes <- works_published_multi_authors_nonus %>%
     }
   })
 
-# Count the occurrences of each country code
+# Count the occurrences of each country code. 
+# 2023: 144 countries
 country_code_counts <- table(all_country_codes$country_code)
 
 # Convert to a new df 
-country_ranking <- as.data.frame(country_code_counts)
-names(country_ranking) <- c("country_code", "count")
+country_counts_full_name <- as.data.frame(country_code_counts)
+names(country_counts_full_name) <- c("country_code", "count")
 
 library(countrycode)
-country_ranking <- country_ranking %>%
+country_counts_full_name <- country_counts_full_name %>%
   mutate(
     country_name = countrycode(country_code, origin = "iso2c", destination = "country.name")
   ) %>%
   select(country_code, country_name, count) # Rearrange columns
 
+# ranking by # of collaborated authors' 
+country_ranking <- country_counts_full_name %>%
+  mutate(
+    country_name = countrycode(country_code, origin = "iso2c", destination = "country.name")
+  ) %>%
+  arrange(desc(count)) %>% # Sort by count in ascending order
+  select(country_code, country_name, count) # Rearrange columns
+
 # We know that the df at least containing one UA author. So just need to find out a specific country
-# Example: Find publications with authors from Canada
-ua_ca <- works_published_multi_authors_nonus %>%
+# Example: Find publications with authors from Mexico
+
+ua_mx <- works_published_multi_authors_nonus %>%
   filter(
     map_lgl(author, function(author_df) {
-      "US" %in% author_df$institution_country_code & "CA" %in% author_df$institution_country_code
+      "MX" %in% author_df$institution_country_code
     })
   )
+unique_titles <- unique(ua_mx$title)
+print(unique_titles)
 
 ua_in <- works_published_multi_authors_nonus %>%
   filter(
     map_lgl(author, function(author_df) {
-      "CA" %in% author_df$institution_country_code
+      "IN" %in% author_df$institution_country_code
     })
   )
+unique_titles <- unique(ua_in$title)
+print(unique_titles)
+
+
+
 
 diff <- setdiff(ua_ca,ua_in)
 diff <- setdiff(ua_in, ua_ca)
@@ -128,17 +148,21 @@ diff <- setdiff(ua_in, ua_ca)
 
 
 ### Step 5: Topics 
-all_topics <- works_published_multi_authors_nonus %>%
+ua_country_collaboration <- ua_in
+
+all_topics <- ua_country_collaboration %>%
   pull(topics) %>%
   map_dfr(function(topic_df) {
-    if ("display_name" %in% names(topic_df)){
+    if ("display_name" %in% names(topic_df)) {
       return(data.frame(topic = topic_df$display_name))
     } else {
-      return(data.frame(topic = character(0)))
+      return(data.frame(topic = character(0))) # Handle missing column
     }
-    
   })
 
-topic_counts <- table(all_topics$topic)
-print(topic_counts)
+topic_counts <- all_topics %>%
+  group_by(topic) %>%
+  summarise(count = n()) %>%
+  arrange(desc(count))
 
+print(topic_counts)
