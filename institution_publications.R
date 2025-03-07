@@ -763,14 +763,15 @@ tryCatch({
   }
   
   saveWorkbook(wb, "citations/combined_brill.xlsx", overwrite = TRUE)
-  message("Combination successful!")
+  message("!!! Combination successful!")
   
 }, error = function(e) {
   message("Combination failed: ", e)
   print(e)
 })
 
-combine_3dfs <- function(df1, df2, df3, file_path_prefix = "citations/", combined_file_name = "combined_brill.xlsx") {
+#### This works too ### 
+combine_3dfs <- function(df1, df2, df3, file_path_prefix = "citations/", combined_file_name = "2combined_brill.xlsx") {
   library(writexl)
   library(openxlsx)
   
