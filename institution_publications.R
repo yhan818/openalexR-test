@@ -102,12 +102,23 @@ works_published_2023 <-oa_fetch(
   #primary_location.source.type = "journal"
 )
 
+works_published_2024 <-oa_fetch(
+  entity="works",
+  institutions.ror=c("03m2x1q45"),
+  from_publication_date ="2024-01-01",
+  to_publication_date = "2024-12-31",
+)
+
+
+
 # Save data
 # saveRDS(works_published_2019, "../works_published_2019.rds")
 # saveRDS(works_published_2020, "../works_published_2020.rds")
 saveRDS(works_published_2021, "../works_published_2021.rds")
 saveRDS(works_published_2022, "../works_published_2022.rds")
 saveRDS(works_published_2023, "../works_published_2023.rds")
+saveRDS(works_published_2024, "../works_published_2024.rds")
+
 
 # Load data 
 works_published_2019 <- readRDS("../works_published_2019.rds")
@@ -128,6 +139,7 @@ works_published_2023_old <- readRDS("../works_published_2023_202410.rds")
 works_published_2023 <- readRDS("../works_published_2023.rds")
 # to filter "journal" works only. I feel it shall not be this restrict. (other works like grey literature are good too)
 works_published <- works_published_2023
+
 
 ##########################################################################################
 #### Testing the later fetched dataset and comparing it with the previous fetched data
@@ -575,7 +587,21 @@ head(matching_rows$id)
 # 2020: 382,495 articles out of 421,866 works: 91%
 # 2019: 291,705 articles out of 323,779 works: 90%
 
-# Filter rows where issn_l is neither NA nor an empty string
+########################################################################################
+#########################################################################################
+### Step 2: Separate works_cited using criteria such as "type", "ISSN" or other criteria
+# Step 2.1: One way is via type = article
+works_cited_type_articles    <- subset(works_cited, type == "article")
+unique(works_cited_type_articles$type)
+unique_issns <- unique(works_cited_type_articles$issn_l)
+number_of_unique_issns <- length(unique_issns)
+
+works_cited_type_nonarticles <- subset(works_cited, type != "article")
+unique(works_cited_type_nonarticles$type)
+unique_issns2 <- unique(works_cited_type_nonarticles$issn_l)
+number_of_unique_issns2 <- length(unique_issns2)
+
+# Step 2.2: The other way is to filter rows where issn_l is neither NA nor an empty string
 works_cited_source_issn_index <- !is.na(works_cited$issn_l) & works_cited$issn_l != ""
 # Subset "articles"
 works_cited_source_issn <- works_cited[works_cited_source_issn_index, ]
@@ -585,7 +611,6 @@ works_cited_source_nonissn <- works_cited[!works_cited_source_issn_index, ]
 
 #############################
 # Filter records where type is "article" (excluding conference paper etc )
-
 works_cited_source_issn_articles    <- works_cited_source_issn[works_cited_source_issn$type == "article", ]
 works_cited_source_issn_nonarticles <- works_cited_source_issn[works_cited_source_issn$type != "article", ]
 
@@ -615,7 +640,7 @@ search_publisher <- function(publisher_string, df) {
 
 # Example usage:
 publisher_string <- "Brill"
-result_indices <- search_publisher(publisher_string, works_cited_source_issn)
+result_indices <- search_publisher(publisher_string, works_cited_type_article)
 
 # Print the indices
 print(result_indices)
@@ -678,156 +703,8 @@ rank_top_cited_journals <- function(data, journal_col, top_n = 10) {
 
 rank_top_cited_journals(publisher_nature, "so")
 
-
-
-truncate_and_write <- function(data, file_path_prefix = "citations/") {
-  data_name <- deparse(substitute(data))
-  file_path <- paste0(file_path_prefix, data_name, ".xlsx")
-  
-  truncated_data <- data %>%
-    mutate(across(where(is.character), ~ ifelse(nchar(.) > 32767, substr(., 1, 32767), .)))
-  
-  write_xlsx(truncated_data, file_path)
-}
-
-### Somethis wrong. need debug
-truncate_and_write <- function(df1, df2, df3, file_path_prefix = "citations/", file_name = "combined_data.xlsx") {
-  file_path <- paste0(file_path_prefix, file_name)
-  
-  truncate_data <- function(data) {
-    data %>% 
-      mutate(across(where(is.character), ~ ifelse(nchar(.) > 32767, substr(., 1, 32767), .)))
-    #  mutate(across(where(is.character), ~ ifelse(is.na(.), "", .))) %>%
-    #  mutate(across(where(is.character), ~ ifelse(nchar(.) > 32767, substr(., 1, 32767), .)))
-  }
-  
-  tryCatch({
-    truncated_df1 <- truncate_data(df1)
-    truncated_df2 <- truncate_data(df2)
-    truncated_df3 <- truncate_data(df3)
-    
-    data_list <- list(
-      deparse(substitute(df1)) = truncated_df1,
-      deparse(substitute(df2)) = truncated_df2,
-      deparse(substitute(df3)) = truncated_df3
-    )
-    
-    write_xlsx(data_list, file_path)
-    
-  }, error = function(e) {
-    message("An error occurred: ", e)
-    print(e)
-  })
-}
-
-#usage
-truncate_and_write(works_cited_source_issn_brill, works_cited_source_nonissn_brill, works_published_brill)
-
-
-write_df_to_excel <- function(df, file_path_prefix = "citations/") {
-  df_name <- deparse(substitute(df))
-  file_name <- paste0(df_name, ".xlsx")
-  file_path <- paste0(file_path_prefix, file_name)
-  
-  tryCatch({
-    write_xlsx(df, file_path)
-    message(paste("Successfully wrote", df_name, "to", file_path))
-  }, error = function(e) {
-    message(paste("Error writing", df_name, "to Excel:", e))
-    print(e)
-  })
-}
-
-# 1. Write Individual Excel Files
-write_xlsx(works_cited_source_issn_brill, "citations/issn_brill.xlsx")
-write_xlsx(works_cited_source_nonissn_brill, "citations/nonissn_brill.xlsx")
-write_xlsx(works_published_brill, "citations/published_brill.xlsx")
-
-
-
-write_df_to_excel(works_cited_source_issn_brill)
-write_df_to_excel(works_cited_source_nonissn_brill)
-write_df_to_excel(works_published_brill)
-
-# 2. Combine Excel Files
-excel_files <- c("citations/issn_brill.xlsx", "citations/nonissn_brill.xlsx", "citations/published_brill.xlsx")
-
-tryCatch({
-  wb <- createWorkbook()
-  
-  for (i in seq_along(excel_files)) {
-    df <- read.xlsx(excel_files[i])
-    sheet_name <- gsub("citations/(.*)\\.xlsx", "\\1", excel_files[i]) # Extract sheet name from file name
-    addWorksheet(wb, sheetName = sheet_name)
-    writeData(wb, sheet = sheet_name, x = df)
-  }
-  
-  saveWorkbook(wb, "citations/combined_brill.xlsx", overwrite = TRUE)
-  message("!!! Combination successful!")
-  
-}, error = function(e) {
-  message("Combination failed: ", e)
-  print(e)
-})
-
-#### This works too ### 
-combine_3dfs <- function(df1, df2, df3, file_path_prefix = "citations/", combined_file_name = "2combined_brill.xlsx") {
-  library(writexl)
-  library(openxlsx)
-  
-  # 1. Write Individual Excel Files
-  write_df_to_excel <- function(df, file_path_prefix) {
-    df_name <- deparse(substitute(df))
-    file_name <- paste0(df_name, ".xlsx")
-    file_path <- paste0(file_path_prefix, file_name)
-    
-    tryCatch({
-      write_xlsx(df, file_path)
-      message(paste("Successfully wrote", df_name, "to", file_path))
-    }, error = function(e) {
-      message(paste("Error writing", df_name, "to Excel:", e))
-      print(e)
-    })
-  }
-  
-  write_df_to_excel(df1, file_path_prefix)
-  write_df_to_excel(df2, file_path_prefix)
-  write_df_to_excel(df3, file_path_prefix)
-  
-  # 2. Combine Excel Files (Read the SAME dfs back)
-  excel_files <- c(
-    paste0(file_path_prefix, deparse(substitute(df1)), ".xlsx"),
-    paste0(file_path_prefix, deparse(substitute(df2)), ".xlsx"),
-    paste0(file_path_prefix, deparse(substitute(df3)), ".xlsx")
-  )
-  
-  tryCatch({
-    wb <- createWorkbook()
-    
-    for (i in seq_along(excel_files)) {
-      df <- read.xlsx(excel_files[i])
-      sheet_name <- gsub(paste0(file_path_prefix, "(.*)\\.xlsx"), "\\1", excel_files[i])
-      sheet_name <- substr(sheet_name, 1, 31) # Truncate to 31 characters
-      
-      addWorksheet(wb, sheetName = sheet_name)
-      writeData(wb, sheet = sheet_name, x = df)
-    }
-    
-    saveWorkbook(wb, paste0(file_path_prefix, combined_file_name), overwrite = TRUE)
-    message("Combination successful!")
-    
-  }, error = function(e) {
-    message("Combination failed: ", e)
-    print(e)
-  })
-}
-
-combine_3dfs(works_cited_source_issn_brill, works_cited_source_nonissn_brill, works_published_brill)
-
-
-
 #######################################################################
-
+### Step 4: Getting analysis for a specific publisher
 
 # publisher: host_organization
 unique_publishers <- unique(works_cited_source_issn$host_organization)
@@ -944,11 +821,31 @@ truncate_and_write(works_cited_source_issn_bmj)
 
 
 # 2025-02: Brill (https://openalex.org/publishers/p4310320561)
-# 2023: 
-# 2022: 110 (ISSN), 37 (Nonissn)
+# 2023: 100 (article), 54 (nonarticle)
+# 2022: 
+
+# Criteria: article and nonarticle.
+works_cited_type_articles_brill <- works_cited_type_articles %>%
+  filter(grepl("Brill", host_organization, ignore.case = TRUE))
+
+works_cited_type_nonarticles_brill <- works_cited_type_nonarticles %>%
+  filter(grepl("Brill", host_organization, ignore.case = TRUE))
+
+works_published_brill <- works_published %>%
+  filter(grepl("Brill", host_organization, ignore.case = TRUE))
+
+
+# The other criteria: choose one for output
 works_cited_source_issn_brill  <- works_cited_source_issn[grepl("Brill", works_cited_source_issn$host_organization, ignore.case = TRUE), ]
 works_cited_source_nonissn_brill <- works_cited_source_nonissn[grepl("Brill", works_cited_source_nonissn$host_organization, ignore.case = TRUE), ]
 works_published_brill <- works_published[grepl("Brill", works_published$host_organization, ignore.case = TRUE), ]
+
+
+
+# Assign values for final output
+works_cited_articles_brill <-  works_cited_type_articles
+works_cited_nonarticles_brill <- works_cited_type_nonarticles
+  
 
 # Combine all the above 3 dfs into one Excel
 combine_3dfs(works_cited_source_issn_brill, works_cited_source_nonissn_brill, works_published_brill)
@@ -1284,4 +1181,48 @@ view(publisher_ranking)
 # View the top 50 publishers.  
 # Top 10: Elsevier (20%), Wiley (9%), Oxford University Press (7%), ICP (5%), Springer(5%), Nature,
 # IOP Publishing, Lippincott Williams & Wilkins, Taylor & Francis, SAGE Publishing (2%)
+
+
+### Step 5: Final output to Excel
+
+write_df_to_excel <- function(df, file_path_prefix = "citations/") {
+  df_name <- deparse(substitute(df))
+  file_name <- paste0(df_name, ".xlsx")
+  file_path <- paste0(file_path_prefix, file_name)
+  
+  tryCatch({
+    write_xlsx(df, file_path)
+    message(paste("Successfully wrote", df_name, "to", file_path))
+  }, error = function(e) {
+    message(paste("Error writing", df_name, "to Excel:", e))
+    print(e)
+  })
+}
+
+# 1. Write Individual Excel Files
+write_df_to_excel(works_cited_type_articles_brill)
+write_df_to_excel(works_cited_type_nonarticles_brill)
+write_df_to_excel(works_published_brill)
+
+# 2. Combine Excel Files
+excel_files <- c("citations/issn_brill.xlsx", "citations/nonissn_brill.xlsx", "citations/published_brill.xlsx")
+
+tryCatch({
+  wb <- createWorkbook()
+  
+  for (i in seq_along(excel_files)) {
+    df <- read.xlsx(excel_files[i])
+    sheet_name <- gsub("citations/(.*)\\.xlsx", "\\1", excel_files[i]) # Extract sheet name from file name
+    addWorksheet(wb, sheetName = sheet_name)
+    writeData(wb, sheet = sheet_name, x = df)
+  }
+  
+  saveWorkbook(wb, "citations/combined_brill.xlsx", overwrite = TRUE)
+  message("!!! Combination successful!")
+  
+}, error = function(e) {
+  message("Combination failed: ", e)
+  print(e)
+})
+
 

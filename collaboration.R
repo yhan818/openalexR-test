@@ -26,16 +26,23 @@ options (openalexR.mailto="yhan@arizona.edu")
 getwd()
 setwd("/home/yhan/Documents/openalexR-test/")
 
-works_published_2022 <- readRDS("../works_published_2022.rds")
+works_published_2024 <- readRDS("../works_published_2024.rds")
 
-works_published <- works_published_2022
+works_published <- works_published_2024
+head(works_published)
 
 ##### Steps:
-### 1. Get the authors of the works
-works_published_authors <- works_published %>% select(id, title, author, topics)
+### Step 1: filter by type = article 
+works_published_type_articles    <- works_published %>% filter(type == "article")
+works_published_type_nonarticles <- works_published %>% filter(type != "article")
+
+### Step 2: Get the authors of the works and related topic-subfield-field-domain structure
+# including primary_topic_display_name, primary_topic_subfield_display_name, primary_topic_field_display_name, and primary_topic_domain_display_name
+#
+# works_published_type_article_authors <- works_published_type_article %>% select(id, doi, title, publication_date, so, host_organization, author, type, referenced_works, topics)
 
 ### Step 2: Identify multi-author papers
-works_published_multi_authors <- works_published_authors %>%
+works_published_type_articles_authors <- works_published_type_articles %>%
   mutate(
     author_count = map_int(author, nrow), # Get the number of rows in each nested df
     has_multiple_authors = author_count > 1 # Check if there are multiple rows
@@ -45,7 +52,7 @@ works_published_multi_authors <- works_published_authors %>%
 # works_published_multi_authors has a new column:
 # - nonus_author: TRUE if at least one author is from a non-US country, FALSE otherwise.
 
-works_published_multi_authors_nonus <- works_published_multi_authors %>%
+works_published_type_articles_authors_nonus <- works_published_type_articles_authors %>%
   mutate(
     nonus_author = map_lgl(author, function(author_df) {
       if (nrow(author_df) == 0) {
@@ -61,70 +68,49 @@ works_published_multi_authors_nonus <- works_published_multi_authors %>%
   filter(nonus_author)
 
 # US authors only. For future use. 
-works_published_multi_authors_us <- works_published_multi_authors %>%
-  mutate(
-    nonus_author = map_lgl(author, function(author_df) {
-      if (nrow(author_df) == 0) {
-        return(FALSE) # No authors, so no non-US authors
-      } else if (!"institution_country_code" %in% names(author_df)) {
-        warning("Nested author data frame missing 'institution_country_code' column.")
-        return(FALSE) # Missing column, assume no non-US authors
-      } else {
-        any(author_df$institution_country_code != "US" & !is.na(author_df$institution_country_code))
-      }
-    })
-  ) %>% 
-  filter(!nonus_author)
+works_published_type_authors_us 
 
-ua_other_nations_collaboration_percent <- (nrow(works_published_multi_authors_nonus) / nrow(works_published)) * 100
-print(ua_other_nations_collaboration_percent)
 
 ### Step 4: Use NonUS author works to figure out collaboration.
-head(works_published_multi_authors_nonus)
+head(works_published_type_articles_authors_nonus)
 
-# Example: Get all country codes from all nested author data frames
-all_country_codes <- works_published_multi_authors_nonus %>%
-  pull(author) %>%
-  map_dfr(function(author_df) {
-    if ("institution_country_code" %in% names(author_df)) {
-      return(data.frame(country_code = author_df$institution_country_code))
-    } else {
-      return(data.frame(country_code = character(0))) # Handle missing column
-    }
-  })
-
-### Count the occurrences of each country code. 
-# 2023: 144 countries
-# 2022: 139 countries
-country_code_counts <- table(all_country_codes$country_code)
-
-# Convert to a new df 
-country_counts_full_name <- as.data.frame(country_code_counts)
-names(country_counts_full_name) <- c("country_code", "count")
-
-library(countrycode)
-country_counts_full_name <- country_counts_full_name %>%
+# Add country codes summary for each work
+works_with_country_codes <- works_published_type_articles_authors_nonus %>%
   mutate(
-    country_name = countrycode(country_code, origin = "iso2c", destination = "country.name")
+    country_codes_summary = map(author, function(author_df) {
+      if ("institution_country_code" %in% names(author_df)) {
+        codes <- unique(author_df$institution_country_code[!is.na(author_df$institution_country_code)])
+        return(paste(sort(codes), collapse = ", "))
+      } else {
+        return(NA_character_)
+      }
+    })
   ) %>%
-  select(country_code, country_name, count) # Rearrange columns
+  select(id, title, country_codes_summary, everything())
 
-# ranking by # of collaborated authors' 
-country_ranking <- country_counts_full_name %>%
-  mutate(
-    country_name = countrycode(country_code, origin = "iso2c", destination = "country.name")
-  ) %>%
-  arrange(desc(count)) %>% # Sort by count in ascending order
-  select(country_code, country_name, count) # Rearrange columns
+# Display the results
+head(works_with_country_codes %>% select(title, country_codes_summary))
 
-# We know that the df at least containing one UA author. So just need to find out a specific country
-# Example: Find publications with authors from Mexico
+# Example: Get all country codes from all nested author data frames. Unnested. 
+# all_country_codes <- works_published_multi_authors_nonus %>%
+#  pull(author) %>%
+#  map_dfr(function(author_df) {
+#    if ("institution_country_code" %in% names(author_df)) {
+#      return(data.frame(country_code = author_df$institution_country_code))
+#    } else {
+#      return(data.frame(country_code = character(0))) # Handle missing column
+#    }
+#  })
+#country_code_counts <- table(all_country_codes$country_code)
 
 ### Change country code here: "IN", "MX", 
-ua_country <- works_published_multi_authors_nonus %>%
+# Create a variable for the target country code
+target_country_code <- "IN"  # Change this value for different countries
+
+ua_country <- works_with_country_codes %>%
   filter(
     map_lgl(author, function(author_df) {
-      "IN" %in% author_df$institution_country_code
+      target_country_code %in% author_df$institution_country_code
     })
   )
 unique_titles <- unique(ua_country$title)
@@ -132,44 +118,13 @@ print(unique_titles)
 
 head(ua_country)
 
+### Step 6: Find the dept/unit within the University of Arizona. 
 ### From here, we can find out the author relationship between UA authors and other country authors. 
 # extract U of Arizona au_affiliation_raw from each work: So that we know which dept/author with that country dept/author
 
-arizona_affiliations <- ua_country %>%
-  mutate(
-    arizona_authors = map(author, function(author_df) {
-      author_df %>%
-        filter(institution_display_name == "University of Arizona") %>%
-        pull(au_affiliation_raw)
-    })
-  ) %>%
-  select(id, title, arizona_authors)
 
-##############################################33
+### Step 7: Topics 
 
-ua_country_affiliations <- ua_country %>%
-  mutate(
-    combined_authors = map(author, function(author_df) {
-      combined <- author_df %>%
-        filter(institution_display_name == "University of Arizona" | institution_country_code == "IN") %>%
-        select(au_affiliation_raw, institution_display_name, institution_country_code)
-      
-      return(combined)
-    })
-  ) %>%
-  unnest(cols = c(combined_authors)) %>%
-  select(id, title, au_affiliation_raw, institution_display_name, institution_country_code)
-
-
-#diff <- setdiff(ua_ca,ua_in)
-#diff <- setdiff(ua_in, ua_ca)
-
-### NEED CHECK>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-###################################
-
-
-### Step 5: Topics 
-#ua_country_collaboration <- ua_in
 
 all_topics <- ua_country %>%
   pull(topics) %>%
@@ -272,7 +227,7 @@ tryCatch({
     }
   }
   
-  saveWorkbook(wb, "collaborations/ua_in_combined_2022.xlsx", overwrite = TRUE)
+  saveWorkbook(wb, "collaborations/ua_in_combined_2024.xlsx", overwrite = TRUE)
   message("!!! Combination successful!")
   
 }, error = function(e) {
