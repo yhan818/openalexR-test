@@ -34,6 +34,11 @@ options (openalexR.mailto="yhan@arizona.edu")
 getwd()
 setwd("/home/yhan/Documents/openalexR-test/")
 
+
+#######################################################################################
+# SECTION 1: Works published
+######################################################################################
+
 ##### 1. Getting data. (retrieved 2024-09-02)
 # Retrieving all publications association with UArizona's ROR (Research Organization Registry) ID.
 # UA works_published per year is ~9,000. For running 2 years data, need better computer or crashed R studio.
@@ -110,7 +115,6 @@ works_published_2024 <-oa_fetch(
 )
 
 
-
 # Save data
 # saveRDS(works_published_2019, "../works_published_2019.rds")
 # saveRDS(works_published_2020, "../works_published_2020.rds")
@@ -118,7 +122,6 @@ saveRDS(works_published_2021, "../works_published_2021.rds")
 saveRDS(works_published_2022, "../works_published_2022.rds")
 saveRDS(works_published_2023, "../works_published_2023.rds")
 saveRDS(works_published_2024, "../works_published_2024.rds")
-
 
 # Load data 
 works_published_2019 <- readRDS("../works_published_2019.rds")
@@ -177,7 +180,6 @@ compare_id_columns <- function(df1, df2, id_column_name) {
   ))
 }
   
-
 id_column <- "id"  # Set the ID column name
 comparison_result <- compare_id_columns(works_published_2023_old, works_published_2023, id_column)
 
@@ -185,8 +187,7 @@ comparison_result <- compare_id_columns(works_published_2023_old, works_publishe
 unique_to_df1 <- comparison_result$unique_to_df1
 unique_to_df2 <- comparison_result$unique_to_df2
 
-############################################################################################
-
+####################################################
 ##### 2. Checking and verifying data
 ##### 2.1 Route 1: Getting citation data from $referenced_works
 ##### Route 2: Getting author's data? 
@@ -298,9 +299,8 @@ UAauthors <-unique(works_published_authors)
 colnames(works_published)
 colnames(works_published_authors)
 
-#####################################################
 #################### 3.3 TESTING!!!#################
-####################################################
+
 # Then extract UArizona authors only
 # 94,500 obs from 426,000 obs (UA authors only).  
 ## https://openalex.org/A5033317672 Saurav Mallik (is at two affiliations for https://api.openalex.org/works/W4389611927. Harvard and University of Arizona)
@@ -405,7 +405,6 @@ system.time({
                  output="list")
 })
 
-
 fetch_number <- 50
 num_of_works <- length (works_published_ref_combined)
 
@@ -427,8 +426,6 @@ print(paste("fetch time: ", time_taken["elapsed"] / 60, "minutes"))
 tail(works_cited_ls)
 
 works_cited <- rbindlist(works_cited_ls, use.names=TRUE, fill=TRUE) 
-
-
 
 
 #########################
@@ -492,14 +489,18 @@ saveRDS(works_cited, "../works_cited_2023.rds")
 saveRDS(works_cited, "../works_cited_2021.rds")
 saveRDS(works_cited, "../works_cited_type_journal_2023.rds")
 
+#######################################################################################
+# SECTION 2: Works cited
+######################################################################################
+
 
 works_cited <- readRDS("../works_cited_2019.rds")
 works_cited <- readRDS("../works_cited_2020.rds")
-works_cited <- readRDS("../works_cited_2021.rds")
-works_cited <- readRDS("../works_cited_2022.rds")
+works_cited_2021 <- readRDS("../works_cited_2021.rds")
+works_cited_2022 <- readRDS("../works_cited_2022.rds")
                              #works_cited_source_journal_2022.rds")
-                          
-works_cited <- readRDS("../works_cited_2023.rds")
+works_cited_2023 <- readRDS("../works_cited_2023.rds")
+
 
 # One is primary.source.type = journal, the other (works_cited_2) contains everything
 # For year 2022, 325,520 : 345,813. 
@@ -562,9 +563,7 @@ head(matching_rows$id)
 
 ###################### Citation Analysis ####################################
 # 1. Analyse journal usage
-#  - remove any row whose col "issn_l" is empty or NULL 
 # Date fetched: 2024-10 and 2024-12:
-
 
 ###  # of works_cited = # of works_cited_source_issn + # of works_cited_source_nonissn
 
@@ -591,6 +590,11 @@ head(matching_rows$id)
 #########################################################################################
 ### Step 2: Separate works_cited using criteria such as "type", "ISSN" or other criteria
 # Step 2.1: One way is via type = article
+
+works_cited <- works_cited_2023
+works_cited <- works_cited_2022
+
+
 works_cited_type_articles    <- subset(works_cited, type == "article")
 unique(works_cited_type_articles$type)
 unique_issns <- unique(works_cited_type_articles$issn_l)
@@ -603,12 +607,9 @@ number_of_unique_issns2 <- length(unique_issns2)
 
 # Step 2.2: The other way is to filter rows where issn_l is neither NA nor an empty string
 works_cited_source_issn_index <- !is.na(works_cited$issn_l) & works_cited$issn_l != ""
-# Subset "articles"
+
 works_cited_source_issn <- works_cited[works_cited_source_issn_index, ]
-# Subset nonarticles (the rest)
 works_cited_source_nonissn <- works_cited[!works_cited_source_issn_index, ]
-
-
 #############################
 # Filter records where type is "article" (excluding conference paper etc )
 works_cited_source_issn_articles    <- works_cited_source_issn[works_cited_source_issn$type == "article", ]
@@ -616,13 +617,6 @@ works_cited_source_issn_nonarticles <- works_cited_source_issn[works_cited_sourc
 
 works_cited_source_nonissn_articles    <- works_cited_source_nonissn[works_cited_source_nonissn$type == "article", ]
 works_cited_source_nonissn_nonarticles <- works_cited_source_nonissn[works_cited_source_nonissn$type != "article", ]
-
-# Empty or NULL records
-count_null_empty_id <- sum(is.na(works_cited_source_issn$id) | trimws(works_cited_source_issn$id) == "")
-count_null_empty_id
-
-
-
 
 ##########################################
 ############# Search Functions #######################
@@ -640,7 +634,7 @@ search_publisher <- function(publisher_string, df) {
 
 # Example usage:
 publisher_string <- "Brill"
-result_indices <- search_publisher(publisher_string, works_cited_type_article)
+result_indices <- search_publisher(publisher_string, works_cited_type_articles)
 
 # Print the indices
 print(result_indices)
@@ -691,17 +685,55 @@ search_references(search_string, works_published)
 # Usage example:
 #rank_top_cited_journals(publisher_nature, "so", 10)  # Top 10 cited journals
 
-rank_top_cited_journals <- function(data, journal_col, top_n = 10) {
-  top_cited_journals <- data %>%
-    group_by(!!sym(journal_col)) %>%      # Group by the journal names (column provided by the user)
-    summarise(citation_count = n()) %>%   # Count the number of articles per journal
-    arrange(desc(citation_count)) %>%     # Sort by citation count in descending order
-    slice(1:top_n)                        # Select top 'n' journals
+rank_top_cited_journals <- function(data, journal_col, top_n = 30, output_dir = "citations") {
+  if (!is.data.frame(data)) {
+    stop("Input 'data' must be a data.frame or tibble.")
+  }
+  if (!is.character(journal_col) || length(journal_col) != 1) {
+    stop("Input 'journal_col' must be a single string.")
+  }
+  if (!(journal_col %in% names(data))) {
+    stop("journal_col is not found")
+  }
   
-  print(top_cited_journals, n = top_n)
+  top_cited_journals <- data %>%
+    group_by(!!sym(journal_col)) %>%
+    summarise(citation_count = n(), .groups = "drop") %>%
+    arrange(desc(citation_count)) %>%
+    rename("Journal Title" = !!sym(journal_col))
+  
+  # Print all rows if top_n is NULL or larger than number of rows
+  if (is.null(top_n) || top_n >= nrow(top_cited_journals)) {
+    print(as.data.frame(top_cited_journals))  # Convert to data.frame and print all
+  } else {
+    # Print only the requested top_n journals.
+    print(head(as.data.frame(top_cited_journals), top_n))
+    top_cited_journals <- top_cited_journals %>%
+      slice(1:top_n) #keep top_n for writing to file
+  }
+  
+  # --- File Output ---
+  # Get the name of the input data frame
+  df_name <- deparse(substitute(data))
+  
+  # Create the output file path
+  if (!dir.exists(output_dir)) {
+    dir.create(output_dir, recursive = TRUE)
+  }
+  output_file <- file.path(output_dir, paste0(df_name, "_top_cited_journals.xlsx"))
+  
+  # Write to Excel
+  tryCatch({
+    write_xlsx(list("Top Cited Journals" = as.data.frame(top_cited_journals)), output_file)
+    message(paste("Successfully wrote top cited journals to:", output_file))
+  }, error = function(e) {
+    message(paste("Error writing to Excel:", e))
+    print(e)  # Print the full error object
+  })
+  
+  return(top_cited_journals)
 }
 
-rank_top_cited_journals(publisher_nature, "so")
 
 #######################################################################
 ### Step 4: Getting analysis for a specific publisher
@@ -808,8 +840,6 @@ cited_all_types <- list(
 # Write the list to an Excel file with each data frame as a separate sheet
 write_xlsx(cited_all_types, "citations/publisher_aps_cited_works_2022.xlsx")
 
-
-
 # 2025-01: BMJ:
 # 2023: journal (article, review): 1,694 ; Non-journal: 0
 # 2022: journal (article, review): 1,914 ; Non-journal: 0
@@ -822,7 +852,7 @@ truncate_and_write(works_cited_source_issn_bmj)
 
 # 2025-02: Brill (https://openalex.org/publishers/p4310320561)
 # 2023: 100 (article), 54 (nonarticle)
-# 2022: 
+# 2022: 109 (article)
 
 # Criteria: article and nonarticle.
 works_cited_type_articles_brill <- works_cited_type_articles %>%
@@ -835,23 +865,15 @@ works_published_brill <- works_published %>%
   filter(grepl("Brill", host_organization, ignore.case = TRUE))
 
 
+# bind 2022 and 2023 data
+works_cited_type_articles_brill_2023 <- works_cited_type_articles_brill 
+works_cited_type_articles_brill_2022 <- works_cited_type_articles_brill 
+works_cited_type_articles_brill_2022_2023 <- bind_rows(works_cited_type_articles_brill_2023, works_cited_type_articles_brill_2022)
+
 # The other criteria: choose one for output
 works_cited_source_issn_brill  <- works_cited_source_issn[grepl("Brill", works_cited_source_issn$host_organization, ignore.case = TRUE), ]
 works_cited_source_nonissn_brill <- works_cited_source_nonissn[grepl("Brill", works_cited_source_nonissn$host_organization, ignore.case = TRUE), ]
 works_published_brill <- works_published[grepl("Brill", works_published$host_organization, ignore.case = TRUE), ]
-
-
-
-# Assign values for final output
-works_cited_articles_brill <-  works_cited_type_articles
-works_cited_nonarticles_brill <- works_cited_type_nonarticles
-  
-
-# Combine all the above 3 dfs into one Excel
-combine_3dfs(works_cited_source_issn_brill, works_cited_source_nonissn_brill, works_published_brill)
-rank_top_cited_journals(works_cited_source_issn_brill, "so")
-
-
 
 id_counts <-table(works_cited_source_issn_brill$id)
 duplicateds <- id_counts[id_counts >= 1]
@@ -1115,7 +1137,6 @@ search_string <- "https://openalex.org/W2070851128"
 search_references(search_string, works_published)
 
 
-
 # Group by 'host_organization' and count the number of articles for each publisher
 publisher_ranking <- works_cited_source_issn %>%
   group_by(host_organization) %>%
@@ -1184,11 +1205,15 @@ view(publisher_ranking)
 
 
 ### Step 5: Final output to Excel
-
 write_df_to_excel <- function(df, file_path_prefix = "citations/") {
   df_name <- deparse(substitute(df))
   file_name <- paste0(df_name, ".xlsx")
   file_path <- paste0(file_path_prefix, file_name)
+  sheet_name <- df_name
+  
+  # Limit sheet name to 31 characters, replacing invalid characters
+  sheet_name <- gsub("[[:punct:]]", "_", sheet_name) # Replace punctuation
+  sheet_name <- substr(sheet_name, 1, 31)       # Truncate
   
   tryCatch({
     write_xlsx(df, file_path)
@@ -1200,12 +1225,19 @@ write_df_to_excel <- function(df, file_path_prefix = "citations/") {
 }
 
 # 1. Write Individual Excel Files
-write_df_to_excel(works_cited_type_articles_brill)
+
+rank_top_cited_journals(works_cited_type_articles_brill_2023, "so", 200)
+rank_top_cited_journals(works_cited_type_articles_brill_2022, "so", 200)
+rank_top_cited_journals(works_cited_type_articles_brill_2022_2023, "so", 200)
+
+write_df_to_excel(works_cited_type_articles_brill_2022_2023)
 write_df_to_excel(works_cited_type_nonarticles_brill)
 write_df_to_excel(works_published_brill)
 
 # 2. Combine Excel Files
-excel_files <- c("citations/issn_brill.xlsx", "citations/nonissn_brill.xlsx", "citations/published_brill.xlsx")
+#excel_files <- c("citations/issn_brill.xlsx", "citations/nonissn_brill.xlsx", "citations/published_brill.xlsx")
+
+excel_files <- c("citations/works_cited_type_articles_brill_2022_2023.xlsx", "citations/brill_2022_2023_top_cited_journals.xlsx")
 
 tryCatch({
   wb <- createWorkbook()
@@ -1213,6 +1245,7 @@ tryCatch({
   for (i in seq_along(excel_files)) {
     df <- read.xlsx(excel_files[i])
     sheet_name <- gsub("citations/(.*)\\.xlsx", "\\1", excel_files[i]) # Extract sheet name from file name
+    sheet_name <-substr(sheet_name, 1, 31)  # Truncate to 31 chars for worksheet
     addWorksheet(wb, sheetName = sheet_name)
     writeData(wb, sheet = sheet_name, x = df)
   }
