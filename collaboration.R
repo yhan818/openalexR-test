@@ -1,7 +1,7 @@
 #### Collaboration analysis
 
 ######## Author: Yan Han with help of Gemini / Cursor
-######## Updated: March 1, 2025
+######## Updated: March 10, 2025
 ##### Analyze an institution authors' and his/her co-authors nation and institutions 
 # OpenAlex R Documentation: https://github.com/ropensci/openalexR
 
@@ -15,6 +15,8 @@ packageVersion("openalexR")
 library(jsonlite)
 library(dplyr)
 library(tidyverse)
+
+source("my_functions.R")
 
 # free unused obj to manage memory
 gc()
