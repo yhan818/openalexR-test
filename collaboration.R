@@ -16,8 +16,6 @@ library(jsonlite)
 library(dplyr)
 library(tidyverse)
 
-source("my_functions.R")
-
 # free unused obj to manage memory
 gc()
 rm(list=ls())
@@ -27,6 +25,8 @@ options("max.print" = 100000)
 options (openalexR.mailto="yhan@arizona.edu")
 getwd()
 setwd("/home/yhan/Documents/openalexR-test/")
+
+source("my_functions.R")
 
 works_published_2024 <- readRDS("../works_published_2024.rds")
 

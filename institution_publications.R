@@ -24,8 +24,6 @@ library(data.table)
 library(openxlsx)
 library(writexl)
 
-source("my_functions.R")
-
 # free unused obj to manage memory
 gc()
 rm(list=ls())
@@ -37,6 +35,8 @@ options (openalexR.mailto="yhan@arizona.edu")
 getwd()
 setwd("/home/yhan/Documents/openalexR-test/")
 
+
+source("my_functions.R")
 
 #######################################################################################
 # SECTION 1: Works published
@@ -142,6 +142,7 @@ works_published <- works_published_2022
 
 
 works_published_2023_old <- readRDS("../works_published_2023_202410.rds")
+
 works_published_2023 <- readRDS("../works_published_2023.rds")
 # to filter "journal" works only. I feel it shall not be this restrict. (other works like grey literature are good too)
 works_published <- works_published_2023
@@ -799,10 +800,6 @@ id_counts <-table(publisher_plos$id)
 duplicateds <- id_counts[id_counts > 10]
 print(duplicateds)
  
-
-
-
-
 ### Test cases for Microbiology
 # both final published version and pre-print existing: https://openalex.org/works/W4379795917 and https://openalex.org/W4319339791 
 # works_published ids are: "https://openalex.org/W4379795917" "https://openalex.org/W4317888776" "https://openalex.org/W4385752148" "https://openalex.org/W4319339791" "https://openalex.org/W4323537660"
@@ -905,8 +902,6 @@ search_string <- ""
 # 2022
 search_string <- "https://openalex.org/W2465933872" # 3 times
 search_string <- "https://openalex.org/"  #2 times
-
-
 
 
 ########################################################################

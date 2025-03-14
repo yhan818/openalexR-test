@@ -75,35 +75,50 @@ extract_topics_by_level <- function(data, level = 1) {
     stop("'level' must be a positive integer.")
   }
   
-  # --- Data Extraction and Combination ---
-  extracted_data <- data %>%
-    select(title, topics) %>%
-    unnest(cols=c(topics)) %>%
+  # --- 1. Prepare the topics data (unnest, filter, combine) ---
+  topics_prepared <- data %>%
+    select(id, title, topics) %>%  # Select id, title and topics
+    # Rename nested 'id' for safety, handle non-data.frame cases
+    mutate(topics = map(topics, ~{
+      if (is.data.frame(.x) && "id" %in% names(.x)) {
+        rename(.x, topic_id = id)
+      } else {
+        .x
+      }
+    })) %>%
+    unnest(cols = c(topics), keep_empty = TRUE) %>%  # keep_empty = TRUE
     filter(i == level) %>%
-    mutate(combined_output = str_c(name, ": ", display_name)) %>%
-    select(title, combined_output)
+    mutate(combined_name = ifelse(!is.na(name) & !is.na(display_name),
+                                  str_c(name, ": ", display_name),
+                                  NA_character_)) %>% # Handle potential NA in name/display_name
+    select(id, title, combined_name)
   
-  # Handle the case where no rows match the level
-  if (nrow(extracted_data) == 0) {
+  # Handle empty results *before* joining
+  if (nrow(topics_prepared) == 0) {
     warning(paste("No data found for level", level,
-                  ". Returning an empty data frame with appropriate columns."))
-    return(tibble(title = character(), combined_output = character()))
+                  ". Returning original data frame with 'combined_output' column as NA."))
+    return(data %>% mutate(combined_output = NA_character_))
   }
   
-  extracted_data <- extracted_data %>%
-    group_by(title) %>%
-    summarize(combined_output = paste(combined_output, collapse=", "), .groups="drop")
+  # --- 2. Summarize (combine topics for the same title) ---
+  topics_summarized <- topics_prepared %>%
+    group_by(id, title) %>%
+    summarize(topics = paste(unique(combined_name), collapse = ", "), .groups = "drop")
   
-  return(extracted_data)
+  # --- 3. Left Join ---
+  final_data <- data %>%
+    left_join(topics_summarized, by = c("id", "title"))
+  
+  return(final_data)
 }
 # use: 
-# primary_topics <- extract_topics_by_level(works_cited_type_articles_brill_2022, 1)
+works_cited_type_articles_publisher <- works_cited_type_articles_brill
 
-
-# second_topics  <- extract_topics_by_level(works_cited_type_articles_brill_2022, 2)
-# third_topics  <- extract_topics_by_level(works_cited_type_articles_brill_2022, 3)
-# fourth_topics  <- extract_topics_by_level(works_cited_type_articles_brill_2022, 4)
-# fifth_topics  <- extract_topics_by_level(works_cited_type_articles_brill_2022, 5)
+primary_topics <- extract_topics_by_level(works_cited_type_articles_publisher, 1)
+second_topics  <- extract_topics_by_level(works_cited_type_articles_publisher, 2)
+third_topics   <- extract_topics_by_level(works_cited_type_articles_publisher, 3)
+fourth_topics  <- extract_topics_by_level(works_cited_type_articles_publisher, 4)
+fifth_topics   <- extract_topics_by_level(works_cited_type_articles_publisher, 5)
 
 ################### Analyze top journals for each publisher ############
 # Function to rank top cited journals
