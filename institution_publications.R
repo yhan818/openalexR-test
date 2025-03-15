@@ -9,7 +9,6 @@ install.packages("dplyr")
 install.packages("tidyverse")
 install.packages("ggplot2")
 install.packages('data.table')
-
 install.packages("openalexR")
 install.packages("remotes")
 # remotes::install_github("ropensci/openalexR", force=TRUE) 
@@ -25,7 +24,6 @@ library(openxlsx)
 library(writexl)
 
 # free unused obj to manage memory
-gc()
 rm(list=ls())
 gc()
 
@@ -34,7 +32,6 @@ options("max.print" = 100000)
 options (openalexR.mailto="yhan@arizona.edu")
 getwd()
 setwd("/home/yhan/Documents/openalexR-test/")
-
 
 source("my_functions.R")
 
@@ -116,7 +113,6 @@ works_published_2024 <-oa_fetch(
   from_publication_date ="2024-01-01",
   to_publication_date = "2024-12-31",
 )
-
 
 # Save data
 # saveRDS(works_published_2019, "../works_published_2019.rds")
@@ -262,7 +258,7 @@ head(works_published_ref_unique)
 
 # Use sapply to find matching elements in the works_published_ref for testing. 
 matching_indices <- which(sapply(works_published_ref_combined, function(x) 
-  any(x %in% c("https://openalex.org/W1624352668", "https://openalex.org/W1548779692")))) # https://openalex.org/W1624352668 were cited on 2021 and 2023 data
+  any(x %in% c("https://openalex.org/W4210835162", "https://openalex.org/W2944198613")))) # https://openalex.org/W1624352668 were cited on 2021 and 2023 data
 print(matching_indices)
 
 # We can see the original works for samples
@@ -338,6 +334,7 @@ for (i in indices) {
   cat("Element:\n", works_published_ref_combined[[i]], "\n\n")
 }
 
+#### Find it from works_published (UA author works_cited the work (search_string))
 # Find it from the original article
 search_string <- "https://openalex.org/W2594545996"  
 # this article was cited 81 (2019, 130 (2020), 90 (2021), 52 (2022), 16 (2023)
@@ -347,10 +344,14 @@ works_published[indices_with_string, ]$id
 
 # test case 2: cited 6 from microbiology, multiple times for 2019, 2020, 2021, 2022
 # both final published version and pre-print existing: https://openalex.org/works/W4379795917 and https://openalex.org/W4319339791 
-search_string <- "https://openalex.org/W2128159409"
+search_string <- "https://openalex.org/W2153919737"
 indices_with_string <- which(sapply(works_published$referenced_works, function(x) search_string %in% x))
 print(indices_with_string)
 works_published[indices_with_string, ]$id
+
+# https://openalex.org/W4210835162
+
+
 
 
 ##### 3.34  Fetch time 
@@ -502,7 +503,6 @@ works_cited <- readRDS("../works_cited_2019.rds")
 works_cited <- readRDS("../works_cited_2020.rds")
 works_cited_2021 <- readRDS("../works_cited_2021.rds")
 works_cited_2022 <- readRDS("../works_cited_2022.rds")
-                             #works_cited_source_journal_2022.rds")
 works_cited_2023 <- readRDS("../works_cited_2023.rds")
 
 
@@ -611,7 +611,6 @@ number_of_unique_issns2 <- length(unique_issns2)
 
 # Step 2.2: The other way is to filter rows where issn_l is neither NA nor an empty string
 works_cited_source_issn_index <- !is.na(works_cited$issn_l) & works_cited$issn_l != ""
-
 works_cited_source_issn <- works_cited[works_cited_source_issn_index, ]
 works_cited_source_nonissn <- works_cited[!works_cited_source_issn_index, ]
 #############################
@@ -622,10 +621,7 @@ works_cited_source_issn_nonarticles <- works_cited_source_issn[works_cited_sourc
 works_cited_source_nonissn_articles    <- works_cited_source_nonissn[works_cited_source_nonissn$type == "article", ]
 works_cited_source_nonissn_nonarticles <- works_cited_source_nonissn[works_cited_source_nonissn$type != "article", ]
 
-
-
 search_references(search_string, works_published)
-
 
 #######################################################################
 ### Step 4: Getting analysis for a specific publisher
@@ -663,9 +659,6 @@ print(publisher_NA_with_issn)
 # 2020: 1,737 / 4,039 NA 
 unique_issn <- unique(publisher_NA$`issn_l`)
 print(unique_issn)
-
-# Not using unnect() because it flattens out every article per author, which creates a lot of duplicated info
-
 
 # Convert the 'author' dataframe to JSON for each row
 publisher_NA <- publisher_NA %>%
@@ -760,6 +753,7 @@ works_published_brill <- works_published %>%
 # bind 2022 and 2023 data
 works_cited_type_articles_brill_2023 <- works_cited_type_articles_brill 
 works_cited_type_articles_brill_2022 <- works_cited_type_articles_brill 
+rm(works_cited_type_articles_brill_2022_2023)
 works_cited_type_articles_brill_2022_2023 <- bind_rows(works_cited_type_articles_brill_2023, works_cited_type_articles_brill_2022)
 
 # The other criteria: choose one for output
@@ -770,18 +764,6 @@ works_published_brill <- works_published[grepl("Brill", works_published$host_org
 id_counts <-table(works_cited_source_issn_brill$id)
 duplicateds <- id_counts[id_counts >= 1]
 print(id_counts)
-
-
-### origin works: test case: 
-difference_df1_df2 <- setdiff(publisher_emerald$id, publisher_emerald2$id)
-head(difference_df1_df2)
-difference_df2_df1 <- setdiff(publisher_emerald2$id, publisher_emerald$id)
-head(difference_df2_df1)
-
-# Find IDs common to both publisher_emerald and publisher_emerald2. 225 
-common_ids <- intersect(publisher_emerald$id, publisher_emerald2$id)
-head(common_ids)
-
 
 ### Test cases for AAAS
 search_string <- "https://openalex.org/W2083070320"
@@ -897,7 +879,9 @@ search_publisher("BMJ", works_published)
 
 ### Test data for Brill: 2025-02
 ## 2022: search journals articles do UA authors cited.
-search_string <- ""
+search_string <- "https://openalex.org/W2176010001"
+search_references(search_string, works_cited_type_articles_brill_2022_2023)
+
 
 # 2022
 search_string <- "https://openalex.org/W2465933872" # 3 times
@@ -929,9 +913,6 @@ duplicate_multi_cited_rows_unique <- duplicate_multi_cited_rows[!duplicated(dupl
 
 # write_xlsx(duplicate_multi_cited_rows, "citations/duplicate_multi_cited_2023.xlsx")
 # write_xlsx(duplicate_multi_cited_rows_unique, "citations/duplicate_multi_cited_unique_2023.xlsx")
-
-
-
 
 ######################################
 ######################################
@@ -1017,10 +998,8 @@ unique_journals <- unique(publisher1$`so`)
 num_unique_issn<- length(unique_journals)
 print(unique_journals)
 
-
 search_string <- "https://openalex.org/W2070851128"
 search_references(search_string, works_published)
-
 
 # Group by 'host_organization' and count the number of articles for each publisher
 publisher_ranking <- works_cited_source_issn %>%
@@ -1097,14 +1076,22 @@ rank_top_cited_journals(works_cited_type_articles_brill_2023, "so", 200)
 rank_top_cited_journals(works_cited_type_articles_brill_2022, "so", 200)
 rank_top_cited_journals(works_cited_type_articles_brill_2022_2023, "so", 200)
 
-write_df_to_excel(works_cited_type_articles_brill_2022_2023)
+
+#works_cited_type_articles_brill_2022_temp <- extract_topics_by_level(works_cited_type_articles_brill_2022, 1)
+#works_cited_type_articles_brill_2023_temp <- extract_topics_by_level(works_cited_type_articles_brill_2023, 1)
+
+works_cited_type_articles_brill_2022_2023 <- bind_rows(works_cited_type_articles_brill_2023, works_cited_type_articles_brill_2022)
+
+works_cited_type_articles_brill_combined_2022_2023 <- extract_topics_by_level(works_cited_type_articles_brill_2022_2023, 1)
+
+
+write_df_to_excel(works_cited_type_articles_brill_combined_2022_2023)
+
 write_df_to_excel(works_cited_type_nonarticles_brill)
 write_df_to_excel(works_published_brill)
 
 # 2. Combine Excel Files
-#excel_files <- c("citations/issn_brill.xlsx", "citations/nonissn_brill.xlsx", "citations/published_brill.xlsx")
-
-excel_files <- c("citations/works_cited_type_articles_brill_2022_2023.xlsx", "citations/brill_2022_2023_top_cited_journals.xlsx")
+excel_files <- c("citations/works_cited_type_articles_brill_combined_2022_2023.xlsx", "citations/brill_2022_2023_top_cited_journals.xlsx")
 
 tryCatch({
   wb <- createWorkbook()

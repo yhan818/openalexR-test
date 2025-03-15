@@ -32,8 +32,8 @@ search_work_publisher <- function(search_string, df) {
 }
 
 # Example usage:
-search_string <- "https://openalex.org/W2944198613"
-result_indices <- search_work_publisher(search_string, works_published)
+# search_string <- "https://openalex.org/W2944198613"
+# result_indices <- search_work_publisher(search_string, works_published)
 
 ###############################################################
 # Verify any cited work using the function search_references()
@@ -48,19 +48,23 @@ search_references <- function(search_string, df) {
 # Example usage:
 search_string <- "Emerald Publishing"
 search_string <- "Brill"
-result_indices <- search_publisher(search_string, works_published)
+# result_indices <- search_publisher(search_string, works_published)
 
 # Example usage
-search_string <- "https://openalex.org/W1604958295" 
+search_string <- "https://openalex.org/W2176010001"
+
 search_string <- "https://openalex.org/W2944198613"
 search_string <- "https://openalex.org/W2465933872"
-indices_with_string <- which(sapply(works_published$referenced_works, function(x) search_string %in% x))
+# indices_with_string <- which(sapply(works_published$referenced_works, function(x) search_string %in% x))
 
 
 ##### Handling works "topic": OpenAlex's new topic has a hierarchical structure:
 ### domain-field-subfield-topic system (https://docs.google.com/document/d/1bDopkhuGieQ4F8gGNj7sEc8WSE8mvLZS/edit)
 ### Example: https://api.openalex.org/works/W2944198613 (search for primary_topic: )
 ## A work may have multiple domain-field-subfield-topic. Primary topic has a number "1" in "i", the 2nd has "2", and so on.
+# The function adds 4 new cols: topic, subfield, field, and domain. 
+# Default: level = 1, it is primary 
+#         level = 2, it is secondry. Most works have 1 to 3 topic-subfield-field-domains, and do not have 4th topic. 
 
 extract_topics_by_level <- function(data, level = 1) {
   
@@ -75,10 +79,10 @@ extract_topics_by_level <- function(data, level = 1) {
     stop("'level' must be a positive integer.")
   }
   
-  # --- 1. Prepare the topics data (unnest, filter, combine) ---
-  topics_prepared <- data %>%
-    select(id, title, topics) %>%  # Select id, title and topics
-    # Rename nested 'id' for safety, handle non-data.frame cases
+  # --- Data Extraction ---
+  extracted_data <- data %>%
+    select(id, title, topics) %>%
+    # Rename the nested 'id' column *before* unnesting
     mutate(topics = map(topics, ~{
       if (is.data.frame(.x) && "id" %in% names(.x)) {
         rename(.x, topic_id = id)
@@ -86,31 +90,35 @@ extract_topics_by_level <- function(data, level = 1) {
         .x
       }
     })) %>%
-    unnest(cols = c(topics), keep_empty = TRUE) %>%  # keep_empty = TRUE
+    unnest(cols = c(topics)) %>%
     filter(i == level) %>%
-    mutate(combined_name = ifelse(!is.na(name) & !is.na(display_name),
-                                  str_c(name, ": ", display_name),
-                                  NA_character_)) %>% # Handle potential NA in name/display_name
-    select(id, title, combined_name)
+    # Select the relevant info
+    select(id, title, level_name = name, display_name)
   
-  # Handle empty results *before* joining
-  if (nrow(topics_prepared) == 0) {
+  # Handle the case where no rows match the level
+  if (nrow(extracted_data) == 0) {
     warning(paste("No data found for level", level,
-                  ". Returning original data frame with 'combined_output' column as NA."))
-    return(data %>% mutate(combined_output = NA_character_))
+                  ". Returning an empty data frame with appropriate columns."))
+    # Create an empty data frame with the correct structure
+    empty_df <- data %>%
+      select(id, title) %>%  # Keep id and title
+      mutate(topic = NA_character_,
+             subfield = NA_character_,
+             field = NA_character_,
+             domain = NA_character_)
+    return(empty_df)
   }
+  # Pivot wider to create separate columns for each level_name
+  extracted_data <- extracted_data %>%
+    pivot_wider(id_cols = c(id, title), names_from = level_name, values_from = display_name, values_fn = ~paste(unique(.x), collapse = ", "))
   
-  # --- 2. Summarize (combine topics for the same title) ---
-  topics_summarized <- topics_prepared %>%
-    group_by(id, title) %>%
-    summarize(topics = paste(unique(combined_name), collapse = ", "), .groups = "drop")
-  
-  # --- 3. Left Join ---
+  # --- Left Join ---
   final_data <- data %>%
-    left_join(topics_summarized, by = c("id", "title"))
+    left_join(extracted_data, by = c("id", "title"))  # Join back to original data
   
   return(final_data)
 }
+
 # use: 
 works_cited_type_articles_publisher <- works_cited_type_articles_brill
 
@@ -118,7 +126,7 @@ primary_topics <- extract_topics_by_level(works_cited_type_articles_publisher, 1
 second_topics  <- extract_topics_by_level(works_cited_type_articles_publisher, 2)
 third_topics   <- extract_topics_by_level(works_cited_type_articles_publisher, 3)
 fourth_topics  <- extract_topics_by_level(works_cited_type_articles_publisher, 4)
-fifth_topics   <- extract_topics_by_level(works_cited_type_articles_publisher, 5)
+# fifth_topics   <- extract_topics_by_level(works_cited_type_articles_publisher, 5)
 
 ################### Analyze top journals for each publisher ############
 # Function to rank top cited journals
