@@ -120,12 +120,12 @@ extract_topics_by_level <- function(data, level = 1) {
 }
 
 # use: 
-works_cited_type_articles_publisher <- works_cited_type_articles_brill
+# works_cited_type_articles_publisher <- works_cited_type_articles_brill
 
-primary_topics <- extract_topics_by_level(works_cited_type_articles_publisher, 1)
-second_topics  <- extract_topics_by_level(works_cited_type_articles_publisher, 2)
-third_topics   <- extract_topics_by_level(works_cited_type_articles_publisher, 3)
-fourth_topics  <- extract_topics_by_level(works_cited_type_articles_publisher, 4)
+# primary_topics <- extract_topics_by_level(works_cited_type_articles_publisher, 1)
+# second_topics  <- extract_topics_by_level(primary_topics, 2)
+# third_topics   <- extract_topics_by_level(works_cited_type_articles_publisher, 3)
+# fourth_topics  <- extract_topics_by_level(works_cited_type_articles_publisher, 4)
 # fifth_topics   <- extract_topics_by_level(works_cited_type_articles_publisher, 5)
 
 ################### Analyze top journals for each publisher ############
