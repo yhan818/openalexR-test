@@ -183,19 +183,146 @@ rank_top_cited_journals <- function(data, journal_col, top_n = 30, output_dir = 
 }
 
 
-# Write df to excel files
-write_df_to_excel <- function(df, file_path_prefix = "citations/") {
+
+
+
+library(openxlsx)
+library(dplyr)
+
+write_df_to_excel <- function(df, file_path_prefix = "citations/", max_chars = 32000) {
   df_name <- deparse(substitute(df))
   file_name <- paste0(df_name, ".xlsx")
   file_path <- paste0(file_path_prefix, file_name)
-  sheet_name <- df_name
   
-  # Limit sheet name to 31 characters, replacing invalid characters
-  sheet_name <- gsub("[[:punct:]]", "_", sheet_name) # Replace punctuation
-  sheet_name <- substr(sheet_name, 1, 31)       # Truncate
+  # Function to process a single value with depth tracking
+  process_value <- function(x, max_chars, depth = 0, col_name = "") {
+    indent <- paste(rep("  ", depth), collapse = "")
+    
+    if (is.null(x) || length(x) == 0) {
+      return(NA_character_)
+    }
+    
+    tryCatch({
+      if (all(is.na(x))) {
+        return(NA_character_)
+      } else if (col_name == "author") {
+        message("\nDEBUG: Processing author data")
+        # Extract the data frame from the list
+        author_df <- x[[1]]
+        message("DEBUG: Number of authors: ", nrow(author_df))
+        
+        # Process each author
+        row_strings <- character(nrow(author_df))
+        for(i in 1:nrow(author_df)) {
+          # Get specific fields in desired order
+          author_info <- c(
+            author_df$au_id[i],
+            author_df$au_display_name[i],
+            author_df$au_orcid[i],
+            author_df$author_position[i],
+            author_df$is_corresponding[i],
+            author_df$au_affiliation_raw[i],
+            author_df$institution_id[i],
+            author_df$institution_display_name[i],
+            author_df$institution_ror[i],
+            author_df$institution_country_code[i],
+            author_df$institution_type[i],
+            author_df$institution_lineage[i]
+          )
+          row_strings[i] <- paste(author_info, collapse = ": ")
+          message("DEBUG: Author ", i, " values: ", row_strings[i])
+        }
+        
+        full_string <- paste(row_strings, collapse = "; ")
+        message("DEBUG: Authors final string: ", full_string)
+        return(full_string)
+        
+      } else if (col_name == "topics") {
+        message("\nDEBUG: Processing topics data")
+        # Extract the data frame from the list
+        topics_df <- x[[1]]
+        message("DEBUG: Number of topics: ", nrow(topics_df))
+        
+        # Process each topic row
+        row_strings <- character(nrow(topics_df))
+        for(i in 1:nrow(topics_df)) {
+          topic_values <- c(
+            topics_df$i[i],
+            topics_df$score[i],
+            topics_df$name[i],
+            topics_df$id[i],
+            topics_df$display_name[i]
+          )
+          row_strings[i] <- paste(topic_values, collapse = ": ")
+          message("DEBUG: Topic ", i, " values: ", row_strings[i])
+        }
+        
+        full_string <- paste(row_strings, collapse = "; ")
+        message("DEBUG: Topics final string: ", full_string)
+        return(full_string)
+        
+      } else if (is.data.frame(x)) {
+        row_strings <- character(nrow(x))
+        for(i in 1:nrow(x)) {
+          row_values <- as.character(unlist(x[i,]))
+          row_strings[i] <- paste(row_values, collapse = ": ")
+        }
+        full_string <- paste(row_strings, collapse = "; ")
+        return(full_string)
+        
+      } else if (is.list(x) && !is.data.frame(x)) {
+        unlisted <- unlist(x)
+        if (is.null(unlisted) || length(unlisted) == 0) {
+          return(NA_character_)
+        }
+        unlisted <- unlisted[!is.null(unlisted) & !is.na(unlisted)]
+        if (length(unlisted) == 0) {
+          return(NA_character_)
+        }
+        full_string <- paste(unlisted, collapse = ": ")
+        if (nchar(full_string) > max_chars) {
+          return(paste0(substr(full_string, 1, max_chars), " [truncated...]"))
+        }
+        return(full_string)
+      } else {
+        char_val <- as.character(x)
+        if (length(char_val) > 1) {
+          char_val <- paste(char_val, collapse = ": ")
+        }
+        if (nchar(char_val) > max_chars) {
+          return(paste0(substr(char_val, 1, max_chars), " [truncated...]"))
+        }
+        return(char_val)
+      }
+    }, error = function(e) {
+      warning(paste("Error processing value:", e$message))
+      return(NA_character_)
+    })
+  }
+  
+  # Convert data.table to data.frame if necessary
+  if (inherits(df, "data.table")) {
+    df <- as.data.frame(df)
+  }
+  
+  # Create output dataframe
+  df_processed <- data.frame(matrix(nrow = nrow(df), ncol = ncol(df)))
+  colnames(df_processed) <- colnames(df)
+  
+  # Process each row
+  for (i in seq_len(nrow(df))) {
+    message(sprintf("\nProcessing main row %d:", i))
+    current_row <- df[i, , drop = FALSE]  # Keep as dataframe
+    processed_row <- sapply(names(current_row), function(col) {
+      result <- process_value(current_row[[col]], max_chars, depth = 1, col_name = col)
+      message("DEBUG: Final result for column ", col, ": ", result)
+      return(result)
+    })
+    df_processed[i,] <- processed_row
+  }
   
   tryCatch({
-    write_xlsx(df, file_path)
+    write_xlsx(df_processed, file_path)
     message(paste("Successfully wrote", df_name, "to", file_path))
   }, error = function(e) {
     message(paste("Error writing", df_name, "to Excel:", e))

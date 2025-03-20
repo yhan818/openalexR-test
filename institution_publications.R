@@ -735,7 +735,7 @@ works_cited_source_nonissn_bmj <- works_cited_source_nonissn[grepl("BMJ", works_
 truncate_and_write(works_cited_source_issn_bmj)
 
 
-# 2025-02: Brill (https://openalex.org/publishers/p4310320561)
+##### 2025-02: Brill (https://openalex.org/publishers/p4310320561)
 # 2023: 100 (article), 54 (nonarticle)
 # 2022: 109 (article)
 
@@ -752,9 +752,14 @@ works_published_brill <- works_published %>%
 
 # bind 2022 and 2023 data
 works_cited_type_articles_brill_2023 <- works_cited_type_articles_brill 
-works_cited_type_articles_brill_2022 <- works_cited_type_articles_brill 
+#works_cited_type_articles_brill_2022 <- works_cited_type_articles_brill 
 rm(works_cited_type_articles_brill_2022_2023)
 works_cited_type_articles_brill_2022_2023 <- bind_rows(works_cited_type_articles_brill_2023, works_cited_type_articles_brill_2022)
+
+# save or load Brill 
+saveRDS(works_cited_type_articles_brill_2022_2023, "../works_cited_type_articles_brill_2022_2023.rds")
+
+####################
 
 # The other criteria: choose one for output
 works_cited_source_issn_brill  <- works_cited_source_issn[grepl("Brill", works_cited_source_issn$host_organization, ignore.case = TRUE), ]
@@ -1077,12 +1082,16 @@ rank_top_cited_journals(works_cited_type_articles_brill_2022, "so", 200)
 rank_top_cited_journals(works_cited_type_articles_brill_2022_2023, "so", 200)
 
 
-#works_cited_type_articles_brill_2022_temp <- extract_topics_by_level(works_cited_type_articles_brill_2022, 1)
-#works_cited_type_articles_brill_2023_temp <- extract_topics_by_level(works_cited_type_articles_brill_2023, 1)
 
+#### Binding multiple years data
 works_cited_type_articles_brill_2022_2023 <- bind_rows(works_cited_type_articles_brill_2023, works_cited_type_articles_brill_2022)
-
+# Extract primary topic and add topic-subfield-field-domain cols to the DF
 works_cited_type_articles_brill_combined_2022_2023 <- extract_topics_by_level(works_cited_type_articles_brill_2022_2023, 1)
+
+source("my_functions.R")
+
+test_df <- works_cited_type_articles_brill_combined_2022_2023[1]
+write_df_to_excel(test_df)
 
 
 write_df_to_excel(works_cited_type_articles_brill_combined_2022_2023)
