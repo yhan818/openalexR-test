@@ -184,6 +184,7 @@ rank_top_cited_journals <- function(data, journal_col, top_n = 30, output_dir = 
 
 
 
+
 # Reformating Column "author" raw data >>> author regular name
 
 ###### $author data structure. 
@@ -245,36 +246,10 @@ extract_author_names <- function(author_data) {
 }
 
 
-
 library(openxlsx)
 library(dplyr)
 
-
 write_df_to_excel <- function(df, file_path_prefix = "citations/", max_chars = 32000) {
-  df_name <- deparse(substitute(df))
-  file_name <- paste0(df_name, ".xlsx")
-  file_path <- paste0(file_path_prefix, file_name)
-  sheet_name <- df_name
-
-  # Limit sheet name to 31 characters, replacing invalid characters
-  sheet_name <- gsub("[[:punct:]]", "_", sheet_name) # Replace punctuation
-  sheet_name <- substr(sheet_name, 1, 31)       # Truncate
-
-  tryCatch({
-    write_xlsx(df, file_path)
-    message(paste("Successfully wrote", df_name, "to", file_path))
-  }, error = function(e) {
-    message(paste("Error writing", df_name, "to Excel:", e))
-    print(e)
-  })  
-}
-
-
-
-
-
-
-write_df_to_excel_w_raw_author_topic <- function(df, file_path_prefix = "citations/", max_chars = 32000) {
   df_name <- deparse(substitute(df))
   file_name <- paste0(df_name, ".xlsx")
   file_path <- paste0(file_path_prefix, file_name)
