@@ -198,7 +198,7 @@ works_published_ref <- works_published$referenced_works
 # Find "NA" indexes: 18- 25% no references 
 # Questions for openAlex: 
 # 1. Is this normal? any plan to improve? 
-# 2. I checked ~3500 records (1% ), Field “issn_l” has values, but “host_organization” field has no values. 
+# 2. I checked ~3500 records (1% ), Field "issn_l" has values, but "host_organization" field has no values. 
 # 3. 
 # "type" is "source.type" ??? 
 # Year 2019: 1575 / 8848 referenced works value="NA", while $type is "article". 18%
@@ -559,7 +559,7 @@ head(matching_rows$id)
 ### We follow a hierarchical and descriptive approach with the following general naming structure:  
 ##### category_subcategory_sub-subcategory
 ##### Where: 
-######### Category = works_published or works_cited (differentiates between UA’s output and what they reference)
+######### Category = works_published or works_cited (differentiates between UA's output and what they reference)
 #########   Subcategory = source_issn or source_nonissn (indicates the type of source)
 #########     Sub-subcategory: either type or publisher 
 ###########     type = defined above (e.g. articles or other)
@@ -593,11 +593,18 @@ head(matching_rows$id)
 ########################################################################################
 #########################################################################################
 ### Step 2: Separate works_cited using criteria such as "type", "ISSN" or other criteria
+# First getting all the works_cited by year data
+works_cited <- works_cited_2023 %>%
+  mutate(UA_authored_year = 2023) %>%
+  select(UA_authored_year, everything())  # This moves UA_authored_year to first position
+
+works_cited <- works_cited_2022 %>%
+  mutate(UA_authored_year = 2022) %>%
+  select(UA_authored_year, everything())  # This moves UA_authored_year to first position
+
+#########################################################
+##########################################################
 # Step 2.1: One way is via type = article
-
-works_cited <- works_cited_2023
-works_cited <- works_cited_2022
-
 
 works_cited_type_articles    <- subset(works_cited, type == "article")
 unique(works_cited_type_articles$type)
@@ -609,6 +616,8 @@ unique(works_cited_type_nonarticles$type)
 unique_issns2 <- unique(works_cited_type_nonarticles$issn_l)
 number_of_unique_issns2 <- length(unique_issns2)
 
+####################################################################
+#########################################################################
 # Step 2.2: The other way is to filter rows where issn_l is neither NA nor an empty string
 works_cited_source_issn_index <- !is.na(works_cited$issn_l) & works_cited$issn_l != ""
 works_cited_source_issn <- works_cited[works_cited_source_issn_index, ]
@@ -750,9 +759,16 @@ works_published_brill <- works_published %>%
   filter(grepl("Brill", host_organization, ignore.case = TRUE))
 
 
+### Test data
+search_string <- "https://openalex.org/W2944198613"
+
+
+
 # bind 2022 and 2023 data
-works_cited_type_articles_brill_2023 <- works_cited_type_articles_brill 
-#works_cited_type_articles_brill_2022 <- works_cited_type_articles_brill 
+#works_cited_type_articles_brill_2023 <- works_cited_type_articles_brill 
+
+works_cited_type_articles_brill_2022 <- works_cited_type_articles_brill 
+
 rm(works_cited_type_articles_brill_2022_2023)
 works_cited_type_articles_brill_2022_2023 <- bind_rows(works_cited_type_articles_brill_2023, works_cited_type_articles_brill_2022)
 
@@ -1084,7 +1100,7 @@ rank_top_cited_journals(works_cited_type_articles_brill_2022_2023, "so", 200)
 
 
 #### Binding multiple years data
-works_cited_type_articles_brill_2022_2023 <- bind_rows(works_cited_type_articles_brill_2023, works_cited_type_articles_brill_2022)
+#works_cited_type_articles_brill_2022_2023 <- bind_rows(works_cited_type_articles_brill_2023, works_cited_type_articles_brill_2022)
 # Extract primary topic and add topic-subfield-field-domain cols to the DF
 works_cited_type_articles_brill_combined_2022_2023 <- extract_topics_by_level(works_cited_type_articles_brill_2022_2023, 1)
 
@@ -1113,7 +1129,7 @@ tryCatch({
     writeData(wb, sheet = sheet_name, x = df)
   }
   
-  saveWorkbook(wb, "citations/combined_brill.xlsx", overwrite = TRUE)
+  saveWorkbook(wb, "citations/works_cited_type_articles_brill_combined_2022_2023_v4.xlsx", overwrite = TRUE)
   message("!!! Combination successful!")
   
 }, error = function(e) {
