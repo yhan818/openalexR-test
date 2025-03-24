@@ -191,7 +191,7 @@ rank_top_cited_journals <- function(data, journal_col, top_n = 30, output_dir = 
 # 2. the "author" column: it is a "list". Each element of this list is the "author" info. 
 #     each data frame has the au_display_name column. 
 #     some elements are data frames and some are other data types. 
-# 3. If "
+# 
 # Apply the function to the author column
 
 extract_author_names <- function(author_data) {
