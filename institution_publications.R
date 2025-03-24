@@ -762,17 +762,13 @@ works_published_brill <- works_published %>%
 ### Test data
 search_string <- "https://openalex.org/W2944198613"
 
-
-
 # bind 2022 and 2023 data
 #works_cited_type_articles_brill_2023 <- works_cited_type_articles_brill 
-
 works_cited_type_articles_brill_2022 <- works_cited_type_articles_brill 
 
-rm(works_cited_type_articles_brill_2022_2023)
-works_cited_type_articles_brill_2022_2023 <- bind_rows(works_cited_type_articles_brill_2023, works_cited_type_articles_brill_2022)
 
-# save or load Brill 
+works_cited_type_articles_brill_2022_2023 <- bind_rows(works_cited_type_articles_brill_2023, works_cited_type_articles_brill_2022)
+# save or load Brill . Output format can be handled later. see line 
 saveRDS(works_cited_type_articles_brill_2022_2023, "../works_cited_type_articles_brill_2022_2023.rds")
 
 ####################
@@ -1098,15 +1094,42 @@ rank_top_cited_journals(works_cited_type_articles_brill_2022, "so", 200)
 rank_top_cited_journals(works_cited_type_articles_brill_2022_2023, "so", 200)
 
 
+#### Step 5.1 : select apropriated cols to output
 
-#### Binding multiple years data
-#works_cited_type_articles_brill_2022_2023 <- bind_rows(works_cited_type_articles_brill_2023, works_cited_type_articles_brill_2022)
 # Extract primary topic and add topic-subfield-field-domain cols to the DF
 works_cited_type_articles_brill_combined_2022_2023 <- extract_topics_by_level(works_cited_type_articles_brill_2022_2023, 1)
 
+# Remove the "topics" column from the dataframe
+works_cited_type_articles_brill_combined_2022_2023 <- works_cited_type_articles_brill_combined_2022_2023 %>%
+  select(-topics)
+
+
+
 source("my_functions.R")
 
+class (works_cited_type_articles_brill_combined_2022_2023$author)
+
+
 test_df <- works_cited_type_articles_brill_combined_2022_2023[1]
+extract_author_names(test_df)
+
+
+# working right, testing
+test <- apply(works_cited_type_articles_brill_combined_2022_2023, 1, function(row) {
+  extract_author_names(row[["author"]])
+})
+
+print(test)
+
+
+works_cited_type_articles_brill_combined_2022_2023$author <- sapply(works_cited_type_articles_brill_combined_2022_2023$author, extract_author_names)
+
+
+
+
+
+
+
 write_df_to_excel(test_df)
 
 
@@ -1136,5 +1159,8 @@ tryCatch({
   message("Combination failed: ", e)
   print(e)
 })
+
+# Print column names to verify "topics" was removed
+colnames(works_cited_type_articles_brill_combined_2022_2023)
 
 

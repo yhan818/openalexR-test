@@ -184,12 +184,97 @@ rank_top_cited_journals <- function(data, journal_col, top_n = 30, output_dir = 
 
 
 
+# Reformating Column "author" raw data >>> author regular name
+
+###### $author data structure. 
+# 1. works_cited: a data frame (or data.table), and its each row is a cited work.   
+# 2. the "author" column: it is a "list". Each element of this list is the "author" info. 
+#     each data frame has the au_display_name column. 
+#     some elements are data frames and some are other data types. 
+# 3. If "
+# Apply the function to the author column
+
+extract_author_names <- function(author_data) {
+  message("DEBUG: Input author_data class: ", class(author_data))
+  
+  if (is.null(author_data)) {
+    message("DEBUG: author_data is NULL.")
+    return(NA_character_)
+  }
+  
+  if (is.data.frame(author_data)) {
+    message("DEBUG: author_data is a data frame.")
+    author_df <- author_data
+  } else if (is.list(author_data) && length(author_data) > 0 && is.data.frame(author_data[[1]])) {
+    message("DEBUG: author_data is a list of data frame.")
+    author_df <- author_data[[1]]
+  } else {
+    message("DEBUG: author_data is not a dataframe or list of dataframe.")
+    return(NA_character_)
+  }
+  
+  if (!is.data.frame(author_df)) {
+    message("DEBUG: author_df is not a data frame.")
+    return(NA_character_)
+  }
+  
+  if (!("au_display_name" %in% names(author_df))) {
+    message("DEBUG: author_df is missing au_display_name.")
+    return(NA_character_)
+  }
+  
+  message("DEBUG: au_display_name column exists.")
+  message("DEBUG: Number of rows in author_df: ", nrow(author_df))
+  
+  if (nrow(author_df) > 0) {
+    message("DEBUG: au_display_name values: ", paste(author_df$au_display_name, collapse = ", "))
+    valid_names <- author_df$au_display_name[!is.na(author_df$au_display_name)]
+    message("DEBUG: valid_names: ", paste(valid_names, collapse = ", "))
+    if(length(valid_names) > 0){
+      author_names <- paste(valid_names, collapse = "; ")
+    } else {
+      author_names <- NA_character_
+    }
+  } else {
+    message("DEBUG: author_df is empty.")
+    author_names <- NA_character_
+  }
+  
+  message("DEBUG: Final author_names: ", author_names)
+  return(author_names)
+}
+
 
 
 library(openxlsx)
 library(dplyr)
 
+
 write_df_to_excel <- function(df, file_path_prefix = "citations/", max_chars = 32000) {
+  df_name <- deparse(substitute(df))
+  file_name <- paste0(df_name, ".xlsx")
+  file_path <- paste0(file_path_prefix, file_name)
+  sheet_name <- df_name
+
+  # Limit sheet name to 31 characters, replacing invalid characters
+  sheet_name <- gsub("[[:punct:]]", "_", sheet_name) # Replace punctuation
+  sheet_name <- substr(sheet_name, 1, 31)       # Truncate
+
+  tryCatch({
+    write_xlsx(df, file_path)
+    message(paste("Successfully wrote", df_name, "to", file_path))
+  }, error = function(e) {
+    message(paste("Error writing", df_name, "to Excel:", e))
+    print(e)
+  })  
+}
+
+
+
+
+
+
+write_df_to_excel_w_raw_author_topic <- function(df, file_path_prefix = "citations/", max_chars = 32000) {
   df_name <- deparse(substitute(df))
   file_name <- paste0(df_name, ".xlsx")
   file_path <- paste0(file_path_prefix, file_name)
