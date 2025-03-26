@@ -11,11 +11,13 @@ install.packages("ggplot2")
 install.packages('data.table')
 install.packages("openalexR")
 install.packages("remotes")
+install.packages("here")
 # remotes::install_github("ropensci/openalexR", force=TRUE) 
 
 library(openalexR)
 packageVersion("openalexR")
 
+library(here)
 library(jsonlite)
 library(dplyr)
 library(tidyverse)
@@ -31,7 +33,7 @@ options("max.print" = 100000)
 
 options (openalexR.mailto="yhan@arizona.edu")
 getwd()
-setwd("/home/yhan/Documents/openalexR-test/")
+print(here())
 
 source("my_functions.R")
 

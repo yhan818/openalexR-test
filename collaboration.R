@@ -1,6 +1,9 @@
 #### Collaboration analysis
 ######## Author: Yan Han with help of Gemini / Cursor
 ######## Updated: March 10, 2025
+##### Comment style: ##### (5#: like H1, Step) 
+#####                 ### (3#: like H2, sub-step)
+#####
 ##### Analyze an institution authors' and his/her co-authors nation and institutions 
 # OpenAlex R Documentation: https://github.com/ropensci/openalexR
 install.packages("dplyr")
@@ -20,7 +23,6 @@ gc()
 options("max.print" = 100000)
 options (openalexR.mailto="yhan@arizona.edu")
 getwd()
-setwd("/home/yhan/Documents/openalexR-test/")
 
 source("my_functions.R")
 
@@ -30,25 +32,25 @@ works_published <- works_published_2024
 head(works_published)
 
 ##### Steps:
-### Step 1: filter by type = article 
+##### Step 1: filter by type = article 
 works_published_type_articles    <- works_published %>% filter(type == "article")
 works_published_type_nonarticles <- works_published %>% filter(type != "article")
 
-### Step 2: Get the authors of the works and related topic-subfield-field-domain structure
+##### Step 2: Get the authors of the works and related topic-subfield-field-domain structure
 # including primary_topic_display_name, primary_topic_subfield_display_name, primary_topic_field_display_name, and primary_topic_domain_display_name
 #
 # works_published_type_article_authors <- works_published_type_article %>% select(id, doi, title, publication_date, so, host_organization, author, type, referenced_works, topics)
 
-### Step 2: Identify multi-author papers
+##### Step 2: Identify multi-author papers
 works_published_type_articles_authors <- works_published_type_articles %>%
   mutate(
     author_count = map_int(author, nrow), # Get the number of rows in each nested df
     has_multiple_authors = author_count > 1 # Check if there are multiple rows
   )
 
-### Step 3: Split it into two works df: US and nonUS authors
+##### Step 3: Split it into two works df: US and nonUS authors
 # works_published_multi_authors has a new column:
-# - nonus_author: TRUE if at least one author is from a non-US country, FALSE otherwise.
+### Step 3.1: nonus_author: TRUE if at least one author is from a non-US country, FALSE otherwise.
 
 works_published_type_articles_authors_nonus <- works_published_type_articles_authors %>%
   mutate(
@@ -65,14 +67,15 @@ works_published_type_articles_authors_nonus <- works_published_type_articles_aut
   ) %>% 
   filter(nonus_author)
 
-# US authors only. For future use. 
+### Step 3.2: US authors only (collaboration within US institutions). For future use. 
 works_published_type_authors_us 
 
 
-### Step 4: Use NonUS author works to figure out collaboration.
+##### Step 4: Use NonUS author works to figure out collaboration.
 head(works_published_type_articles_authors_nonus)
 
-# Add country codes summary for each work
+### Step 4.1: Add country codes summary for each work
+# It uses unique(), so only unique countries will be outputed. 
 works_published_w_country_codes <- works_published_type_articles_authors_nonus %>%
   mutate(
     country_codes_summary = map(author, function(author_df) {
@@ -89,6 +92,11 @@ works_published_w_country_codes <- works_published_type_articles_authors_nonus %
 # Display the results
 head(works_published_w_country_codes %>% select(title, country_codes_summary))
 
+### Step 4.2: Find out Country_code = NA (openAlex data has no country code). Deal with it later
+
+
+
+
 # Example: Get all country codes from all nested author data frames. Unnested. 
 # all_country_codes <- works_published_multi_authors_nonus %>%
 #  pull(author) %>%
@@ -101,9 +109,11 @@ head(works_published_w_country_codes %>% select(title, country_codes_summary))
 #  })
 #country_code_counts <- table(all_country_codes$country_code)
 
-### Change country code here: "IN", "MX", 
-# Create a variable for the target country code
-target_country_code <- "IN"  # Change this value for different countries
+#### Step 5: Working on a specific country
+
+### Step 5.1: Change country code here: "IN", "MX", 
+# Create a variable for the target country code. change this value for a different county
+target_country_code <- "IN"
 
 works_published_ua_country <- works_published_w_country_codes %>%
   filter(
@@ -113,12 +123,12 @@ works_published_ua_country <- works_published_w_country_codes %>%
   )
 
 
-### Step 6: Find the dept/unit within the University of Arizona. 
+##### Step 6: Find the dept/unit within the University of Arizona. 
 ### From here, we can find out the author relationship between UA authors and other country authors. 
 # extract U of Arizona au_affiliation_raw from each work: So that we know which dept/author with that country dept/author
 
 
-### Step 7: Topics 
+### Step 6: Topics: Primary topic 
 # primary_topics <- extract_topics_by_level(works_cited_type_articles_publisher, 1)
 
 # Check if parameters exist and are valid
@@ -126,7 +136,7 @@ if (!exists("works_published_ua_country")) {
   stop("Required data frame ' not found")
 }
 
-# Use the correct variable name and add error handling
+### Step 6.1: Extract primary_topic_subfield_field_domain out of Topics column. 
 works_published_ua_country_topics <- tryCatch({
   extract_topics_by_level(works_published_ua_country, 1)
 }, error = function(e) {
@@ -136,15 +146,62 @@ works_published_ua_country_topics <- tryCatch({
 
 head(works_published_ua_country_topics)
 
-### Step 6: Unique institutions at that country
+##### Step 7: Unique institutions at that country
+##### We need two pass to read the data. 
+
+### Step 7.1: Find distinct institutions in that country
+target_country_code <- "IN"  # Change this value for different countries
+
+library(dplyr)
+
+find_distinct_country_institutions <- function(articles_df, target_country) {
+  distinct_institutions <- new.env(hash = TRUE) # Use environment as a set
+  
+  for (i in 1:nrow(articles_df)) {
+    article <- articles_df[i, ]
+    authors <- article$authors[[1]] # Adjust access to authors as needed
+    
+    if (nrow(authors) > 0) {
+      for (j in 1:nrow(authors)) {
+        author <- authors[j, ]
+        country <- author$country
+        affiliation <- author$affiliation
+        
+        if (!is.null(country) && country == target_country && !is.null(affiliation)) {
+          distinct_institutions[[affiliation]] <- TRUE
+        }
+      }
+    }
+  }
+  
+  return(ls(distinct_institutions)) # Return the distinct institutions as a list
+}
+
+# Example Usage: Find distinct institutions from India
+country_institutions <- find_distinct_country_institutions(your_dataframe, "India")
+print(india_institutions)
+
+
+
+
+
+#Option 1: Only count once for a work even if the work has many countries
+# We already processed in unique countries codes.
+
+### Step 7.2: Option 2: Count the number of occurrences
 # Extract all institutions from the target country
+
+
+
+
+
+
 
 library(dplyr)
 library(purrr)
 
- target_country_code <- "US"  # Change this value for different countries
 
-# One work can only count one institution once even multiple authors from the same insitution.
+# One work can only count one institution once even multiple authors from the same institution.
 ua_country_institutions <- works_published_ua_country_topics %>%
   mutate(institutions = map(author, ~ {
     if (is.null(.x) || length(.x) == 0) {
