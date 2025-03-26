@@ -152,34 +152,64 @@ head(works_published_ua_country_topics)
 ### Step 7.1: Find distinct institutions in that country
 target_country_code <- "IN"  # Change this value for different countries
 
-library(dplyr)
 
-find_distinct_country_institutions <- function(articles_df, target_country) {
-  distinct_institutions <- new.env(hash = TRUE) # Use environment as a set
+# Function: find distinct_institutions. 
+# Need to handle "NA" value, as openAlex data country code can be "NA". "NA" value interacts with logic condition. 
+find_distinct_institutions <- function(articles_df, target_country_code, debug = FALSE) {
+  distinct_institutions <- new.env(hash = TRUE)
+  
+  if (debug) message("DEBUG: Processing articles_df.")
   
   for (i in 1:nrow(articles_df)) {
     article <- articles_df[i, ]
-    authors <- article$authors[[1]] # Adjust access to authors as needed
+    author_data <- article$author
+    
+    if (debug) message("DEBUG: author_data class for row ", i, ": ", class(author_data))
+    
+    if (is.list(author_data) && length(author_data) > 0 && is.data.frame(author_data[[1]])) {
+      authors <- author_data[[1]]
+      if (debug) message("DEBUG: authors extracted as list of data frame for row ", i, ".")
+    } else if (is.data.frame(author_data)) {
+      authors <- author_data
+      if (debug) message("DEBUG: authors extracted as data frame for row ", i, ".")
+    } else {
+      if (debug) message("DEBUG: Unexpected author data type for row ", i, ".")
+      next
+    }
+    
+    if (debug) message("DEBUG: Number of authors for row ", i, ": ", nrow(authors))
     
     if (nrow(authors) > 0) {
       for (j in 1:nrow(authors)) {
         author <- authors[j, ]
-        country <- author$country
-        affiliation <- author$affiliation
+        country_code <- author$institution_country_code
+        institution_name <- author$institution_display_name
         
-        if (!is.null(country) && country == target_country && !is.null(affiliation)) {
-          distinct_institutions[[affiliation]] <- TRUE
+        if (debug) {
+          message("DEBUG: Country code for row ", i, ", author ", j, ": ", country_code)
+          message("DEBUG: Institution name for row ", i, ", author ", j, ": ", institution_name)
+        }
+        
+        if (!is.null(country_code) && !is.na(country_code) && tolower(country_code) == tolower(target_country_code) && !is.null(institution_name)) {
+          distinct_institutions[[institution_name]] <- TRUE
+          if (debug) message("DEBUG: Institution added for row ", i, ", author ", j, ": ", institution_name)
         }
       }
     }
   }
   
-  return(ls(distinct_institutions)) # Return the distinct institutions as a list
+  return(ls(distinct_institutions))
 }
 
+# Test
+first_row <- works_published_ua_country[1, ]
+result <- find_distinct_institutions(first_row, "US") # Replace "us" with your target
+print(result)
+
 # Example Usage: Find distinct institutions from India
-country_institutions <- find_distinct_country_institutions(your_dataframe, "India")
-print(india_institutions)
+country_institutions <- find_distinct_institutions(works_published_ua_country, "US") # Replace "us" with your target
+country_institutions <- find_distinct_institutions(works_published_ua_country, "IN") # Replace "us" with your target
+print(country_institutions)
 
 
 
