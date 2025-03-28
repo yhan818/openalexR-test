@@ -212,19 +212,116 @@ country_institutions <- find_distinct_institutions(works_published_ua_country, "
 print(country_institutions)
 
 
+### Option 1: Count the Number of Works an Institution Appears In (Distinct Works):
+# This method counts each institution's appearance per work only once, regardless of how many times it appears in that work.
+
+count_institution_appearances_with_works_id <- function(articles_df, target_country_code, debug = FALSE) {
+  institution_data <- data.frame(institution = character(), works = integer(), work_ids = I(list()))
+  
+  if (debug) message("DEBUG: Starting count_institution_appearances_with_works_id.")
+  
+  for (i in 1:nrow(articles_df)) {
+    article <- articles_df[i, ]
+    author_data <- article$author
+    work_id <- article$id
+    
+    if (debug) message(paste("DEBUG: work_id =", work_id, "for row", i))
+    
+    if (is.list(author_data) && length(author_data) > 0 && is.data.frame(author_data[[1]])) {
+      authors <- author_data[[1]]
+    } else if (is.data.frame(author_data)) {
+      authors <- author_data
+    } else {
+      if (debug) message(paste("DEBUG: Unexpected author data for row", i))
+      next
+    }
+    
+    if (nrow(authors) > 0) {
+      for (j in 1:nrow(authors)) {
+        author <- authors[j, ]
+        country_code <- author$institution_country_code
+        institution_name <- author$institution_display_name
+        
+        if (!is.null(country_code) && !is.na(country_code) && tolower(country_code) == tolower(target_country_code) && !is.null(institution_name)) {
+          if (institution_name %in% institution_data$institution) {
+            row_index <- which(institution_data$institution == institution_name)
+            institution_data$works[row_index] <- institution_data$works[row_index] + 1
+            institution_data$work_ids[[row_index]] <- c(institution_data$work_ids[[row_index]], work_id)
+          } else {
+            new_row <- data.frame(institution = institution_name, works = 1, work_ids = I(list(work_id)))
+            institution_data <- rbind(institution_data, new_row)
+          }
+        }
+      }
+    }
+  }
+  
+  if (debug) message("DEBUG: Ending count_institution_appearances_with_works_id.")
+  
+  return(institution_data)
+}
 
 
+### Count distinct work 
+count_institution_works_with_works_id <- function(articles_df, target_country_code, debug = FALSE) {
+  institution_data <- data.frame(institution = character(), works = integer(), work_ids = I(list()))
+  
+  if (debug) message("DEBUG: Starting count_institution_works_with_works_id.")
+  
+  for (i in 1:nrow(articles_df)) {
+    article <- articles_df[i, ]
+    author_data <- article$author
+    work_id <- article$id
+    article_institutions <- new.env(hash = TRUE)
+    
+    if (debug) message(paste("DEBUG: work_id =", work_id, "for row", i))
+    
+    if (is.list(author_data) && length(author_data) > 0 && is.data.frame(author_data[[1]])) {
+      authors <- author_data[[1]]
+    } else if (is.data.frame(author_data)) {
+      authors <- author_data
+    } else {
+      if (debug) message(paste("DEBUG: Unexpected author data for row", i))
+      next
+    }
+    
+    if (nrow(authors) > 0) {
+      for (j in 1:nrow(authors)) {
+        author <- authors[j, ]
+        country_code <- author$institution_country_code
+        institution_name <- author$institution_display_name
+        
+        if (!is.null(country_code) && !is.na(country_code) && tolower(country_code) == tolower(target_country_code) && !is.null(institution_name)) {
+          article_institutions[[institution_name]] <- TRUE
+        }
+      }
+    }
+    
+    for (inst in ls(article_institutions)) {
+      if (inst %in% institution_data$institution) {
+        row_index <- which(institution_data$institution == inst)
+        institution_data$works[row_index] <- institution_data$works[row_index] + 1
+        institution_data$work_ids[[row_index]] <- c(institution_data$work_ids[[row_index]], work_id)
+      } else {
+        new_row <- data.frame(institution = inst, works = 1, work_ids = I(list(work_id)))
+        institution_data <- rbind(institution_data, new_row)
+      }
+    }
+  }
+  
+  if (debug) message("DEBUG: Ending count_institution_works_with_works_id.")
+  
+  return(institution_data)
+}
 
-#Option 1: Only count once for a work even if the work has many countries
-# We already processed in unique countries codes.
-
-### Step 7.2: Option 2: Count the number of occurrences
-# Extract all institutions from the target country
+### Test
 
 
+inst_total_counts_with_works_id <- count_institution_appearances_with_works_id(works_published_ua_country_topics, "US")
+print(inst_total_counts_with_works_id)
 
-
-
+inst_work_counts_with_works_id <- count_institution_works_with_works_id(works_published_ua_country_topics, "US")
+print(inst_work_counts_with_works_id)
 
 
 library(dplyr)
