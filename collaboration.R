@@ -211,9 +211,8 @@ country_institutions <- find_distinct_institutions(works_published_ua_country, "
 country_institutions <- find_distinct_institutions(works_published_ua_country, "IN") # Replace "us" with your target
 print(country_institutions)
 
-
-### Option 1: Count the Number of Works an Institution Appears In (Distinct Works):
-# This method counts each institution's appearance per work only once, regardless of how many times it appears in that work.
+##### Step 8: Count 
+  ### Step 8.1: total appearances: count the Number of Works an Institution Appears regardless one institution can appear 5 times in a work 
 
 count_institution_appearances_with_works_id <- function(articles_df, target_country_code, debug = FALSE) {
   institution_data <- data.frame(institution = character(), works = integer(), work_ids = I(list()))
@@ -262,7 +261,8 @@ count_institution_appearances_with_works_id <- function(articles_df, target_coun
 }
 
 
-### Count distinct work 
+  ### Step 8.2: Distinct works: count only once even if an institution appears 50 times in a work.
+
 count_institution_works_with_works_id <- function(articles_df, target_country_code, debug = FALSE) {
   institution_data <- data.frame(institution = character(), works = integer(), work_ids = I(list()))
   
