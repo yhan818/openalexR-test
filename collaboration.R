@@ -16,6 +16,8 @@ library(jsonlite)
 library(dplyr)
 library(tidyverse)
 
+library(openxlsx)
+library(writexl)
 # free unused obj to manage memory
 rm(list=ls())
 gc()
@@ -206,32 +208,100 @@ first_row <- works_published_ua_country[1, ]
 result <- find_distinct_institutions(first_row, "US") # Replace "us" with your target
 print(result)
 
+
+find_distinct_institutions <- function(articles_df, target_country_code, debug = FALSE) {
+  distinct_institutions <- new.env(hash = TRUE)
+  
+  if (debug)
+    message("DEBUG: Processing articles_df.")
+  
+  for (i in 1:nrow(articles_df)) {
+    article <- articles_df[i,]
+    author_data <- article$author
+    
+    if (debug)
+      message("DEBUG: author_data class for row ", i, ": ", class(author_data))
+    
+    if (is.list(author_data) && length(author_data) > 0 && is.data.frame(author_data[[1]])) {
+      authors <- author_data[[1]]
+      if (debug)
+        message("DEBUG: authors extracted as list of data frame for row ", i, ".")
+    } else if (is.data.frame(author_data)) {
+      authors <- author_data
+      if (debug)
+        message("DEBUG: authors extracted as data frame for row ", i, ".")
+    } else {
+      if (debug)
+        message("DEBUG: Unexpected author data type for row ", i, ".")
+      next
+    }
+    
+    if (debug)
+      message("DEBUG: Number of authors for row ", i, ": ", nrow(authors))
+    
+    if (nrow(authors) > 0) {
+      for (j in 1:nrow(authors)) {
+        author <- authors[j,]
+        country_code <- author$institution_country_code
+        institution_name <- author$institution_display_name
+        
+        if (debug) {
+          message("DEBUG: Country code for row ", i, ", author ", j, ": ", country_code)
+          message("DEBUG: Institution name for row ", i, ", author ", j, ": ", institution_name)
+        }
+        
+        if (!is.null(country_code) && !is.na(country_code) && tolower(country_code) == tolower(target_country_code) && !is.null(institution_name)) {
+          distinct_institutions[[institution_name]] <- TRUE
+          if (debug)
+            message("DEBUG: Institution added for row ", i, ", author ", j, ": ", institution_name)
+        } else {
+          if(debug){
+            message("DEBUG: Institution not added for row ", i, ", author ", j, ". Country code: ", country_code, ", Institution name: ", institution_name)
+          }
+        }
+      }
+    }
+  }
+  
+  return(ls(distinct_institutions))
+}
+
+
+
 # Example Usage: Find distinct institutions from India
 country_institutions <- find_distinct_institutions(works_published_ua_country, "US") # Replace "us" with your target
 country_institutions <- find_distinct_institutions(works_published_ua_country, "IN") # Replace "us" with your target
 print(country_institutions)
 
 ##### Step 8: Count 
-  ### Step 8.1: total appearances: count the Number of Works an Institution Appears regardless one institution can appear 5 times in a work 
+  ### Step 8.1: Distinct works: count only once even if an institution appears 50 times in a work.
 
-count_institution_appearances_with_works_id <- function(articles_df, target_country_code, debug = FALSE) {
-  institution_data <- data.frame(institution = character(), works = integer(), work_ids = I(list()))
+count_institution_works_with_works_id <- function(articles_df, target_country_code, debug = FALSE) {
+  institution_data <- data.frame(institution = character(), works = integer(), work_ids = character())
   
-  if (debug) message("DEBUG: Starting count_institution_appearances_with_works_id.")
+  if (debug)
+    message("DEBUG: Starting count_institution_works_with_works_id.")
   
   for (i in 1:nrow(articles_df)) {
     article <- articles_df[i, ]
     author_data <- article$author
-    work_id <- article$id
+    work_id <- as.character(article$id) # Ensure character type
     
-    if (debug) message(paste("DEBUG: work_id =", work_id, "for row", i))
+    if (debug) {
+      print(paste("DEBUG: article$id (raw) =", article$id))
+      print(paste("DEBUG: article$id (class) =", class(article$id)))
+      print(paste("DEBUG: work_id =", work_id, "for row", i))
+    }
+    
+    article_institutions <- new.env(hash = TRUE)
     
     if (is.list(author_data) && length(author_data) > 0 && is.data.frame(author_data[[1]])) {
       authors <- author_data[[1]]
     } else if (is.data.frame(author_data)) {
       authors <- author_data
     } else {
-      if (debug) message(paste("DEBUG: Unexpected author data for row", i))
+      if (debug)
+        message(paste("DEBUG: Unexpected author data for row", i))
       next
     }
     
@@ -241,55 +311,10 @@ count_institution_appearances_with_works_id <- function(articles_df, target_coun
         country_code <- author$institution_country_code
         institution_name <- author$institution_display_name
         
-        if (!is.null(country_code) && !is.na(country_code) && tolower(country_code) == tolower(target_country_code) && !is.null(institution_name)) {
-          if (institution_name %in% institution_data$institution) {
-            row_index <- which(institution_data$institution == institution_name)
-            institution_data$works[row_index] <- institution_data$works[row_index] + 1
-            institution_data$work_ids[[row_index]] <- c(institution_data$work_ids[[row_index]], work_id)
-          } else {
-            new_row <- data.frame(institution = institution_name, works = 1, work_ids = I(list(work_id)))
-            institution_data <- rbind(institution_data, new_row)
-          }
+        if (debug) {
+          message(paste("DEBUG: Country code for row", i, ", author", j, ":", country_code))
+          message(paste("DEBUG: Institution name for row", i, ", author", j, ":", institution_name))
         }
-      }
-    }
-  }
-  
-  if (debug) message("DEBUG: Ending count_institution_appearances_with_works_id.")
-  
-  return(institution_data)
-}
-
-
-  ### Step 8.2: Distinct works: count only once even if an institution appears 50 times in a work.
-
-count_institution_works_with_works_id <- function(articles_df, target_country_code, debug = FALSE) {
-  institution_data <- data.frame(institution = character(), works = integer(), work_ids = I(list()))
-  
-  if (debug) message("DEBUG: Starting count_institution_works_with_works_id.")
-  
-  for (i in 1:nrow(articles_df)) {
-    article <- articles_df[i, ]
-    author_data <- article$author
-    work_id <- article$id
-    article_institutions <- new.env(hash = TRUE)
-    
-    if (debug) message(paste("DEBUG: work_id =", work_id, "for row", i))
-    
-    if (is.list(author_data) && length(author_data) > 0 && is.data.frame(author_data[[1]])) {
-      authors <- author_data[[1]]
-    } else if (is.data.frame(author_data)) {
-      authors <- author_data
-    } else {
-      if (debug) message(paste("DEBUG: Unexpected author data for row", i))
-      next
-    }
-    
-    if (nrow(authors) > 0) {
-      for (j in 1:nrow(authors)) {
-        author <- authors[j, ]
-        country_code <- author$institution_country_code
-        institution_name <- author$institution_display_name
         
         if (!is.null(country_code) && !is.na(country_code) && tolower(country_code) == tolower(target_country_code) && !is.null(institution_name)) {
           article_institutions[[institution_name]] <- TRUE
@@ -300,31 +325,165 @@ count_institution_works_with_works_id <- function(articles_df, target_country_co
     for (inst in ls(article_institutions)) {
       if (inst %in% institution_data$institution) {
         row_index <- which(institution_data$institution == inst)
+        if (debug)
+          print(paste("DEBUG: Before adding, work_id =", work_id))
         institution_data$works[row_index] <- institution_data$works[row_index] + 1
-        institution_data$work_ids[[row_index]] <- c(institution_data$work_ids[[row_index]], work_id)
+        institution_data$work_ids[row_index] <- paste(institution_data$work_ids[row_index], work_id, sep = "; ")
+        if (debug) {
+          print(paste("DEBUG: After adding, work_ids for", inst, ":", institution_data$work_ids[row_index]))
+          message(paste("DEBUG: Institution count incremented for", inst, ", work_id added"))
+        }
       } else {
-        new_row <- data.frame(institution = inst, works = 1, work_ids = I(list(work_id)))
+        if (debug)
+          print(paste("DEBUG: Before adding, work_id =", work_id))
+        new_row <- data.frame(institution = inst, works = 1, work_ids = work_id)
         institution_data <- rbind(institution_data, new_row)
+        if (debug) {
+          print(paste("DEBUG: After adding, work_ids for", inst, ":", institution_data$work_ids[nrow(institution_data)]))
+          message(paste("DEBUG: Institution added for", inst, ", work_id added"))
+        }
+      }
+    }
+    
+    if (debug) {
+      print("DEBUG: institution_data after processing row:")
+      print(str(institution_data)) # Print structure
+    }
+  }
+  
+  if (debug)
+    message("DEBUG: Ending count_institution_works_with_works_id.")
+  
+  print("DEBUG: Final institution_data structure:")
+  print(str(institution_data))
+  return(institution_data)
+}
+
+
+### Step 8.2: total appearances: count the Number of Works an Institution Appears regardless one institution can appear 5 times in a work 
+count_institution_appearances_with_works_id <- function(articles_df, target_country_code, debug = FALSE) {
+  institution_data <- data.frame(institution = character(), appearances = integer(), work_ids = character())  # Changed "works" to "appearances"
+  
+  if (debug)
+    message("DEBUG: Starting count_institution_appearances_with_works_id.")
+  
+  for (i in 1:nrow(articles_df)) {
+    article <- articles_df[i, ]
+    author_data <- article$author
+    work_id <- as.character(article$id)  # Ensure character type
+    
+    if (debug) {
+      print(paste("DEBUG: article$id (raw) =", article$id))
+      print(paste("DEBUG: article$id (class) =", class(article$id)))
+      print(paste("DEBUG: work_id =", work_id, "for row", i))
+    }
+    
+    if (is.list(author_data) && length(author_data) > 0 && is.data.frame(author_data[[1]])) {
+      authors <- author_data[[1]]
+    } else if (is.data.frame(author_data)) {
+      authors <- author_data
+    } else {
+      if (debug)
+        message(paste("DEBUG: Unexpected author data for row", i))
+      next
+    }
+    
+    if (nrow(authors) > 0) {
+      for (j in 1:nrow(authors)) {
+        author <- authors[j, ]
+        country_code <- author$institution_country_code
+        institution_name <- author$institution_display_name
+        
+        if (debug) {
+          message(paste("DEBUG: Country code for row", i, ", author", j, ":", country_code))
+          message(paste("DEBUG: Institution name for row", i, ", author", j, ":", institution_name))
+        }
+        
+        if (!is.null(country_code) && !is.na(country_code) && tolower(country_code) == tolower(target_country_code) && !is.null(institution_name)) {
+          if (institution_name %in% institution_data$institution) {
+            row_index <- which(institution_data$institution == institution_name)
+            institution_data$appearances[row_index] <- institution_data$appearances[row_index] + 1  # Changed "works" to "appearances"
+            institution_data$work_ids[row_index] <- paste(institution_data$work_ids[row_index], work_id, sep = "; ")
+            if (debug) {
+              print(paste("DEBUG: Institution count incremented for", institution_name, ", work_id added:", work_id))
+              print(paste("DEBUG: work_ids for", institution_name, ":", institution_data$work_ids[row_index]))
+            }
+          } else {
+            if (debug)
+              print(paste("DEBUG: Adding new institution:", institution_name, ", work_id:", work_id))
+            new_row <- data.frame(institution = institution_name, appearances = 1, work_ids = work_id)  # Changed "works" to "appearances"
+            institution_data <- rbind(institution_data, new_row)
+            if (debug)
+              message(paste("DEBUG: Institution added for", institution_name, ", work_id added:", work_id))
+          }
+        }
       }
     }
   }
   
-  if (debug) message("DEBUG: Ending count_institution_works_with_works_id.")
+  if (debug)
+    message("DEBUG: Ending count_institution_appearances_with_works_id.")
   
   return(institution_data)
 }
 
-### Test
 
 
-inst_total_counts_with_works_id <- count_institution_appearances_with_works_id(works_published_ua_country_topics, "US")
+# Test case: Distinct works with work IDs (using "id") for the first row, with debug
+first_row <- works_published_ua_country_topics[1, , drop = FALSE] # Extract the first row as a data frame
+inst_work_counts_with_works_id_debug <- count_institution_works_with_works_id(first_row, "US")
+head(inst_work_counts_with_works_id_debug)
+
+inst_total_counts_with_works_id <- count_institution_appearances_with_works_id(works_published_ua_country_topics, "IN")
+inst_total_counts_with_works_id <- inst_total_counts_with_works_id %>%
+  arrange(desc(appearances))
 print(inst_total_counts_with_works_id)
 
-inst_work_counts_with_works_id <- count_institution_works_with_works_id(works_published_ua_country_topics, "US")
+inst_work_counts_with_works_id <- count_institution_works_with_works_id(works_published_ua_country_topics, "IN")
+inst_work_counts_with_works_id <- inst_work_counts_with_works_id %>%
+  arrange(desc(works))
+print(inst_work_counts_with_works_id)
+
+# Write out to Excel 
+write_df_to_excel(inst_total_counts_with_works_id, "collaborations/")
+write_df_to_excel(inst_work_counts_with_works_id, "collaborations/")
+
+
+inst_total_counts_with_works_id <- count_institution_appearances_with_works_id(works_published_ua_country_topics, "IN")
+print(inst_total_counts_with_works_id)
+
+inst_work_counts_with_works_id <- count_institution_works_with_works_id(works_published_ua_country_topics, "IN")
 print(inst_work_counts_with_works_id)
 
 
-library(dplyr)
+# 2. Combine Excel Files
+excel_files <- c("collaborations/inst_total_counts_with_works_id.xlsx", "collaborations/inst_work_counts_with_works_id.xlsx")
+
+tryCatch({
+  wb <- createWorkbook()
+  
+  for (i in seq_along(excel_files)) {
+    df <- read.xlsx(excel_files[i])
+    sheet_name <- gsub("collaborations/(.*)\\.xlsx", "\\1", excel_files[i]) # Extract sheet name from file name
+    sheet_name <-substr(sheet_name, 1, 31)  # Truncate to 31 chars for worksheet
+    addWorksheet(wb, sheetName = sheet_name)
+    writeData(wb, sheet = sheet_name, x = df)
+  }
+  
+  saveWorkbook(wb, "collaborations/IN_institution_counts_combined_2024_v3.xlsx", overwrite = TRUE)
+  message("!!! Combination successful!")
+  
+}, error = function(e) {
+  message("Combination failed: ", e)
+  print(e)
+})
+
+
+
+
+########################################################333
+########################### REMOVE
+ library(dplyr)
 library(purrr)
 
 
