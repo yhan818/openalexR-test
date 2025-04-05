@@ -50,12 +50,75 @@ search_string <- "Emerald Publishing"
 search_string <- "Brill"
 # result_indices <- search_publisher(search_string, works_published)
 
-# Example usage
-search_string <- "https://openalex.org/W2176010001"
 
-search_string <- "https://openalex.org/W2944198613"
-search_string <- "https://openalex.org/W2465933872"
+
+
+#' Find IDs of Works Citing a Specific Work
+#'
+#' Searches the 'referenced_works' column of a dataframe to find which entries
+#' cite a specific work (represented by a string 'work_b'). It returns the IDs
+#' ('df$id') of those citing entries.
+#'
+#' @param work_b A string representing the exact cited work to search for
+#'               within the reference lists in 'df$referenced_works'.
+#' @param df The dataframe containing work information. Must include columns
+#'           'id' and 'referenced_works'. 'referenced_works' is assumed
+#'           to contain lists or vectors of citation strings.
+#'
+#' @return A vector containing the 'id' values from rows in 'df' where
+#'         'work_b' was found in that row's 'referenced_works' list.
+#'         Returns an empty vector of the appropriate type (e.g., character(0))
+#'         if no citing works are found or if columns are missing.
+#'
+find_org_works <- function(work_cited, works_published) {
+  # Assign input dataframe to local variable df
+  df <- works_published
+  
+  # --- Input Checks ---
+  # Check if df is actually a data frame
+  if (!is.data.frame(df)) { # Added closing parenthesis here
+    stop("Error: 'works_published' must be a data frame.") # Changed message slightly for clarity
+  }
+  
+  # Check for required 'referenced_works' column
+  if (!"referenced_works" %in% names(df)) {
+    warning("Warning: Dataframe 'works_published' missing 'referenced_works' column. Returning empty vector.")
+    # Determine appropriate empty vector type based on 'id' column if it exists
+    if ("id" %in% names(df)) return(df$id[0]) else return(character(0))
+  }
+  
+  # Check for required 'id' column
+  if (!"id" %in% names(df)) {
+    warning("Warning: Dataframe 'works_published' missing 'id' column. Returning empty vector.")
+    return(character(0)) # Cannot return IDs if 'id' column is missing
+  }
+  
+  # Check if work_cited is a single string
+  if (!is.character(work_cited) || length(work_cited) != 1) {
+    # Corrected variable name in the error message below
+    stop("Error: 'work_cited' must be a single string.")
+  }
+  
+  # --- Find Indices ---
+  # Find indices where work_cited exists exactly within the referenced_works list/vector.
+  # This handles cases where an element in referenced_works might be NULL.
+  indices_with_string <- which(sapply(df$referenced_works, function(reference_list) {
+    # Check if reference_list is not NULL before checking for work_cited within it
+    !is.null(reference_list) && work_cited %in% reference_list
+  }))
+  
+  # --- Retrieve and Return IDs ---
+  # If no indices found, this correctly returns an empty vector df$id[integer(0)]
+  citing_ids <- df$id[indices_with_string]
+  
+  return(citing_ids)
+}
+
+# --- Example Usage ---
+work_cited <- "https://openalex.org/W2176010001"
 # indices_with_string <- which(sapply(works_published$referenced_works, function(x) search_string %in% x))
+
+find_org_works(work_cited, works_published_2024)
 
 
 ##### Handling works "topic": OpenAlex's new topic has a hierarchical structure:

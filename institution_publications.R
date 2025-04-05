@@ -145,14 +145,12 @@ works_published_2023 <- readRDS("../works_published_2023.rds")
 # to filter "journal" works only. I feel it shall not be this restrict. (other works like grey literature are good too)
 works_published <- works_published_2023
 
+works_published_202x <- readRDS("../works_published_2024.rds")
+works_published <- works_published_2024
 
 ##########################################################################################
 #### Testing the later fetched dataset and comparing it with the previous fetched data
 names(works_published)
-print(class(works_published$id))
-print(length(works_published$id))
-str(works_published_old)
-any(is.na(works_published$id))
 
 compare_id_columns <- function(df1, df2, id_column_name) {
   # Check if the ID column exists in both data frames
@@ -354,8 +352,6 @@ works_published[indices_with_string, ]$id
 # https://openalex.org/W4210835162
 
 
-
-
 ##### 3.34  Fetch time 
 # the number of works to fetch at a time has little influence the time to run oa_fetch
 # 2024-09: fetch_number = 1,000, reduced the total running time of 10% comparing to fetch_number 100
@@ -491,11 +487,14 @@ works_cited <- works_cited2
 
 #### Step 1: Re-generate a new row if it matches (meaning; cited multiple times.)
 
+
+saveRDS(works_cited, "../works_cited_2020.rds")
+saveRDS(works_cited, "../works_cited_2021.rds")
 saveRDS(works_cited, "../works_cited_2022.rds")
 saveRDS(works_cited, "../works_cited_2023.rds")
-saveRDS(works_cited, "../works_cited_2021.rds")
-saveRDS(works_cited, "../works_cited_type_journal_2023.rds")
 
+# 2024-04-04: 305,670  
+saveRDS(works_cited, "../works_cited_2024.rds")
 #######################################################################################
 # SECTION 2: Works cited
 ######################################################################################
@@ -596,6 +595,11 @@ head(matching_rows$id)
 #########################################################################################
 ### Step 2: Separate works_cited using criteria such as "type", "ISSN" or other criteria
 # First getting all the works_cited by year data
+
+works_cited <- works_cited_2024 %>%
+  mutate(UA_authored_year = 2024) %>%
+  select(UA_authored_year, everything())  # This moves UA_authored_year to first position
+
 works_cited <- works_cited_2023 %>%
   mutate(UA_authored_year = 2023) %>%
   select(UA_authored_year, everything())  # This moves UA_authored_year to first position
@@ -638,12 +642,14 @@ search_references(search_string, works_published)
 ### Step 4: Getting analysis for a specific publisher
 
 # publisher: host_organization
-unique_publishers <- unique(works_cited_source_issn$host_organization)
+unique_publishers <- unique(works_cited_type_articles$host_organization)
 # number of publishers: ~1,600
 num_unique_publishers <- length(unique_publishers)
 # list top 50 publishers
 print(unique_publishers[1:50])
 
+
+####################### Using ISSN 
 # list NULL publishers ~ 1 %
 # 2023: 2,227 (probably need ISSN matching) / 2,922 NA/
 # 2022: 3,312 NA / 323,221
@@ -697,8 +703,6 @@ publisher_nature <- works_cited_source_issn[grepl("Nature Portfolio", works_cite
 publisher_ua  <- works_cited_source_issn[grepl("University of Arizona",       works_cited_source_issn$host_organization, ignore.case = TRUE), ]
 publisher_uap <- works_cited_source_issn[grepl("University of Arizona Press", works_cited_source_issn$host_organization, ignore.case = TRUE), ]
 
-# Emerald: cited (yyyy): 395 (2020), 257 (2021), 322 (2022), 276 (2023), 
-works_cited_source_issn_emerald <- works_cited_source_issn[grepl("Emerald Publishing", works_cited_source_issn$host_organization, ignore.case = TRUE), ]
 
 ### Cell press
 works_cited_source_issn_cell <- works_cited_source_issn[grepl("Cell Press", works_cited_source_issn$host_organization, ignore.case = TRUE), ]
@@ -764,18 +768,43 @@ works_published_brill <- works_published %>%
 ### Test data
 search_string <- "https://openalex.org/W2944198613"
 
+##### 2025-04: Emerald
+# Emerald: type_articles: cited (yyyy): 237 (2024), 395 (2020), 257 (2021), 322 (2022),  325(2023), 
+#works_cited_source_issn_emerald <- works_cited_source_issn[grepl("Emerald Publishing", works_cited_source_issn$host_organization, ignore.case = TRUE), ]
+works_cited_type_articles_emerald <- works_cited_type_articles %>%
+  filter(grepl("Emerald", host_organization, ignore.case = TRUE))
 
+# type_nonarticles: 32 (2024), 43 (2023)
+works_cited_type_nonarticles_Emerald <- works_cited_type_nonarticles %>%
+  filter(grepl("Emerald", host_organization, ignore.case = TRUE))
 
+# published: 2 (2024), 8 (2023)
+works_published_Emerald <- works_published %>%
+  filter(grepl("Emerald", host_organization, ignore.case = TRUE))
+
+### Test data for a work published by Emerald.
+work_cited_str <- "https://openalex.org/W4211158612"
+work_cited_str <- "https://openalex.org/W1603381256"
+
+find_citing_works(work_cited_str, works_published_2024)
+
+  
 # bind 2022 and 2023 data
-#works_cited_type_articles_brill_2023 <- works_cited_type_articles_brill 
 
-works_cited_type_articles_brill_2022 <- works_cited_type_articles_brill 
+works_cited_type_articles_emerald_2023 <- works_cited_type_articles_emerald
+works_cited_type_articles_emerald_2024 <- works_cited_type_articles_emerald
 
-rm(works_cited_type_articles_brill_2022_2023)
-works_cited_type_articles_brill_2022_2023 <- bind_rows(works_cited_type_articles_brill_2023, works_cited_type_articles_brill_2022)
+rm(works_cited_type_articles_emerald_2023_2024)
+works_cited_type_articles_emerald_2023_2024 <- bind_rows(works_cited_type_articles_emerald_2023, works_cited_type_articles_emerald_2024)
 
 # save or load Brill 
-saveRDS(works_cited_type_articles_brill_2022_2023, "../works_cited_type_articles_brill_2022_2023.rds")
+saveRDS(works_cited_type_articles_emerald_2022_2023, "../works_cited_type_articles_emerald_2023_2024.rds")
+
+
+
+
+
+
 
 ####################
 
