@@ -228,7 +228,8 @@ works_na_referenced_works <- works_published %>%
 ### 2.2 Combine all the references and do further data analysis
 # Avg # of references per article: ~50
 # Year 2023 total references: 364,304: total journal article: 308,359:  unique 281,470 / 351,479: more cited: ~77,000 
-# Year 2022 total references: 354,355: 
+# Year 2022 total references: 356,718: 
+
 # Year 2021 total references: 382,965: 
 # Year 2020 total references: 392,992: article 
 # Year 2019 total references: 352,509: articles 329,000  
@@ -497,15 +498,21 @@ saveRDS(works_cited, "../works_cited_2023.rds")
 saveRDS(works_cited, "../works_cited_2024.rds")
 #######################################################################################
 # SECTION 2: Works cited
+# 2022: 342,918
+# 2023:  
+# 2024: 
 ######################################################################################
 
 
-works_cited <- readRDS("../works_cited_2019.rds")
-works_cited <- readRDS("../works_cited_2020.rds")
+works_cited_2019 <- readRDS("../works_cited_2019.rds")
+works_cited_2020 <- readRDS("../works_cited_2020.rds")
 works_cited_2021 <- readRDS("../works_cited_2021.rds")
+
 works_cited_2022 <- readRDS("../works_cited_2022.rds")
+
 works_cited_2023 <- readRDS("../works_cited_2023.rds")
 
+works_cited_2024 <- readRDS("../works_cited_2024.rds")
 
 # One is primary.source.type = journal, the other (works_cited_2) contains everything
 # For year 2022, 325,520 : 345,813. 
@@ -538,7 +545,6 @@ head(matching_rows$id)
 
 # Step4: We have the final works cited, including multiple occurances of a work
 # works_cited <- rbind(works_cited, matching_rows_expanded)
-
 
 ### Questions: 
 # 1. I fetched 354,355 unique works, returned 325,520 
@@ -612,6 +618,10 @@ works_cited <- works_cited_2022 %>%
 ##########################################################
 # Step 2.1: One way is via type = article
 
+# 2024: works_cited_type_articles: 
+# 2023: works_cited_type_articles: 296,477
+# 2022: works_cited_type_articles: 285,399
+
 works_cited_type_articles    <- subset(works_cited, type == "article")
 unique(works_cited_type_articles$type)
 unique_issns <- unique(works_cited_type_articles$issn_l)
@@ -632,14 +642,12 @@ works_cited_source_nonissn <- works_cited[!works_cited_source_issn_index, ]
 # Filter records where type is "article" (excluding conference paper etc )
 works_cited_source_issn_articles    <- works_cited_source_issn[works_cited_source_issn$type == "article", ]
 works_cited_source_issn_nonarticles <- works_cited_source_issn[works_cited_source_issn$type != "article", ]
-
 works_cited_source_nonissn_articles    <- works_cited_source_nonissn[works_cited_source_nonissn$type == "article", ]
 works_cited_source_nonissn_nonarticles <- works_cited_source_nonissn[works_cited_source_nonissn$type != "article", ]
 
-search_references(search_string, works_published)
 
 #######################################################################
-### Step 4: Getting analysis for a specific publisher
+### Step 3: Getting analysis for publisher
 
 # publisher: host_organization
 unique_publishers <- unique(works_cited_type_articles$host_organization)
@@ -750,184 +758,294 @@ works_cited_source_nonissn_bmj <- works_cited_source_nonissn[grepl("BMJ", works_
 truncate_and_write(works_cited_source_issn_bmj)
 
 
+###############################################################################
+#### Step 4: Analyzing publisher
+###############################################################################
+
+############################################################
 ##### 2025-02: Brill (https://openalex.org/publishers/p4310320561)
+# 2024: 100, 
 # 2023: 100 (article), 54 (nonarticle)
 # 2022: 109 (article)
 
 # Criteria: article and nonarticle.
+publisher_str <- "Brill"
 works_cited_type_articles_brill <- works_cited_type_articles %>%
-  filter(grepl("Brill", host_organization, ignore.case = TRUE))
+  filter(grepl(publisher_str, host_organization, ignore.case = TRUE))
 
 works_cited_type_nonarticles_brill <- works_cited_type_nonarticles %>%
-  filter(grepl("Brill", host_organization, ignore.case = TRUE))
+  filter(grepl(publisher_str, host_organization, ignore.case = TRUE))
 
 works_published_brill <- works_published %>%
-  filter(grepl("Brill", host_organization, ignore.case = TRUE))
-
+  filter(grepl(publisher_str, host_organization, ignore.case = TRUE))
 
 ### Test data
 search_string <- "https://openalex.org/W2944198613"
 
+
+works_cited_type_articles_brill_22 <- works_cited_type_articles_brill
+
+works_cited_type_articles_brill_23 <- works_cited_type_articles_brill
+
+works_cited_type_articles_brill_24 <- works_cited_type_articles_brill
+
+works_cited_type_articles_brill_22_23_24 <- bind_rows(works_cited_type_articles_brill_22, 
+                                                      works_cited_type_articles_brill_23, 
+                                                      works_cited_type_articles_brill_24)
+
+saveRDS(works_cited_type_articles_brill_22_23_24, "./citations/works_cited_type_articles_brill_22_23_24.rds")
+
+works_cited_type_articles_brill_yr22_23_24 <- extract_topics_by_level(works_cited_type_articles_brill_22_23_24, 1)
+write_df_to_excel(works_cited_type_articles_brill_yr22_23_24)
+
+
+# Combine Excel Files
+excel_files <- c("citations/works_cited_type_articles_brill_yr22_23_24.xlsx", "citations/brill_22_23_24_top_cited_journals.xlsx", "citations/README.xlsx")
+tryCatch({
+  wb <- createWorkbook()
+  for (i in seq_along(excel_files)) {
+    df <- read.xlsx(excel_files[i])
+    sheet_name <- gsub("citations/(.*)\\.xlsx", "\\1", excel_files[i]) # Extract sheet name from file name
+    sheet_name <-substr(sheet_name, 1, 31)  # Truncate to 31 chars for worksheet
+    addWorksheet(wb, sheetName = sheet_name)
+    writeData(wb, sheet = sheet_name, x = df)
+  }
+  saveWorkbook(wb, "citations/works_cited_type_articles_brill_22_23_24_v1.xlsx", overwrite = TRUE)
+  message("!!! Combination successful!")
+}, error = function(e) {
+  message("Combination failed: ", e)
+  print(e)
+})
+
+
+
+
+###############################################
 ##### 2025-04: Emerald
-# Emerald: type_articles: cited (yyyy): 237 (2024), 395 (2020), 257 (2021), 322 (2022),  325(2023), 
-#works_cited_source_issn_emerald <- works_cited_source_issn[grepl("Emerald Publishing", works_cited_source_issn$host_organization, ignore.case = TRUE), ]
+# Emerald: type_articles: cited (yyyy): 237 (2024), 325(2023), 290 (2022),  
+publisher_str <- "Emerald"
+
 works_cited_type_articles_emerald <- works_cited_type_articles %>%
-  filter(grepl("Emerald", host_organization, ignore.case = TRUE))
+  filter(grepl(publisher_str, host_organization, ignore.case = TRUE))
 
-# type_nonarticles: 32 (2024), 43 (2023)
+# type_nonarticles: 32 (2024), 43 (2023), 40 (2022)
 works_cited_type_nonarticles_Emerald <- works_cited_type_nonarticles %>%
-  filter(grepl("Emerald", host_organization, ignore.case = TRUE))
+  filter(grepl(publisher_str, host_organization, ignore.case = TRUE))
 
-# published: 2 (2024), 8 (2023)
+# published: 2 (2024), 8 (2023), 2 (2022)
 works_published_Emerald <- works_published %>%
-  filter(grepl("Emerald", host_organization, ignore.case = TRUE))
+  filter(grepl(publisher_str, host_organization, ignore.case = TRUE))
 
 ### Test data for a work published by Emerald.
 work_cited_str <- "https://openalex.org/W4211158612"
-work_cited_str <- "https://openalex.org/W1603381256"
+work_cited_str <- "https://openalex.org/W2010044735"
 
-find_citing_works(work_cited_str, works_published_2024)
-
-  
-# bind 2022 and 2023 data
-
-works_cited_type_articles_emerald_2023 <- works_cited_type_articles_emerald
-works_cited_type_articles_emerald_2024 <- works_cited_type_articles_emerald
-
-rm(works_cited_type_articles_emerald_2023_2024)
-works_cited_type_articles_emerald_2023_2024 <- bind_rows(works_cited_type_articles_emerald_2023, works_cited_type_articles_emerald_2024)
-
-# save or load Brill 
-saveRDS(works_cited_type_articles_emerald_2022_2023, "../works_cited_type_articles_emerald_2023_2024.rds")
+find_citing_works(work_cited_str, works_published_2023)
 
 
+works_cited_type_articles_emerald_22 <- works_cited_type_articles_emerald
+works_cited_type_articles_emerald_23 <- works_cited_type_articles_emerald
+works_cited_type_articles_emerald_24 <- works_cited_type_articles_emerald
+
+# save or load  
+saveRDS(works_cited_type_articles_emerald_22_23_24, "./citations/works_cited_type_articles_emerald_22_23_24.rds")
+
+works_cited_type_articles_emerald_yr22_23_24 <- extract_topics_by_level(works_cited_type_articles_emerald_22_23_24, 1)
+write_df_to_excel(works_cited_type_articles_emerald_yr22_23_24)
+
+
+#### 2025-04: Taylor & Francis
+# 2022: 7,134 
+# 2023: 6,937
+# 2024: 6,007
+
+publisher_str <- "Taylor & Francis"
+works_cited_type_articles_tf <- works_cited_type_articles %>%
+  filter(grepl(publisher_str, host_organization, ignore.case = TRUE))
+
+works_cited_type_nonarticles_tf <- works_cited_type_nonarticles %>%
+  filter(grepl(publisher_str, host_organization, ignore.case = TRUE))
+
+works_published_tf <- works_published %>%
+  filter(grepl(publisher_str, host_organization, ignore.case = TRUE))
+
+
+works_cited_type_articles_tf_22 <- works_cited_type_articles_tf
+
+works_cited_type_articles_tf_23 <- works_cited_type_articles_tf
+
+works_cited_type_articles_tf_24 <- works_cited_type_articles_tf
+
+works_cited_type_articles_tf_22_23_24 <- bind_rows(works_cited_type_articles_tf_22, 
+                                                      works_cited_type_articles_tf_23, 
+                                                      works_cited_type_articles_tf_24)
+
+saveRDS(works_cited_type_articles_tf_22_23_24, "./citations/works_cited_type_articles_tf_22_23_24.rds")
+works_cited_type_articles_tf_yr22_23_24 <- extract_topics_by_level(works_cited_type_articles_tf_22_23_24, 1)
+write_df_to_excel(works_cited_type_articles_tf_yr22_23_24)
+
+# Combine Excel Files
+excel_files <- c("citations/works_cited_type_articles_tf_yr22_23_24.xlsx", "citations/tf_22_23_24_top_cited_journals.xlsx", "citations/README.xlsx")
+tryCatch({
+  wb <- createWorkbook()
+  for (i in seq_along(excel_files)) {
+    df <- read.xlsx(excel_files[i])
+    sheet_name <- gsub("citations/(.*)\\.xlsx", "\\1", excel_files[i]) # Extract sheet name from file name
+    sheet_name <-substr(sheet_name, 1, 31)  # Truncate to 31 chars for worksheet
+    addWorksheet(wb, sheetName = sheet_name)
+    writeData(wb, sheet = sheet_name, x = df)
+  }
+  saveWorkbook(wb, "citations/works_cited_type_articles_tf_22_23_24_v1.xlsx", overwrite = TRUE)
+  message("!!! Combination successful!")
+}, error = function(e) {
+  message("Combination failed: ", e)
+  print(e)
+})
+
+#### 2025-04: Springer Nature : need to dive more
+# 2022: 2,686
+# 2023: 3,118
+# 2024: 2,550
+
+publisher_str <- "Springer Nature"
+works_cited_type_articles_sn <- works_cited_type_articles %>%
+  filter(grepl(publisher_str, host_organization, ignore.case = TRUE))
+
+works_cited_type_nonarticles_sn <- works_cited_type_nonarticles %>%
+  filter(grepl(publisher_str, host_organization, ignore.case = TRUE))
+
+works_published_sn <- works_published %>%
+  filter(grepl(publisher_str, host_organization, ignore.case = TRUE))
+
+
+works_cited_type_articles_sn_22 <- works_cited_type_articles_sn
+
+works_cited_type_articles_sn_23 <- works_cited_type_articles_sn
+
+works_cited_type_articles_sn_24 <- works_cited_type_articles_sn
+
+works_cited_type_articles_sn_22_23_24 <- bind_rows(works_cited_type_articles_sn_22, 
+                                                      works_cited_type_articles_sn_23, 
+                                                      works_cited_type_articles_sn_24)
+
+saveRDS(works_cited_type_articles_sn_22_23_24, "./citations/works_cited_type_articles_sn_22_23_24.rds")
+works_cited_type_articles_sn_yr22_23_24 <- extract_topics_by_level(works_cited_type_articles_sn_22_23_24, 1)
+write_df_to_excel(works_cited_type_articles_sn_yr22_23_24)
+
+
+# Combine Excel Files
+excel_files <- c("citations/works_cited_type_articles_sn_yr22_23_24.xlsx", "citations/sn_22_23_24_top_cited_journals.xlsx", "citations/README.xlsx")
+tryCatch({
+  wb <- createWorkbook()
+  for (i in seq_along(excel_files)) {
+    df <- read.xlsx(excel_files[i])
+    sheet_name <- gsub("citations/(.*)\\.xlsx", "\\1", excel_files[i]) # Extract sheet name from file name
+    sheet_name <-substr(sheet_name, 1, 31)  # Truncate to 31 chars for worksheet
+    addWorksheet(wb, sheetName = sheet_name)
+    writeData(wb, sheet = sheet_name, x = df)
+  }
+  saveWorkbook(wb, "citations/works_cited_type_articles_sn_22_23_24_v1.xlsx", overwrite = TRUE)
+  message("!!! Combination successful!")
+}, error = function(e) {
+  message("Combination failed: ", e)
+  print(e)
+})
+
+
+#### 2025-04: Elsevier
+publisher_str <- "Elsevier"
+
+works_cited_type_articles_elsevier <- works_cited_type_articles %>%
+  filter(grepl(publisher_str, host_organization, ignore.case = TRUE))
+
+works_cited_type_nonarticles_elsevier <- works_cited_type_nonarticles %>%
+  filter(grepl(publisher_str, host_organization, ignore.case = TRUE))
+
+works_published_elsevier <- works_published %>%
+  filter(grepl(publisher_str, host_organization, ignore.case = TRUE))
+
+works_cited_type_articles_elsevier_22 <- works_cited_type_articles_elsevier
+
+works_cited_type_articles_elsevier_23 <- works_cited_type_articles_elsevier
+
+works_cited_type_articles_elsevier_24 <- works_cited_type_articles_elsevier
+
+works_cited_type_articles_elsevier_22_23_24 <- bind_rows(works_cited_type_articles_elsevier_22, 
+                                                      works_cited_type_articles_elsevier_23, 
+                                                      works_cited_type_articles_elsevier_24)
+
+saveRDS(works_cited_type_articles_elsevier_22_23_24, "./citations/works_cited_type_articles_elsevier_22_23_24.rds")
+
+
+#### 2025-04: Wiley
+publisher_str <- "Wiley"
+works_cited_type_articles_wiley <- works_cited_type_articles %>%
+  filter(grepl(publisher_str, host_organization, ignore.case = TRUE))
+
+works_cited_type_nonarticles_wiley <- works_cited_type_nonarticles %>%
+  filter(grepl(publisher_str, host_organization, ignore.case = TRUE))
+
+works_published_wiley <- works_published %>%
+  filter(grepl(publisher_str, host_organization, ignore.case = TRUE))
+
+works_cited_type_articles_wiley_22 <- works_cited_type_articles_wiley
+
+works_cited_type_articles_wiley_23 <- works_cited_type_articles_wiley
+
+works_cited_type_articles_wiley_24 <- works_cited_type_articles_wiley
+
+works_cited_type_articles_wiley_22_23_24 <- bind_rows(works_cited_type_articles_wiley_22, 
+                                                      works_cited_type_articles_wiley_23, 
+                                                      works_cited_type_articles_wiley_24)
+
+saveRDS(works_cited_type_articles_wiley_22_23_24, "./citations/works_cited_type_articles_wiley_22_23_24.rds")
 
 
 
 
+#### 2025-04: Sage
+publisher_str <- "Sage"
+works_cited_type_articles_sage <- works_cited_type_articles %>%
+  filter(grepl(publisher_str, host_organization, ignore.case = TRUE))
 
-####################
+works_cited_type_nonarticles_sage <- works_cited_type_nonarticles %>%
+  filter(grepl(publisher_str, host_organization, ignore.case = TRUE))
 
-# The other criteria: choose one for output
-works_cited_source_issn_brill  <- works_cited_source_issn[grepl("Brill", works_cited_source_issn$host_organization, ignore.case = TRUE), ]
-works_cited_source_nonissn_brill <- works_cited_source_nonissn[grepl("Brill", works_cited_source_nonissn$host_organization, ignore.case = TRUE), ]
-works_published_brill <- works_published[grepl("Brill", works_published$host_organization, ignore.case = TRUE), ]
+works_published_sage <- works_published %>%
+  filter(grepl(publisher_str, host_organization, ignore.case = TRUE))
 
-id_counts <-table(works_cited_source_issn_brill$id)
-duplicateds <- id_counts[id_counts >= 1]
-print(id_counts)
+works_cited_type_articles_sage_22 <- works_cited_type_articles_sage
 
-### Test cases for AAAS
-search_string <- "https://openalex.org/W2083070320"
+works_cited_type_articles_sage_23 <- works_cited_type_articles_sage
 
-id_counts <-table(publisher_elsevier$id)
-duplicateds <- id_counts[id_counts > 60]
-print(duplicateds)
+works_cited_type_articles_sage_24 <- works_cited_type_articles_sage
 
-id_counts <-table(publisher_aaas$id)
-duplicateds <- id_counts[id_counts > 10]
-print(duplicateds)
+works_cited_type_articles_sage_22_23_24 <- bind_rows(works_cited_type_articles_sage_22, 
+                                                      works_cited_type_articles_sage_23, 
+                                                      works_cited_type_articles_sage_24)
 
-### Test cases for PLOS
-search_string <- "https://openalex.org/W2125300654"
-id_counts <-table(publisher_plos$id)
-duplicateds <- id_counts[id_counts > 10]
-print(duplicateds)
- 
-### Test cases for Microbiology
-# both final published version and pre-print existing: https://openalex.org/works/W4379795917 and https://openalex.org/W4319339791 
-# works_published ids are: "https://openalex.org/W4379795917" "https://openalex.org/W4317888776" "https://openalex.org/W4385752148" "https://openalex.org/W4319339791" "https://openalex.org/W4323537660"
-# "https://openalex.org/W4323309440"
-search_string <- "https://openalex.org/W2128159409"  # Microbiology articles
-search_string <- "https://openalex.org/W2017185349" # Microbiology
+saveRDS(works_cited_type_articles_sage_22_23_24, "./citations/works_cited_type_articles_sage_22_23_24.rds")
 
-# Publishers test case : cited 6 from microbiology
-# both final published version and pre-print existing: https://openalex.org/works/W4379795917 and https://openalex.org/W4319339791 
-publisher_article_indicies <- which(sapply(publisher_microbiology$id, function(x) search_string %in% x))
-print(publisher_article_indicies)
-publisher_microbiology[publisher_article_indicies, ]$id
+works_cited_type_articles_sage_yr22_23_24 <- extract_topics_by_level(works_cited_type_articles_sage_22_23_24, 1)
+write_df_to_excel(works_cited_type_articles_sage_yr22_23_24)
 
-# Test case: 
-# cited 32 times (2020), 53(2022), 47(2023)
-# The Gaia mission
-search_string <- "https://openalex.org/W147232447"
-search_references(search_string, works_published)
-
-# Test case: 
-# cited: >80 (2019), 123 times (2020), 40 (2022), 16 (2023)
-# https://openalex.org/W2066340221 cited > 80 times in 2019.
-search_string <- "https://openalex.org/W2066340221"
-search_references(search_string, works_published)
-
-# Test case: Emerald (2022)
-search_string <- "https://openalex.org/W1998245073"
-search_string <- "https://openalex.org/W2508822998" # (3 times), 2(2023)
-search_string <- "https://openalex.org/W1607198972"
-search_string <- "https://openalex.org/W2011490204"
-search_references(search_string, works_published)
-
-
-# Test case: IWA. 1 (2022)
-search_string <- "https://openalex.org/W2045185088"
-search_publisher("IWA", works_published) # UA author published in IWA in 2014. not in 2019, 2020, and 2021
-
-search_string <- "https://openalex.org/W2130109162"
-search_string <- "https://openalex.org/W1965549985"
-
-search_references(search_string, works_published)
-
-# https://openalex.org/W2130109162 same record, different publication date? 
-matches <- which(tolower(works_cited_source_issn$id) == tolower(search_string))
-view(works_cited_source_issn[matches, ])
-print(works_cited_source_issn$id[matches])
-
-# Test case: Cell Press(2023)
-# UA authors publish in Cell Press journals
-search_publisher("Cell Press", works_published)
-
-## search these cell press journals articles do UA authors cited.
-search_string <- "https://openalex.org/W2511428910"
-search_string <- "https://openalex.org/W2125987139"
-search_stirng <- "https://openalex.org/W2002490399"
-search_references(search_string, works_published)
-
-# Test case: APS (2021)
-# UA authors publish the journals
-search_publisher("American Phytopathological Society", works_published)
-
-### Test data for APS: 2024-12
-## 2021: search journals articles do UA authors cited.
-search_string <- "https://openalex.org/W2070851128"
-search_string <- "https://openalex.org/W2125987139"
-
-# 2022
-search_string <- "https://openalex.org/W2088715433"  # 2 times
-search_string <- "https://openalex.org/W2057480435"  # 3 times
-
-# 2023 
-search_string <- "https://openalex.org/W2802507504" # 3 times
-search_string <- "https://openalex.org/W4226087454" # 4 times 
-search_references(search_string, works_published)
-# UA authors publish the journals
-search_publisher("American Phytopathological Society", works_published)
-
-### Test data for BMJ: 2025-01
-## 2021: search journals articles do UA authors cited.
-search_string <- ""
-
-# 2022
-search_string <- "https://openalex.org/W1965622788" # 1 time
-search_string <- "https://openalex.org/W1964153922"  #2 times
-
-# 2023 
-search_string <- "https://openalex.org/W1967057044" # 4 times
-search_string <- "https://openalex.org/W2157823046" # 7 times 
-search_string <- "https://openalex.org/W2034673450" # 2 times
-
-search_references(search_string, works_published)
-#
-search_publisher("BMJ", works_published)
-
+# Combine Excel Files
+excel_files <- c("citations/works_cited_type_articles_sage_yr22_23_24.xlsx", "citations/sage_22_23_24_top_cited_journals.xlsx", "citations/README.xlsx")
+tryCatch({
+  wb <- createWorkbook()
+  for (i in seq_along(excel_files)) {
+    df <- read.xlsx(excel_files[i])
+    sheet_name <- gsub("citations/(.*)\\.xlsx", "\\1", excel_files[i]) # Extract sheet name from file name
+    sheet_name <-substr(sheet_name, 1, 31)  # Truncate to 31 chars for worksheet
+    addWorksheet(wb, sheetName = sheet_name)
+    writeData(wb, sheet = sheet_name, x = df)
+  }
+  saveWorkbook(wb, "citations/works_cited_type_articles_sage_22_23_24_v1.xlsx", overwrite = TRUE)
+  message("!!! Combination successful!")
+}, error = function(e) {
+  message("Combination failed: ", e)
+  print(e)
+})
 
 ### Test data for Brill: 2025-02
 ## 2022: search journals articles do UA authors cited.
@@ -1122,32 +1240,30 @@ view(publisher_ranking)
 
 ### Step 5: Final output to Excel
 
-# 1. Write Individual Excel Files
+# 1. top cited journals
 
-rank_top_cited_journals(works_cited_type_articles_brill_2023, "so", 200)
-rank_top_cited_journals(works_cited_type_articles_brill_2022, "so", 200)
-rank_top_cited_journals(works_cited_type_articles_brill_2022_2023, "so", 200)
+rank_top_cited_journals(works_cited_type_articles_brill_22_23_24, "so", 2000)
 
+
+rank_top_cited_journals(works_cited_type_articles_elsevier_22_23_24, "so", 2000)
+rank_top_cited_journals(works_cited_type_articles_wiley_22_23_24, "so", 2000)
+
+rank_top_cited_journals(works_cited_type_articles_sage_22_23_24, "so", 2000)
+rank_top_cited_journals(works_cited_type_articles_sn_22_23_24, "so", 2000)
+rank_top_cited_journals(works_cited_type_articles_tf_22_23_24, "so", 2000)
 
 
 #### Binding multiple years data
 #works_cited_type_articles_brill_2022_2023 <- bind_rows(works_cited_type_articles_brill_2023, works_cited_type_articles_brill_2022)
 # Extract primary topic and add topic-subfield-field-domain cols to the DF
-works_cited_type_articles_brill_combined_2022_2023 <- extract_topics_by_level(works_cited_type_articles_brill_2022_2023, 1)
+#works_cited_type_articles_brill_combined_2022_2023 <- extract_topics_by_level(works_cited_type_articles_brill_2022_2023, 1)
+#works_cited_type_articles_brill_yr22_23_24 <- extract_topics_by_level(works_cited_type_articles_brill_22_23_24, 1)
 
-source("my_functions.R")
-
-test_df <- works_cited_type_articles_brill_combined_2022_2023[1]
-write_df_to_excel(test_df)
-
-
-write_df_to_excel(works_cited_type_articles_brill_combined_2022_2023)
-
-write_df_to_excel(works_cited_type_nonarticles_brill)
-write_df_to_excel(works_published_brill)
+#write_df_to_excel(works_cited_type_nonarticles_brill)
+#write_df_to_excel(works_published_brill)
 
 # 2. Combine Excel Files
-excel_files <- c("citations/works_cited_type_articles_brill_combined_2022_2023.xlsx", "citations/brill_2022_2023_top_cited_journals.xlsx")
+excel_files <- c("citations/works_cited_type_articles_brill_yr22_23_24.xlsx", "citations/brill_22_23_24_top_cited_journals.xlsx", "citations/README.xlsx")
 
 tryCatch({
   wb <- createWorkbook()
@@ -1160,7 +1276,7 @@ tryCatch({
     writeData(wb, sheet = sheet_name, x = df)
   }
   
-  saveWorkbook(wb, "citations/works_cited_type_articles_brill_combined_2022_2023_v4.xlsx", overwrite = TRUE)
+  saveWorkbook(wb, "citations/works_cited_type_articles_brill_22_23__24_v1.xlsx", overwrite = TRUE)
   message("!!! Combination successful!")
   
 }, error = function(e) {
