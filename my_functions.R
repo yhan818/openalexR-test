@@ -117,7 +117,7 @@ find_org_works <- function(work_cited, works_published) {
 work_cited <- "https://openalex.org/W2176010001"
 # indices_with_string <- which(sapply(works_published$referenced_works, function(x) search_string %in% x))
 
-find_org_works(work_cited, works_published_2024)
+# find_org_works(work_cited, works_published_2024)
 
 
 ##### Handling works "topic": OpenAlex's new topic has a hierarchical structure:

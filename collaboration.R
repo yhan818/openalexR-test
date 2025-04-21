@@ -94,8 +94,21 @@ works_published_w_country_codes <- works_published_type_articles_authors_nonus %
 # Display the results
 head(works_published_w_country_codes %>% select(title, country_codes_summary))
 
-### Step 4.2: Find out Country_code = NA (openAlex data has no country code). Deal with it later
+### Step 4.2: Find out Country_code = NA (openAlex data has no country code). 
+library(dplyr)
 
+works_with_missing_country_code <- works_published_w_country_codes %>%
+  mutate(has_missing_country_code = map_lgl(author, function(author_df) {
+    if ("institution_country_code" %in% names(author_df)) {
+      any(is.na(author_df$institution_country_code))
+    } else {
+      TRUE # Or FALSE, depending on how you want to treat missing column
+    }
+  })) %>%
+  filter(has_missing_country_code)
+
+print("Works with at least one author having missing country code:")
+print(works_with_missing_country_code)
 
 
 
