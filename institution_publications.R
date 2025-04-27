@@ -23,6 +23,7 @@ library(dplyr)
 library(tidyverse)
 library(data.table)
 library(openxlsx)
+library(readxl)
 library(writexl)
 
 # free unused obj to manage memory
@@ -73,7 +74,7 @@ UAworks_count <-oa_fetch(
 ### 1.2 Getting all the works based on the institution ROR and publication date. It takes longer time. 
 # see above for the running time
 # 2019 
-works_published_2019 <-oa_fetch(
+works_published_2020 <-oa_fetch(
   entity="works",
   institutions.ror=c("03m2x1q45"),
   from_publication_date ="2020-01-01",
@@ -85,7 +86,7 @@ works_published_2021 <-oa_fetch(
   institutions.ror=c("03m2x1q45"),
   from_publication_date ="2021-01-01",
   to_publication_date = "2021-12-31",
-  # primary_location.source.type = "journal"
+ 
 )
 
 works_published_2022 <-oa_fetch(
@@ -132,7 +133,7 @@ works_published_2020 <- readRDS("../works_published_2020.rds")
 works_published <- works_published_2020
 
 works_published_2021 <- readRDS("../works_published_2021.rds")
-works_published_2021_journal <- readRDS("../works_published_journal_2021.rds")
+#works_published_2021_journal <- readRDS("../works_published_journal_2021.rds")
 works_published <- works_published_2021
 
 works_published_2022 <- readRDS("../works_published_2022.rds")
@@ -601,6 +602,10 @@ head(matching_rows$id)
 #########################################################################################
 ### Step 2: Separate works_cited using criteria such as "type", "ISSN" or other criteria
 # First getting all the works_cited by year data
+works_cited <- works_cited_2021 %>%
+  mutate(UA_authored_year = 2021) %>%
+  select(UA_authored_year, everything())  # This moves UA_authored_year to first position
+
 works_cited <- works_cited_2022 %>%
   mutate(UA_authored_year = 2022) %>%
   select(UA_authored_year, everything())  # This moves UA_authored_year to first position
@@ -620,6 +625,7 @@ works_cited <- works_cited_2024 %>%
 # 2024: works_cited_type_articles: 
 # 2023: works_cited_type_articles: 296,477
 # 2022: works_cited_type_articles: 285,399
+# 2021: works_cited_type_articles: 315,054
 
 works_cited_type_articles    <- subset(works_cited, type == "article")
 unique(works_cited_type_articles$type)
@@ -874,7 +880,7 @@ tryCatch({
   print(e)
 })
 
-#### 2025-04: Springer Nature : need to dive more
+#### 2025-04: Springer Nature :
 # 2022: 2,686
 # 2023: 3,118
 # 2024: 2,550
@@ -882,6 +888,12 @@ tryCatch({
 publisher_str <- "Springer Nature"
 works_cited_type_articles_sn <- works_cited_type_articles %>%
   filter(grepl(publisher_str, host_organization, ignore.case = TRUE))
+
+### 
+works_cited_type_articles_sn_nature <- works_cited_type_articles_sn %>%
+  filter(grepl(p, so, ignore.case = TRUE))
+
+
 
 works_cited_type_nonarticles_sn <- works_cited_type_nonarticles %>%
   filter(grepl(publisher_str, host_organization, ignore.case = TRUE))
@@ -904,7 +916,6 @@ saveRDS(works_cited_type_articles_sn_22_23_24, "./citations/works_cited_type_art
 works_cited_type_articles_sn_yr22_23_24 <- extract_topics_by_level(works_cited_type_articles_sn_22_23_24, 1)
 write_df_to_excel(works_cited_type_articles_sn_yr22_23_24)
 
-
 # Combine Excel Files
 excel_files <- c("citations/works_cited_type_articles_sn_yr22_23_24.xlsx", "citations/sn_22_23_24_top_cited_journals.xlsx", "citations/README.xlsx")
 tryCatch({
@@ -922,6 +933,85 @@ tryCatch({
   message("Combination failed: ", e)
   print(e)
 })
+
+
+## 2025-04: Testing "Nature Portfolio"
+### Since Nature journals have the same publisher as "Springer Nature", so Using ISSNs to match is the best way to go
+
+xlsx_file_path <- "2025-nature-journals-issns.xlsx"
+df <- works_cited_type_articles_sn
+df_issn_col_name <- "issn_l"
+
+issn_p_col_name <- "ISSN print"
+issn_e_col_name <- "ISSN electronic"
+
+if (!file.exists(xlsx_file_path)) {
+  stop(paste("Error: File not found at path:", xlsx_file_path))
+}
+tryCatch({
+  nature_issns_df <- read_excel(xlsx_file_path)
+}, error = function(e) {
+  stop(paste("Error reading Excel file:", e$message))
+})
+
+if (!issn_p_col_name %in% names(nature_issns_df)) {
+  stop(paste("Error: Column '", issn_p_col_name, "' not found in the Excel file."))
+}
+if (!issn_e_col_name %in% names(nature_issns_df)) {
+  stop(paste("Error: Column '", issn_e_col_name, "' not found in the Excel file."))
+}
+
+# Extract ISSNs from both columns, combine, remove NAs, and get unique values
+nature_issns_list <- unique(c(
+  na.omit(nature_issns_df[[issn_p_col_name]]),
+  na.omit(nature_issns_df[[issn_e_col_name]])
+))
+
+# Optional: You might need to clean the ISSNs if the format differs
+# (e.g., remove hyphens) between the files.
+# Example:
+# nature_issns_list <- gsub("-", "", nature_issns_list)
+# df[[df_issn_col_name]] <- gsub("-", "", df[[df_issn_col_name]])
+
+cat(sprintf("Extracted %d unique ISSNs from the Nature journals file.\n", length(nature_issns_list)))
+
+if (!exists("df")) {
+  stop("Error: DataFrame 'df' not found. Please load or define it before this step.")
+}
+if (!df_issn_col_name %in% names(df)) {
+  stop(paste("Error: Column '", df_issn_col_name, "' not found in DataFrame 'df'."))
+}
+
+df_filtered <- df %>%
+  filter(!is.na(.data[[df_issn_col_name]])) %>%
+  filter(.data[[df_issn_col_name]] %in% nature_issns_list)
+
+# --- Step : Assign the filtered data to the new DataFrame ---
+works_cited_type_articles_nature <- df_filtered
+
+cat(sprintf("\nCreated 'works_cited_type_articles_nature' DataFrame with %d rows.\n", nrow(works_cited_type_articles_nature)))
+
+if (nrow(works_cited_type_articles_nature) > 0) {
+  cat("First few rows of the new DataFrame:\n")
+  print(head(works_cited_type_articles_nature))
+} else {
+  cat("No matching rows found.\n")
+}
+
+works_cited_type_articles_nature_22 <- works_cited_type_articles_nature
+
+works_cited_type_articles_nature_23 <- works_cited_type_articles_nature
+
+works_cited_type_articles_nature_24 <- works_cited_type_articles_nature
+
+works_cited_type_articles_nature_22_23_24 <- bind_rows(works_cited_type_articles_nature_22, 
+                                                   works_cited_type_articles_nature_23, 
+                                                   works_cited_type_articles_nature_24)
+
+saveRDS(works_cited_type_articles_nature_22_23_24, "./citations/works_cited_type_articles_nature_22_23_24.rds")
+works_cited_type_articles_nature_yr22_23_24 <- extract_topics_by_level(works_cited_type_articles_nature_22_23_24, 1)
+write_df_to_excel(works_cited_type_articles_nature_yr22_23_24)
+
 
 
 #### 2025-04: Elsevier
